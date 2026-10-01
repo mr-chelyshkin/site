@@ -12,6 +12,7 @@
   --color-border-main: #{settings.$color-border-main};
   --color-rule-main: #{settings.$color-rule-main};
   --color-rule-tint: #{settings.$color-rule-tint};
+  --color-scrim: #{settings.$color-scrim};
 
   /* Accents and signal fringes */
   --color-accent: #{settings.$color-accent};
@@ -22,6 +23,7 @@
 
   /* Type */
   --font-main: #{settings.$font-main};
+  --font-display: #{settings.$font-display};
   --font-mono: #{settings.$font-mono};
   --text-size-md: #{settings.$text-size-md};
   --text-size-sm: #{settings.$text-size-sm};

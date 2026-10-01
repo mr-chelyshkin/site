@@ -3,27 +3,34 @@ import { useId } from 'vue'
 import ExternalLinkList from '@/components/ui/ExternalLinkList.vue'
 import SectionHeading from '@/components/ui/SectionHeading.vue'
 import SectionRail from '@/components/ui/SectionRail.vue'
+import { useReveal } from '@/composables/useReveal'
 import { padIndex } from '@/utils/format'
 import type { ContentPage } from '@/contents'
 
 defineProps<{ content: ContentPage['openSource'] }>()
 
 const titleId = `open-source-${useId()}`
+const { target, isRevealed, isTuning } = useReveal()
 </script>
 
 <template>
-  <section class="content-open-source o-poster" :aria-labelledby="titleId">
+  <section
+    ref="target"
+    class="content-open-source o-poster c-reveal"
+    :class="{ 'c-reveal--shown': isRevealed, 'c-reveal--tuning': isTuning }"
+    :aria-labelledby="titleId"
+  >
     <div class="o-poster__sheet">
-      <div class="o-poster__split">
+      <div class="o-poster__split c-reveal__item">
         <SectionHeading :id="titleId" :lines="content.headline" />
         <p class="o-poster__aside">{{ content.description }}</p>
       </div>
 
-      <ul class="content-open-source__grid">
+      <ul class="content-open-source__grid c-reveal__group">
         <li
           v-for="(project, index) in content.projects"
           :key="project.name"
-          class="content-open-source__plate"
+          class="content-open-source__plate c-reveal__item"
         >
           <p class="content-open-source__plate-index" aria-hidden="true">{{ padIndex(index) }}</p>
           <h3 class="content-open-source__plate-name">{{ project.name }}</h3>

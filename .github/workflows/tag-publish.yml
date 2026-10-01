@@ -10,14 +10,47 @@ concurrency:
   queue: max
 
 permissions:
-  contents: write
-  id-token: write
+  contents: read
 
 jobs:
-  release:
-    name: release
-    uses: mr-chelyshkin/actions/.github/workflows/tag-aws-s3-site-release.yml@v1
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Verify tag commit belongs to the default branch
+        uses: mr-chelyshkin/actions/check-tag-branch@v1
+        with:
+          branch: main
+
+  build:
+    needs: verify
+    runs-on: ubuntu-24.04
+    outputs:
+      artifact-name: static-site-${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build static site
+        uses: mr-chelyshkin/actions/invoke-taskfile@v1
+        with: { command: ci/build }
+      - name: Upload static artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: static-site-${{ github.sha }}
+          path: app/dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: build
+    uses: mr-chelyshkin/actions/.github/workflows/tag-aws-s3-static-release.yml@v1
+    permissions:
+      contents: read
+      id-token: write
     with:
+      artifact-name: ${{ needs.build.outputs.artifact-name }}
       terraform-workdir: tf
       aws-region: ${{ vars.AWS_REGION }}
       terraform-state-bucket: ${{ vars.TF_STATE_BUCKET }}
@@ -27,3 +60,18 @@ jobs:
       domain-name: ${{ vars.SITE_DOMAIN_NAME }}
       site-bucket-name: ${{ vars.SITE_BUCKET_NAME }}
       acm-certificate-arn: ${{ vars.SITE_ACM_CERTIFICATE_ARN }}
+
+  release:
+    needs: publish
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v3
+        with:
+          draft: false
+          prerelease: false
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          generate_release_notes: true

@@ -4,211 +4,271 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>404 - Page Not Found | Igor Chelyshkin</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600;700&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href="/fonts/inter-display-semibold-4.1.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
 
     <style>
+      @font-face {
+        font-family: 'Inter Display';
+        src: url('/fonts/inter-display-semibold-4.1.woff2') format('woff2');
+        font-style: normal;
+        font-weight: 600;
+        font-display: swap;
+      }
+
+      /* CloudFront serves this document directly, including at nested URLs.
+         Keep it self-contained; mirror the site's paper, type and poster spacing. */
       :root {
         --color-background-main: #f7f7f2;
-        --color-background-contrast: #171717;
         --color-text-main: #171717;
-        --color-text-contrast: #f7f7f2;
-        --color-text-secondary: #595954;
-        --color-accent: #bbc3c4;
-        --font-mono: 'Roboto Mono', 'SFMono-Regular', Consolas, monospace;
-        --motion-fast: 160ms;
+        --color-text-muted: #5f5f5c;
+        --color-rule-main: rgb(23 23 23 / 16%);
+        --signal-cool: #58b9c0;
+        --signal-warm: #d58c64;
+        --poster-gutter: clamp(1.25rem, 5vw, 5rem);
+        --poster-block: clamp(3.5rem, 7vw, 7rem);
+        --poster-gap: clamp(2.5rem, 5vw, 5rem);
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        color: var(--color-text-main);
+        background: var(--color-background-main);
+      }
+
+      * {
+        box-sizing: border-box;
       }
 
       body {
         margin: 0;
-        font-family: var(--font-mono);
-        background: var(--color-background-main);
-        color: var(--color-text-main);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        text-align: center;
+        min-height: 100svh;
       }
 
-      .container {
-        max-width: 600px;
-        padding: 2rem;
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      a:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: 4px;
+      }
+
+      .site-header {
+        border-bottom: 1px solid var(--color-text-main);
+      }
+
+      .site-header__inner {
+        display: flex;
+        align-items: center;
+        min-height: 72px;
+        max-width: 1600px;
+        margin-inline: auto;
+        padding-inline: var(--poster-gutter);
+      }
+
+      .site-header__identity {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.625rem;
+        min-height: 44px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: -0.025em;
+      }
+
+      .site-header__identity img {
+        flex: none;
+      }
+
+      .not-found {
+        max-width: 1600px;
+        margin-inline: auto;
+        padding: var(--poster-block) var(--poster-gutter);
       }
 
       .not-found-code {
-        font-size: 8rem;
-        font-weight: 700;
-        color: var(--color-text-main);
-        font-family: var(--font-mono);
-        margin: 0 0 1rem;
+        --signal-offset: -0.025em;
+        position: relative;
+        width: fit-content;
+        margin: 0 0 var(--poster-gap);
+        font-size: clamp(7rem, 22vw, 20rem);
+        font-weight: 600;
+        line-height: 0.8;
+        letter-spacing: -0.05em;
       }
 
-      .not-found-error {
-        font-size: 2rem;
+      .not-found-code,
+      .not-found-title {
+        font-family: 'Inter Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      }
+
+      .not-found-code__slice {
+        position: absolute;
+        inset: 0;
+        background: var(--color-background-main);
+        clip-path: inset(31% 0 57% 4%);
+        transform: translateX(var(--signal-offset));
+        text-shadow:
+          -0.012em 0 var(--signal-cool),
+          0.012em 0 var(--signal-warm);
+        pointer-events: none;
+        user-select: none;
+      }
+
+      .not-found-code__slice--echo {
+        --signal-drift: -1;
+        clip-path: inset(74% 58% 16% 0);
+        transform: translateX(calc(var(--signal-offset) * -1));
+      }
+
+      .not-found-title {
+        margin: 0;
+        font-size: clamp(2.5rem, 5.6vw, 5.5rem);
         font-weight: 600;
-        color: var(--color-text-main);
-        margin-bottom: 2rem;
-        animation: glitch 0.6s infinite;
+        line-height: 0.9;
+        letter-spacing: -0.04em;
+        text-transform: uppercase;
+        text-wrap: balance;
       }
 
       .not-found-message {
-        color: var(--color-text-secondary);
-        font-size: 1.1rem;
-        line-height: 1.6;
-        margin-bottom: 3rem;
+        max-width: 46ch;
+        margin: 1.5rem 0 0;
+        color: var(--color-text-muted);
+        font-size: clamp(1rem, 1.35vw, 1.25rem);
+        line-height: 1.5;
+        letter-spacing: -0.01em;
       }
 
       .not-found-actions {
         display: flex;
-        gap: 2rem;
-        justify-content: center;
+        flex-wrap: wrap;
         align-items: center;
-      }
-
-      .not-found-button {
-        background: var(--color-background-contrast);
-        color: var(--color-text-contrast);
-        border: 2px solid var(--color-text-main);
-        padding: 1rem 2rem;
-        font-family: var(--font-mono);
-        font-weight: 600;
-        cursor: pointer;
-        transition:
-          background-color var(--motion-fast),
-          color var(--motion-fast);
-        position: relative;
-        text-decoration: none;
-        display: inline-block;
-      }
-
-      .not-found-button::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        width: 15px;
-        height: 15px;
-        background: var(--color-background-contrast);
-        transition:
-          background-color var(--motion-fast),
-          width var(--motion-fast),
-          height var(--motion-fast);
-      }
-
-      .not-found-button:hover {
-        background: transparent;
-        color: var(--color-text-main);
-      }
-
-      .not-found-button:hover::before {
-        background: var(--color-accent);
-        width: 20px;
-        height: 20px;
+        gap: 1rem 2.5rem;
+        margin-top: var(--poster-gap);
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--color-rule-main);
       }
 
       .not-found-link {
-        color: var(--color-text-main);
-        font-family: var(--font-mono);
-        text-decoration: none;
-        position: relative;
-        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.625rem;
+        min-height: 44px;
         font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: -0.025em;
       }
 
-      .not-found-link::after {
-        background: currentColor;
-        transform-origin: left;
-        position: absolute;
+      .not-found-link__label {
+        position: relative;
+      }
+
+      .not-found-link__label::after {
         content: '';
+        position: absolute;
         top: 50%;
-        left: -0.5rem;
+        right: -0.25rem;
+        left: -0.25rem;
         height: max(1px, 0.025em);
-        right: -0.5rem;
+        background: currentColor;
         transform: translateY(-50%) scaleX(0);
+        transform-origin: left;
         transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       }
 
-      .not-found-link:hover::after {
+      .not-found-link:hover .not-found-link__label::after {
         transform: translateY(-50%) scaleX(1);
       }
 
-      a:focus-visible {
-        outline: 2px solid var(--color-text-main);
-        outline-offset: 4px;
-      }
+      @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+        .not-found-code:hover .not-found-code__slice {
+          animation: signal-drift 520ms steps(1, end) 1;
+        }
 
-      @keyframes glitch {
-        0%,
-        100% {
-          transform: translateX(0);
+        .not-found-code:hover .not-found-code__slice--echo {
+          animation-duration: 640ms;
         }
-        20% {
-          transform: translateX(-2px) skew(2deg);
-        }
-        40% {
-          transform: translateX(2px) skew(-2deg);
-        }
-        60% {
-          transform: translateX(-1px) skew(1deg);
-        }
-        80% {
-          transform: translateX(1px) skew(-1deg);
-        }
-      }
 
-      @media (max-width: 768px) {
-        .not-found-code {
-          font-size: 6rem;
-        }
-        .not-found-error {
-          font-size: 1.5rem;
-        }
-        .not-found-actions {
-          flex-direction: column;
-          gap: 1rem;
+        @keyframes signal-drift {
+          0%,
+          100% {
+            transform: translateX(calc(var(--signal-offset) * var(--signal-drift, 1)));
+          }
+          15% {
+            transform: translateX(calc(var(--signal-offset) * var(--signal-drift, 1) * -3.5));
+          }
+          35% {
+            transform: translateX(calc(var(--signal-offset) * var(--signal-drift, 1) * 4.5));
+          }
+          55% {
+            transform: translateX(calc(var(--signal-offset) * var(--signal-drift, 1) * -1.5));
+          }
+          75% {
+            transform: translateX(calc(var(--signal-offset) * var(--signal-drift, 1) * 5.5));
+          }
+          90% {
+            transform: translateX(calc(var(--signal-offset) * var(--signal-drift, 1) * -2.5));
+          }
         }
       }
 
-      @media (max-width: 419px) {
-        .not-found-code {
-          font-size: 4rem;
-        }
-        .container {
-          padding: 1rem;
+      @media (max-width: 64rem) {
+        .not-found-title {
+          font-size: clamp(2.25rem, 8vw, 4rem);
         }
       }
 
       @media (prefers-reduced-motion: reduce) {
-        .not-found-error {
-          animation: none;
-        }
-        .not-found-button,
-        .not-found-button::before,
-        .not-found-link::after {
+        .not-found-link__label::after {
           transition: none;
         }
       }
     </style>
   </head>
   <body>
-    <main class="container">
-      <h1 class="not-found-code">404</h1>
-      <div class="not-found-error">ERROR</div>
-      <p class="not-found-message">
-        The requested resource could not be located on this server.<br />
-        Perhaps you were looking for something else?
-      </p>
-      <div class="not-found-actions">
-        <a href="/" class="not-found-button">Return to Home</a>
-        <a href="https://github.com/mr-chelyshkin" target="_blank" class="not-found-link">
-          Check GitHub
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-header__identity" href="/" aria-label="Igor Chelyshkin, home">
+          <img src="/favicon.svg" alt="" width="28" height="28" />
+          <span>Igor Chelyshkin</span>
         </a>
       </div>
+    </header>
+    <main class="not-found">
+      <p class="not-found-code">
+        404
+        <span class="not-found-code__slice" aria-hidden="true">404</span>
+        <span class="not-found-code__slice not-found-code__slice--echo" aria-hidden="true"
+          >404</span
+        >
+      </p>
+      <h1 class="not-found-title">Page not found</h1>
+      <p class="not-found-message">
+        The requested resource could not be located on this server. Perhaps you were looking for
+        something else?
+      </p>
+      <nav class="not-found-actions" aria-label="Continue browsing">
+        <a href="/" class="not-found-link">
+          <span aria-hidden="true">←</span>
+          <span class="not-found-link__label">Return to Home</span>
+        </a>
+        <a
+          href="https://github.com/mr-chelyshkin"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="not-found-link"
+          aria-label="Check GitHub (opens in a new tab)"
+        >
+          <span class="not-found-link__label">Check GitHub</span>
+          <span aria-hidden="true">↗</span>
+        </a>
+      </nav>
     </main>
   </body>
 </html>

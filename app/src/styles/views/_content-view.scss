@@ -82,7 +82,7 @@
     padding: clamp(14rem, 32svh, 26rem) var(--poster-gutter) clamp(2rem, 4.5svh, 4rem);
     font-size: clamp(2rem, min(13.6vw, 22svh), 14rem);
     line-height: 0.88;
-    letter-spacing: -0.067em;
+    letter-spacing: -0.02em;
   }
 
   .content-view__hero-line {
@@ -101,7 +101,7 @@
     color: var(--color-text-main);
     font-size: clamp(1.75rem, min(5vw, 6.25svh), 4.75rem);
     line-height: 1;
-    letter-spacing: -0.055em;
+    letter-spacing: -0.035em;
 
     > span {
       writing-mode: vertical-rl;

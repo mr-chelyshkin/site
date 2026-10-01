@@ -7,6 +7,7 @@
 3. `objects/` — page layout, container and poster geometry.
 4. `components/` — chrome, shared objects and section parts.
 5. `views/` — what makes each homepage section different from the others.
+6. `utilities/` — cross-cutting behavior that has to win over a view.
 
 Each layer exposes its partials through `_index.scss`. `settings/` holds Sass
 values; `themes/_site.scss` exposes the used CSS custom properties, grouped by
@@ -15,6 +16,20 @@ shared mixins and emits no standalone CSS.
 
 Vue files own markup and behavior. Their selectors and media queries live here.
 The page is a hero, three numbered sections, a contact section and the chrome.
+
+## Display font
+
+`--font-display` uses the bundled Inter Display SemiBold (600, normal) from
+[Inter 4.1](https://rsms.me/inter/download/). `generic/_fonts.scss` declares the face;
+headings, company names, the contact email and footer name share the token.
+The standalone `public/404.html` declares the same face for its number and title.
+Both HTML documents preload the same WOFF2 with `font-display: swap`.
+
+The font lives in `public/fonts/` so the standalone error page can use a
+root-absolute URL at any missing path. Its filename includes the pinned release;
+when updating the file, change that URL in both font declarations and preloads.
+`public/fonts/Inter-LICENSE.txt` contains its SIL Open Font License 1.1.
+The body and mono families use their existing tokens.
 
 ## Poster geometry
 
@@ -75,8 +90,27 @@ keeps its rotation while it glitches. Keyframes meant to override a base transfo
 use `transform` on purpose — `signal-drift` in `components/_signal-text.scss` does,
 because it overrides the slice's own offset.
 
-The navigation keeps the dark panel and small mono link from `v0.0.1`.
+The navigation keeps the dark panel and small mono link from `v0.0.1`, on the
+page's own ink and `--color-scrim` rather than colors of its own.
 Strike-through is a hover effect; the active route uses a heavier font weight.
+
+## Reveal
+
+`utilities/_reveal.scss` gives each section one event the first time it comes into
+view: its parts rise in a short cascade while the heading locks its signal once.
+`useReveal` observes the section, adds `c-reveal--shown`, and drops the transient
+`c-reveal--tuning` again so the same drift stays available on hover.
+
+Two placement decisions matter. It sits in `utilities`, after `views`, because a
+view may declare its own `transition` on the very elements that reveal, and a later
+layer wins whatever the specificity. And the rise is an animation, not a transition,
+so it cannot clobber a view's transition list — the plates and layers keep their
+hover treatments.
+
+`--reveal-base` on a `c-reveal__group` offsets everything inside it;
+`--reveal-step` staggers items by their position. Every rule sits inside
+`prefers-reduced-motion: no-preference`, and the composable reveals immediately
+when that preference is set, so nothing stays hidden.
 
 ## Reusable objects
 

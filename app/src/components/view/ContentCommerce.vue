@@ -2,12 +2,14 @@
 import { computed, ref, useId } from 'vue'
 import SectionHeading from '@/components/ui/SectionHeading.vue'
 import SectionRail from '@/components/ui/SectionRail.vue'
+import { useReveal } from '@/composables/useReveal'
 import { padIndex } from '@/utils/format'
 import type { ContentPage } from '@/contents'
 
 const props = defineProps<{ content: ContentPage['commerce'] }>()
 
 const titleId = `commerce-${useId()}`
+const { target, isRevealed, isTuning } = useReveal()
 
 // The readout follows pointer and keyboard alike; with nothing selected it
 // carries the section's own lede.
@@ -34,15 +36,24 @@ const selectFocused = (index: number) => {
 </script>
 
 <template>
-  <section class="content-commerce o-poster" :aria-labelledby="titleId">
+  <section
+    ref="target"
+    class="content-commerce o-poster c-reveal"
+    :class="{ 'c-reveal--shown': isRevealed, 'c-reveal--tuning': isTuning }"
+    :aria-labelledby="titleId"
+  >
     <div class="o-poster__sheet">
-      <SectionHeading :id="titleId" :lines="content.headline" />
+      <SectionHeading :id="titleId" :lines="content.headline" class="c-reveal__item" />
 
       <ul
-        class="content-commerce__wall"
+        class="content-commerce__wall c-reveal__group"
         :class="{ 'content-commerce__wall--tuned': activeIndex !== null }"
       >
-        <li v-for="(company, index) in content.companies" :key="company.name">
+        <li
+          v-for="(company, index) in content.companies"
+          :key="company.name"
+          class="c-reveal__item"
+        >
           <button
             type="button"
             class="content-commerce__entry"
@@ -60,7 +71,7 @@ const selectFocused = (index: number) => {
         </li>
       </ul>
 
-      <p class="content-commerce__readout" aria-live="polite">
+      <p class="content-commerce__readout c-reveal__item" aria-live="polite">
         <span class="content-commerce__readout-meta">
           {{ activeCompany ? activeCompany.meta : content.hint }}
         </span>
