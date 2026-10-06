@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import BaseIcon from '@/components/ui/BaseIcon.vue'
-import type { IconProps } from '@/types/ui'
+import BaseIcon from '@/components/icons/BaseIcon.vue'
+import type { IconProps } from '@/components/icons/types'
 
 defineProps<IconProps>()
 </script>

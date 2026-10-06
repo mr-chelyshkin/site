@@ -1,15 +1,20 @@
-@forward 'header';
-@forward 'footer';
-@forward 'navigation';
-@forward 'view';
-@forward 'link';
+// Shared objects
 @forward 'icon';
+@forward 'image';
+@forward 'link';
 @forward 'external-link';
 @forward 'external-link-list';
 @forward 'social-links';
-@forward 'image';
-@forward 'animations';
 @forward 'signal-text';
+@forward 'glitch';
+
+// Section parts
 @forward 'section-rail';
 @forward 'section-band';
 @forward 'section-heading';
+
+// Chrome
+@forward 'site-header';
+@forward 'site-menu-toggle';
+@forward 'site-navigation';
+@forward 'site-footer';

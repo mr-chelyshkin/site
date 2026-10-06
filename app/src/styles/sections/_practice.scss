@@ -1,20 +1,14 @@
 @use '../tools';
 
-@layer views {
-  /* Composition: a stack of layers read from what the team works with down to
-     what it runs on. Geometry comes from `.o-poster`. */
-  .content-practice {
+@layer sections {
+  /* A stack of layers read from what the team works with down to what it runs
+     on. Geometry comes from `.o-poster`. */
+  .practice {
     background: var(--color-background-main);
     color: var(--color-text-main);
   }
 
-  .content-practice__stack {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .content-practice__layer {
+  .practice__layer {
     padding-block: clamp(1.5rem, 2.6vw, 2.5rem);
     border-top: 1px solid var(--color-rule-main);
     transition: border-color var(--motion-fast) ease;
@@ -28,50 +22,44 @@
     }
   }
 
-  .content-practice__layer-name {
-    margin: 0;
+  .practice__layer-name {
+    @include tools.display-caps;
     font-size: clamp(1.75rem, 3.4vw, 3.25rem);
-    font-weight: 600;
-    line-height: 0.95;
-    letter-spacing: -0.035em;
-    text-transform: uppercase;
     transition: text-shadow var(--motion-fast) ease;
 
-    .content-practice__layer:hover & {
-      text-shadow:
-        -0.022em 0 var(--signal-cool),
-        0.018em 0 var(--signal-warm);
+    .practice__layer:hover & {
+      @include tools.signal-fringe;
     }
   }
 
-  .content-practice__layer-copy {
+  .practice__layer-copy {
     display: grid;
     gap: 0.5rem;
     padding-bottom: 0.2em;
   }
 
-  .content-practice__layer-caption {
+  .practice__layer-caption {
     @include tools.meta-text;
     color: var(--color-text-muted);
   }
 
-  .content-practice__layer-description {
+  .practice__layer-description {
     max-width: 38ch;
     font-size: var(--text-size-md);
     line-height: 1.5;
     color: var(--color-text-muted);
   }
 
-  @media (max-width: 64rem) {
-    .content-practice__layer {
+  @include tools.below(lg) {
+    .practice__layer {
       gap: 0.875rem;
     }
 
-    .content-practice__layer-copy {
+    .practice__layer-copy {
       padding-bottom: 0;
     }
 
-    .content-practice__layer-description {
+    .practice__layer-description {
       max-width: 46ch;
     }
   }

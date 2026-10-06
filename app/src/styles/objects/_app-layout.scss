@@ -1,7 +1,15 @@
 @layer objects {
-  .app-layout {
+  /* Header, page and footer in one column. The page takes the free height, so
+     the footer rests at the bottom of a short page. */
+  .o-app-layout {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+  }
+
+  .o-app-layout__main {
+    flex: 1 1 0%;
+    position: relative;
+    min-width: 0;
   }
 }

@@ -1,6 +1,7 @@
 import { onScopeDispose, ref } from 'vue'
 
-import type { GlitchAnimation } from '@/types/ui'
+/** Animation classes from `styles/components/_glitch.scss`. */
+export type GlitchAnimation = 'c-glitch-digital' | 'c-glitch-matrix'
 
 interface UseGlitchOptions {
   animation?: GlitchAnimation

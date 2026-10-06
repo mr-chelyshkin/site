@@ -1,17 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import ContentView from '@/views/ContentView.vue'
+import HomeView from '@/views/HomeView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'content',
-      component: ContentView,
+      name: 'home',
+      component: HomeView,
     },
+    // Unknown client-side paths show the home page; CloudFront serves
+    // `public/404.html` for missing files.
     {
       path: '/:pathMatch(.*)*',
-      component: ContentView,
+      component: HomeView,
     },
   ],
 })

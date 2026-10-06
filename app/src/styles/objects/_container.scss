@@ -2,15 +2,9 @@
   .o-container {
     width: 100%;
     max-width: var(--max-width);
-    margin-left: auto;
     margin-right: auto;
-    padding-left: clamp(1.25rem, 4vw, 4rem);
+    margin-left: auto;
     padding-right: clamp(1.25rem, 4vw, 4rem);
-
-    &--row-between {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-    }
+    padding-left: clamp(1.25rem, 4vw, 4rem);
   }
 }

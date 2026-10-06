@@ -4,9 +4,11 @@ import SiteHeader from '@/components/chrome/SiteHeader.vue'
 </script>
 
 <template>
-  <div class="app-layout">
+  <div class="o-app-layout">
     <SiteHeader />
-    <RouterView />
+    <main class="o-app-layout__main">
+      <RouterView />
+    </main>
     <SiteFooter />
   </div>
 </template>

@@ -2,11 +2,11 @@
   /* One event per section, the first time it comes into view: its parts rise
      into place in a short cascade while the heading locks its signal once.
 
-     This lives in `utilities`, after `views`, because a view may declare its own
-     `transition` on the very elements that reveal — a later layer wins whatever
-     the specificity. For the same reason the rise is an animation rather than a
-     transition: `animation` cannot clobber a view's transition list, so hover
-     treatments on those elements keep working.
+     This lives in `utilities`, after `sections`, because a section may declare
+     its own `transition` on the very elements that reveal — a later layer wins
+     whatever the specificity. For the same reason the rise is an animation
+     rather than a transition: `animation` cannot clobber a section's transition
+     list, so hover treatments on those elements keep working.
 
      Everything sits inside `no-preference`, so a reader who asked for less
      motion gets the finished section with no hidden state to recover from. */
@@ -23,48 +23,54 @@
       }
     }
 
-    .c-reveal__item {
+    .u-reveal__item {
       opacity: 0;
     }
 
-    .c-reveal--shown .c-reveal__item {
+    .u-reveal--shown .u-reveal__item {
       animation: reveal-rise 520ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
       animation-delay: calc(var(--reveal-base, 0ms) + var(--reveal-step, 0ms));
     }
 
+    /* Keyboard navigation must never arrive at an invisible control. */
+    .u-reveal:focus-within .u-reveal__item {
+      opacity: 1;
+      animation: none;
+    }
+
     /* A group starts after the parts above it have begun. */
-    .c-reveal__group {
+    .u-reveal__group {
       --reveal-base: 140ms;
     }
 
-    .c-reveal__item:nth-child(2) {
+    .u-reveal__item:nth-child(2) {
       --reveal-step: 70ms;
     }
 
-    .c-reveal__item:nth-child(3) {
+    .u-reveal__item:nth-child(3) {
       --reveal-step: 140ms;
     }
 
-    .c-reveal__item:nth-child(4) {
+    .u-reveal__item:nth-child(4) {
       --reveal-step: 210ms;
     }
 
-    .c-reveal__item:nth-child(5) {
+    .u-reveal__item:nth-child(5) {
       --reveal-step: 280ms;
     }
 
-    .c-reveal__item:nth-child(6) {
+    .u-reveal__item:nth-child(6) {
       --reveal-step: 350ms;
     }
 
     /* The lock itself. The class is dropped once it has run, so the very same
        animation stays available on hover. */
-    .c-reveal--tuning .c-section-heading .c-signal-text__slice {
+    .u-reveal--tuning .c-section-heading .c-signal-text__slice {
       animation: signal-drift 560ms steps(1, end);
       animation-delay: 200ms;
     }
 
-    .c-reveal--tuning .c-section-heading .c-signal-text__slice--echo {
+    .u-reveal--tuning .c-section-heading .c-signal-text__slice--echo {
       --signal-drift: -1;
       animation-duration: 680ms;
     }

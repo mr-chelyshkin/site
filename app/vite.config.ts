@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
 import { fileURLToPath, URL } from 'node:url'
+import vue from '@vitejs/plugin-vue'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [vue()],
@@ -10,18 +10,14 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'dist',
-    minify: 'esbuild',
-    sourcemap: false,
     rollupOptions: {
       output: {
+        // Vue and the router change less often than the site, so they keep
+        // their own long-lived chunk.
         manualChunks: {
           vue: ['vue', 'vue-router'],
         },
       },
     },
-  },
-  optimizeDeps: {
-    include: ['vue', 'vue-router'],
   },
 })

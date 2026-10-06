@@ -6,7 +6,7 @@ defineProps<{
   label: string
 }>()
 defineSlots<{ icon(): VNode[] }>()
-defineEmits<{ click: [event: MouseEvent] }>()
+const emit = defineEmits<{ click: [event: MouseEvent] }>()
 </script>
 
 <template>
@@ -16,7 +16,7 @@ defineEmits<{ click: [event: MouseEvent] }>()
     target="_blank"
     rel="noopener noreferrer"
     :aria-label="`${label} (opens in a new tab)`"
-    @click="$emit('click', $event)"
+    @click="emit('click', $event)"
   >
     <span class="c-external-link__icon"><slot name="icon" /></span>
     <span class="c-external-link__label">{{ label }}</span>

@@ -1,3 +1,5 @@
+@use '../tools';
+
 @layer objects {
   /* Shared page geometry for the full-bleed sections: a content column beside
      the rail, one left edge for display type, and one vertical rhythm. Sections
@@ -36,7 +38,7 @@
     letter-spacing: -0.01em;
   }
 
-  @media (max-width: 64rem) {
+  @include tools.below(lg) {
     .o-poster__split {
       grid-template-columns: minmax(0, 1fr);
       align-items: start;

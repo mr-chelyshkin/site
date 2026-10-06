@@ -1,20 +1,26 @@
 <script setup lang="ts">
-import { useId } from 'vue'
+import { computed, useId } from 'vue'
 import BaseImage from '@/components/ui/BaseImage.vue'
 import { useGlitch } from '@/composables/useGlitch'
-import type { ContentPage } from '@/contents'
+import type { HomeContent } from '@/contents'
 
-defineProps<{
-  content: ContentPage['hero']
-}>()
+const props = defineProps<{ content: HomeContent['hero'] }>()
 
+const titleId = `hero-${useId()}`
 const signalFilterId = `hero-signal-${useId()}`
-// In tall frames, cover scales the landscape image to the hero's height.
-const imageSizes = '(min-aspect-ratio: 16/9) 100vw, 178vh'
-const { isGlitching, trigger, glitchClass } = useGlitch({
-  animation: 'c-glitch-digital',
-  duration: 400,
-})
+const { isGlitching, trigger, glitchClass } = useGlitch()
+
+// The photo, its torn strips and the face layer draw the same frame from one
+// source, so the browser makes a single request for all of them.
+const photo = computed(() => ({
+  src: props.content.image,
+  width: 1600,
+  assetWidth: 1600,
+  height: 900,
+  // In tall frames, cover scales the landscape image to the hero's height.
+  sizes: '(min-aspect-ratio: 16/9) 100vw, 178vh',
+  priority: true,
+}))
 
 const tears = [
   { top: '16%', bottom: '82%', shift: '-2.5%' },
@@ -25,8 +31,8 @@ const tears = [
 </script>
 
 <template>
-  <section class="content-view__hero" aria-labelledby="hero-title">
-    <svg class="content-view__hero-filters" aria-hidden="true" focusable="false">
+  <section class="hero" :aria-labelledby="titleId">
+    <svg class="hero__filters" aria-hidden="true" focusable="false">
       <defs>
         <filter
           :id="signalFilterId"
@@ -67,22 +73,13 @@ const tears = [
       </defs>
     </svg>
 
-    <div class="content-view__hero-image">
-      <div class="content-view__hero-exposure" :style="{ filter: `url(#${signalFilterId})` }">
-        <BaseImage
-          class="content-view__hero-photo"
-          :src="content.image"
-          :alt="content.imageAlt"
-          :width="1600"
-          :asset-width="1600"
-          :height="900"
-          :sizes="imageSizes"
-          :priority="true"
-        />
+    <div class="hero__image">
+      <div class="hero__exposure" :style="{ filter: `url(#${signalFilterId})` }">
+        <BaseImage class="hero__photo" v-bind="photo" :alt="content.imageAlt" />
         <div
           v-for="tear in tears"
           :key="tear.top"
-          class="content-view__hero-tear"
+          class="hero__tear"
           :style="{
             '--tear-top': tear.top,
             '--tear-bottom': tear.bottom,
@@ -90,42 +87,24 @@ const tears = [
           }"
           aria-hidden="true"
         >
-          <BaseImage
-            :src="content.image"
-            alt=""
-            :width="1600"
-            :asset-width="1600"
-            :height="900"
-            :sizes="imageSizes"
-            :priority="true"
-          />
+          <BaseImage v-bind="photo" alt="" />
         </div>
       </div>
-      <div class="content-view__hero-signal" aria-hidden="true">
-        <span v-for="block in 5" :key="block" class="content-view__hero-signal-block" />
+      <div class="hero__signal" aria-hidden="true">
+        <span v-for="block in 5" :key="block" class="hero__signal-block" />
       </div>
-      <BaseImage
-        class="content-view__hero-face"
-        :src="content.image"
-        alt=""
-        aria-hidden="true"
-        :width="1600"
-        :asset-width="1600"
-        :height="900"
-        :sizes="imageSizes"
-        :priority="true"
-      />
+      <BaseImage class="hero__face" v-bind="photo" alt="" aria-hidden="true" />
     </div>
 
-    <h1 id="hero-title" class="content-view__hero-title" :aria-label="content.title">
-      <span class="content-view__hero-headline" aria-hidden="true">
-        <span v-for="line in content.headline" :key="line" class="content-view__hero-line">
+    <h1 :id="titleId" class="hero__title" :aria-label="content.title">
+      <span class="hero__headline" aria-hidden="true">
+        <span v-for="line in content.headline" :key="line" class="hero__line">
           {{ line }}
         </span>
       </span>
-      <span class="content-view__hero-discipline" aria-hidden="true">
+      <span class="hero__discipline" aria-hidden="true">
         <span @mouseenter="trigger">
-          <span class="content-view__hero-discipline-text" :class="{ [glitchClass]: isGlitching }">
+          <span class="hero__discipline-text" :class="{ [glitchClass]: isGlitching }">
             {{ content.discipline }}
           </span>
         </span>

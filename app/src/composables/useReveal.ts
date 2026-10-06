@@ -19,7 +19,7 @@ interface UseRevealOptions {
  * drift and is dropped again so the same animation stays available on hover.
  */
 export function useReveal(options: UseRevealOptions = {}) {
-  const { threshold = 0, rootMargin = '0px 0px -15% 0px', tuningDuration = 1000 } = options
+  const { threshold = 0, rootMargin = '0px', tuningDuration = 1000 } = options
 
   const target = ref<HTMLElement | null>(null)
   const isRevealed = ref(false)

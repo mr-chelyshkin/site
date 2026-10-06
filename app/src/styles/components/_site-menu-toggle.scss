@@ -1,0 +1,70 @@
+@layer components {
+  .site-menu-toggle {
+    position: relative;
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 4px;
+    width: 44px;
+    height: 44px;
+    padding: 6px;
+    color: var(--color-text-main);
+  }
+
+  .site-menu-toggle__line {
+    height: 4px;
+    background-color: currentColor;
+    transform-origin: center;
+    transition:
+      transform var(--motion-base) var(--ease-standard),
+      width var(--motion-base) var(--ease-standard),
+      opacity var(--motion-base) var(--ease-standard);
+
+    &--top {
+      width: 50%;
+    }
+
+    &--middle {
+      width: 75%;
+    }
+
+    &--bottom {
+      width: 100%;
+    }
+  }
+
+  /* Closed: hovering flips the stack of lines the other way up. */
+  .site-menu-toggle:hover:not(.site-menu-toggle--open) {
+    .site-menu-toggle__line--top {
+      width: 100%;
+    }
+
+    .site-menu-toggle__line--bottom {
+      width: 50%;
+    }
+  }
+
+  /* Open: the lines cross over the panel, so they take the panel's ink. */
+  .site-menu-toggle--open {
+    color: var(--color-text-contrast);
+
+    .site-menu-toggle__line {
+      width: 100%;
+    }
+
+    .site-menu-toggle__line--top {
+      transform: translateY(6px) rotate(45deg);
+    }
+
+    .site-menu-toggle__line--middle {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+
+    .site-menu-toggle__line--bottom {
+      transform: translateY(-6px) rotate(-45deg);
+    }
+  }
+}

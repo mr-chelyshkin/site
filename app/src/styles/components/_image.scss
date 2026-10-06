@@ -1,14 +1,14 @@
 @layer components {
   .c-image {
     display: block;
-    transition: opacity 0.3s ease;
     opacity: 0;
+    transition: opacity var(--motion-base) ease;
 
-    &.c-image--loaded {
+    &--loaded {
       opacity: 1;
     }
 
-    &.c-image--error {
+    &--error {
       opacity: 0.5;
       filter: grayscale(100%);
     }

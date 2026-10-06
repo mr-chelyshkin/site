@@ -1,85 +1,73 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import imageWidths from '@/assets/image-widths.json'
 
-import type { ImageFormat } from '@/types/ui'
+const props = withDefaults(
+  defineProps<{
+    /** Name of a photo in `assets/images-source/`, without its extension. */
+    src: string
+    alt: string
+    /** Intrinsic size, so the layout holds its space before the file loads. */
+    width: number
+    height: number
+    /** Generated width used for the plain `src` fallback. */
+    assetWidth?: number
+    sizes?: string
+    /** Above-the-fold images load eagerly and with high fetch priority. */
+    priority?: boolean
+  }>(),
+  {
+    assetWidth: 800,
+    sizes: '(max-width: 768px) 400px, (max-width: 1200px) 800px, 1200px',
+    priority: false,
+  },
+)
 
-interface Props {
-  format?: ImageFormat
+// `scripts/optimize-images.js` writes one `<name>-<width>.webp` per width.
+const imageUrls = import.meta.glob<string>('../../assets/images/*.webp', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+})
 
-  height?: number
-  width?: number
-  assetWidth?: number
+const imageUrl = (width: number) => {
+  const path = `../../assets/images/${props.src}-${width}.webp`
+  const url = imageUrls[path]
 
-  responsive?: boolean
-  priority?: boolean
-  lazy?: boolean
+  if (!url) throw new Error(`Image asset not found: ${path}`)
 
-  src: string
-  alt: string
-
-  sizes?: string
-  folder?: string
+  return url
 }
+
+const fallbackSrc = computed(() => imageUrl(props.assetWidth))
+const srcset = computed(() => imageWidths.map((width) => `${imageUrl(width)} ${width}w`).join(', '))
 
 const isLoaded = ref(false)
 const hasError = ref(false)
 
-const props = withDefaults(defineProps<Props>(), {
-  responsive: true,
-  priority: false,
-  lazy: true,
-  assetWidth: 800,
-
-  format: 'webp',
-  folder: '',
-})
-const imageUrls = import.meta.glob('../../assets/images/**/*.{jpg,jpeg,png,webp}', {
-  eager: true,
-  query: '?url',
-  import: 'default',
-}) as Record<string, string>
-const getImagePath = (width: number) => {
-  const folder = props.folder ? `${props.folder}/` : ''
-  const source = `../../assets/images/${folder}${props.src}-${width}.${props.format}`
-  const imageUrl = imageUrls[source]
-
-  if (!imageUrl) throw new Error(`Image asset not found: ${source}`)
-
-  return imageUrl
-}
-const optimizedSrc = computed(() => getImagePath(props.assetWidth))
-const srcSet = computed(() => {
-  const widths = [400, 800, 1200, 1600]
-  return widths.map((width) => `${getImagePath(width)} ${width}w`).join(', ')
-})
-const defaultSizes = '(max-width: 768px) 400px, (max-width: 1200px) 800px, 1200px'
-const loadingValue = computed<'eager' | 'lazy' | undefined>(() => {
-  if (props.priority) return 'eager'
-  if (props.lazy) return 'lazy'
-  return undefined
-})
-const imageAttributes = computed(() => ({
-  ...(props.responsive ? { sizes: props.sizes || defaultSizes, srcset: srcSet.value } : {}),
-  ...(loadingValue.value ? { loading: loadingValue.value } : {}),
-  ...(props.height !== undefined ? { height: props.height } : {}),
-  ...(props.width !== undefined ? { width: props.width } : {}),
-}))
-const handleError = () => {
-  hasError.value = true
-}
 const handleLoad = () => {
   hasError.value = false
   isLoaded.value = true
 }
+const handleError = () => {
+  hasError.value = true
+}
 </script>
 
 <template>
+  <!-- `srcset`, `sizes` and `loading` precede `src` so the first request
+       already knows how to choose and when to load. -->
   <img
-    v-bind="imageAttributes"
+    :srcset="srcset"
+    :sizes="sizes"
+    :loading="priority ? 'eager' : 'lazy'"
     :fetchpriority="priority ? 'high' : 'auto'"
-    :src="optimizedSrc"
+    :width="width"
+    :height="height"
+    :src="fallbackSrc"
     :alt="alt"
-    :class="['c-image', { 'c-image--loaded': isLoaded }, { 'c-image--error': hasError }]"
+    class="c-image"
+    :class="{ 'c-image--loaded': isLoaded, 'c-image--error': hasError }"
     @load="handleLoad"
     @error="handleError"
   />

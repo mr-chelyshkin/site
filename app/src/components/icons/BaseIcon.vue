@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, type SVGAttributes } from 'vue'
-import type { IconProps } from '@/types/ui'
+import type { IconProps } from '@/components/icons/types'
 
 const props = withDefaults(defineProps<IconProps>(), { size: 20 })
 const accessibility = computed<SVGAttributes>(() =>

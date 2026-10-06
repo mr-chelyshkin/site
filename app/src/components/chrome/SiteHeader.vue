@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch } from 'vue'
-import BaseContainer from '@/components/layout/BaseContainer.vue'
+import { onMounted, onUnmounted, ref, useId, watch } from 'vue'
 import SiteMenuToggle from '@/components/chrome/SiteMenuToggle.vue'
 import SiteNavigation from '@/components/chrome/SiteNavigation.vue'
+import BaseContainer from '@/components/ui/BaseContainer.vue'
 import { useScrollLock } from '@/composables/useScrollLock'
 import { siteContent } from '@/contents'
 
-const { lock, unlock } = useScrollLock()
-const isMenuOpen = ref(false)
+const navigationId = `navigation-${useId()}`
 const header = ref<HTMLElement | null>(null)
 const menuToggle = ref<InstanceType<typeof SiteMenuToggle> | null>(null)
+const isMenuOpen = ref(false)
+const { lock, unlock } = useScrollLock()
 
 const toggleMenu = (isOpen: boolean) => {
   isMenuOpen.value = isOpen
@@ -39,18 +40,23 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <header ref="header" class="site-header site-header--poster" @focusout="closeOnFocusLeave">
-    <BaseContainer class="o-container--row-between">
+  <header ref="header" class="site-header" @focusout="closeOnFocusLeave">
+    <BaseContainer class="site-header__bar">
       <a
         class="site-header__identity"
         :href="siteContent.links.home"
         :aria-label="`${siteContent.brand.fullName}, home`"
       >
-        <img src="/favicon.svg" alt="" width="28" height="28" />
-        <span>{{ siteContent.brand.fullName }}</span>
+        <img class="site-header__logo" src="/favicon.svg" alt="" width="28" height="28" />
+        <span class="site-header__name">{{ siteContent.brand.fullName }}</span>
       </a>
-      <SiteMenuToggle ref="menuToggle" :is-open="isMenuOpen" @toggle="toggleMenu" />
+      <SiteMenuToggle
+        ref="menuToggle"
+        :is-open="isMenuOpen"
+        :controls="navigationId"
+        @toggle="toggleMenu"
+      />
     </BaseContainer>
-    <SiteNavigation :is-open="isMenuOpen" @close="closeMenu" />
+    <SiteNavigation :id="navigationId" :is-open="isMenuOpen" @close="closeMenu" />
   </header>
 </template>

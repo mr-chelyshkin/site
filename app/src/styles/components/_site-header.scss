@@ -1,0 +1,47 @@
+@layer components {
+  .site-header {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: var(--z-index-header);
+    display: flex;
+    align-items: center;
+    height: var(--header-height);
+    border-bottom: 1px solid var(--color-border-main);
+    background: var(--color-background-main);
+    color: var(--color-text-main);
+  }
+
+  .site-header__bar {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .site-header__identity {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-width: 0;
+    min-height: 44px;
+    font-size: var(--text-size-sm);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+
+  .site-header__logo {
+    flex: none;
+  }
+
+  .site-header__name {
+    min-width: 0;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+
+  /* The toggle stays above the open panel, so the same button closes it. */
+  .site-header .site-menu-toggle {
+    z-index: var(--z-index-nav-button);
+  }
+}

@@ -2,4 +2,6 @@ import siteContent from './site.json'
 
 export { siteContent }
 export type SiteContent = typeof siteContent
-export type ContentPage = SiteContent['pages']['content']
+export type HomeContent = SiteContent['home']
+export type SocialProfiles = SiteContent['socialProfiles']
+export type SocialPlatform = keyof SocialProfiles

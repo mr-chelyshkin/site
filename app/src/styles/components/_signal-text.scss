@@ -1,3 +1,5 @@
+@use '../tools';
+
 @layer components {
   .c-signal-text {
     position: relative;
@@ -11,9 +13,7 @@
     background: var(--signal-surface, var(--color-background-main));
     clip-path: var(--signal-cut, inset(26% 3% 69% 61%));
     transform: translateX(var(--signal-offset, 0.03em));
-    text-shadow:
-      -0.012em 0 var(--signal-cool),
-      0.012em 0 var(--signal-warm);
+    @include tools.signal-fringe(-0.012em, 0.012em);
     pointer-events: none;
     user-select: none;
 

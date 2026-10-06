@@ -1,4 +1,6 @@
 @layer components {
+  /* An icon-and-label tile. It inherits its ink, so borders and the hover fill
+     derive from it on light and dark surfaces alike. */
   .c-external-link {
     display: inline-flex;
     flex-direction: column;
@@ -14,24 +16,16 @@
       background-color var(--motion-fast),
       border-color var(--motion-fast);
 
-    &::after {
-      display: none;
-    }
-
     &:hover,
     &:focus-visible {
       border-color: currentColor;
       background-color: color-mix(in srgb, currentColor 8%, transparent);
     }
-
-    &:focus-visible {
-      outline-color: currentColor;
-    }
   }
 
   .c-external-link__label {
     font-family: var(--font-mono);
-    font-size: 0.875rem;
+    font-size: var(--text-size-sm);
     font-weight: 400;
     line-height: 1.25;
   }

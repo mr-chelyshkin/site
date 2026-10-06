@@ -13,11 +13,9 @@
   --color-rule-main: #{settings.$color-rule-main};
   --color-rule-tint: #{settings.$color-rule-tint};
   --color-scrim: #{settings.$color-scrim};
+  --color-selection: #{settings.$color-selection};
 
-  /* Accents and signal fringes */
-  --color-accent: #{settings.$color-accent};
-  --color-accent-cool: #{settings.$color-accent-cool};
-  --color-accent-warm: #{settings.$color-accent-warm};
+  /* Signal fringes */
   --signal-cool: #{settings.$color-signal-cool};
   --signal-warm: #{settings.$color-signal-warm};
 
@@ -40,17 +38,21 @@
   /* Layout and chrome */
   --max-width: #{settings.$max-width};
   --header-height: #{settings.$header-height};
-  --z-index-nav-menu: #{settings.$z-index-nav-menu};
-  --z-index-nav-overlay: #{settings.$z-index-nav-overlay};
-  --z-index-nav-button: #{settings.$z-index-nav-button};
   --z-index-header: #{settings.$z-index-header};
+  --z-index-nav-scrim: #{settings.$z-index-nav-scrim};
+  --z-index-nav-menu: #{settings.$z-index-nav-menu};
+  --z-index-nav-button: #{settings.$z-index-nav-button};
 
-  /* Motion */
+  /* Motion. Transitions take their durations from here, so a reader who asks
+     for less motion gets every change at once. */
   --motion-fast: 160ms;
+  --motion-base: 300ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
     --motion-fast: 0ms;
+    --motion-base: 0ms;
   }
 }

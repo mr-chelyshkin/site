@@ -1,20 +1,18 @@
+@use '../tools';
+
 @layer components {
+  /* A router link in the navigation panel. */
   .c-link {
-    color: var(--color-text-contrast);
-    position: relative;
-    text-align: right;
     display: block;
     padding: 1rem 0;
-    text-decoration: none;
+    color: var(--color-text-contrast);
     font-family: var(--font-mono);
     font-size: 1rem;
     font-weight: 400;
     line-height: normal;
-
-    &::after {
-      height: 2.5px;
-    }
+    @include tools.strike-on-hover($thickness: 2.5px);
   }
+
   .c-link--active {
     font-weight: 600;
   }

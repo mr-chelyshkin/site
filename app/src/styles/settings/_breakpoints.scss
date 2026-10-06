@@ -1,0 +1,6 @@
+// Widths below which the layout changes. Media queries cannot read custom
+// properties, so these stay Sass values; use them through `tools.below()`.
+$breakpoints: (
+  'md': 48rem,
+  'lg': 64rem,
+);

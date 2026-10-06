@@ -1,5 +1,9 @@
-@layer views {
-  .content-view__hero {
+@layer sections {
+  /* The photo under a static signal split: a color filter from `HeroSection`,
+     torn strips, scanlines and blocks, with a masked copy that keeps the face
+     clear. The oversized headline sits on top; the discipline runs down the
+     rail column. */
+  .hero {
     position: relative;
     isolation: isolate;
     overflow: clip;
@@ -9,7 +13,7 @@
     color: var(--color-text-contrast);
   }
 
-  .content-view__hero-filters {
+  .hero__filters {
     position: absolute;
     width: 0;
     height: 0;
@@ -17,7 +21,7 @@
     pointer-events: none;
   }
 
-  .content-view__hero-image {
+  .hero__image {
     position: absolute;
     inset: 0 var(--poster-rail) 0 0;
     overflow: hidden;
@@ -38,14 +42,14 @@
     }
   }
 
-  .content-view__hero-exposure {
+  .hero__exposure {
     position: absolute;
     inset: 0;
   }
 
-  .content-view__hero-photo,
-  .content-view__hero-face,
-  .content-view__hero-tear > img {
+  .hero__photo,
+  .hero__face,
+  .hero__tear > img {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -54,7 +58,7 @@
     object-position: 50% 40%;
   }
 
-  .content-view__hero-face {
+  .hero__face {
     mask-image: url('../../assets/hero-face-mask.svg');
     mask-size: cover;
     mask-position: 50% 40%;
@@ -63,20 +67,19 @@
     pointer-events: none;
   }
 
-  .content-view__hero-title {
+  .hero__title {
     position: relative;
     z-index: 1;
     display: grid;
     grid-template-columns: minmax(0, 1fr) var(--poster-rail);
     min-height: inherit;
-    margin: 0;
     font-weight: 600;
     text-transform: uppercase;
     text-wrap: nowrap;
     overflow-wrap: normal;
   }
 
-  .content-view__hero-headline {
+  .hero__headline {
     align-self: end;
     min-width: 0;
     padding: clamp(14rem, 32svh, 26rem) var(--poster-gutter) clamp(2rem, 4.5svh, 4rem);
@@ -85,13 +88,13 @@
     letter-spacing: -0.02em;
   }
 
-  .content-view__hero-line {
+  .hero__line {
     display: block;
     position: relative;
     width: fit-content;
   }
 
-  .content-view__hero-discipline {
+  .hero__discipline {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -110,11 +113,11 @@
     }
   }
 
-  .content-view__hero-discipline-text {
+  .hero__discipline-text {
     display: block;
   }
 
-  .content-view__hero-tear {
+  .hero__tear {
     position: absolute;
     inset: 0;
     clip-path: inset(var(--tear-top) 0 var(--tear-bottom));
@@ -122,14 +125,14 @@
     pointer-events: none;
   }
 
-  .content-view__hero-signal {
+  .hero__signal {
     position: absolute;
     inset: 0;
     pointer-events: none;
     background: repeating-linear-gradient(to bottom, transparent 0 2px, rgb(4 12 14 / 42%) 2px 3px);
   }
 
-  .content-view__hero-signal-block {
+  .hero__signal-block {
     position: absolute;
     display: block;
     background-color: var(--signal-cool);

@@ -22,121 +22,199 @@
     "openNavigation": "open menu",
     "closeNavigation": "close menu"
   },
-  "pages": {
-    "content": {
-      "hero": {
-        "image": "hero",
-        "imageAlt": "Igor Chelyshkin",
-        "title": "Software Engineer, Infrastructure",
-        "headline": ["Software", "Engineer."],
-        "discipline": "Infrastructure"
-      },
-      "practice": {
-        "index": "01",
-        "label": "What I build",
-        "headline": ["The systems", "behind the", "product."],
-        "description": "I design and build cloud infrastructure, delivery workflows and internal software for development teams.",
-        "areas": [
-          {
-            "caption": "What the team works with",
-            "title": "Internal software",
-            "description": "Platforms, services and tools for the people building the product."
-          },
-          {
-            "caption": "How it gets there",
-            "title": "Delivery workflows",
-            "description": "CI/CD, deployment processes and the automation connecting them."
-          },
-          {
-            "caption": "What it runs on",
-            "title": "Cloud infrastructure",
-            "description": "Cloud environments, clusters and the foundations for running services."
-          }
-        ]
-      },
-      "commerce": {
-        "index": "02",
-        "label": "Commercial work",
-        "headline": ["Where the work", "was done."],
-        "description": "PLACEHOLDER — one or two sentences framing the commercial work.",
-        "hint": "Pick a name",
-        "companies": [
-          {
-            "name": "Raiffeisen Bank",
-            "meta": "PLACEHOLDER · years · role",
-            "note": "PLACEHOLDER — one specific line about what was built here."
-          },
-          {
-            "name": "VK",
-            "meta": "PLACEHOLDER · years · role",
-            "note": "PLACEHOLDER — one specific line about what was built here."
-          },
-          {
-            "name": "Ozon Tech",
-            "meta": "PLACEHOLDER · years · role",
-            "note": "PLACEHOLDER — one specific line about what was built here."
-          },
-          {
-            "name": "Aqua Security",
-            "meta": "PLACEHOLDER · years · role",
-            "note": "PLACEHOLDER — one specific line about what was built here."
-          },
-          {
-            "name": "Banank",
-            "meta": "PLACEHOLDER · years · role",
-            "note": "PLACEHOLDER — one specific line about what was built here."
-          },
-          {
-            "name": "ForkJoin",
-            "meta": "PLACEHOLDER · years · role",
-            "note": "PLACEHOLDER — one specific line about what was built here."
-          }
-        ]
-      },
-      "openSource": {
-        "index": "03",
-        "label": "Open source",
-        "headline": ["Work that", "stays public."],
-        "description": "PLACEHOLDER — one or two sentences on why these exist and who they are for.",
-        "projects": [
-          {
-            "name": "Taskvisor",
-            "summary": "In-process task supervisor for Tokio services: retries, per-attempt timeouts, cooperative cancellation and one owner per key.",
-            "specs": [
-              { "term": "Version", "value": "PLACEHOLDER" },
-              { "term": "Language", "value": "Rust 1.90+" },
-              { "term": "License", "value": "Apache-2.0" }
-            ],
-            "links": [
-              { "label": "crates.io", "href": "https://crates.io/crates/taskvisor" },
-              { "label": "docs.rs", "href": "https://docs.rs/taskvisor" },
-              { "label": "GitHub", "href": "https://github.com/soltiHQ/taskvisor" }
-            ]
-          },
-          {
-            "name": "Solti",
-            "summary": "Modular Rust SDK for task-execution agents built from Kubernetes-shaped resources, pluggable runners and optional HTTP or gRPC boundaries.",
-            "specs": [
-              { "term": "Version", "value": "PLACEHOLDER" },
-              { "term": "Language", "value": "Rust 1.90+" },
-              { "term": "License", "value": "Apache-2.0" }
-            ],
-            "links": [
-              { "label": "crates.io", "href": "https://crates.io/crates/solti" },
-              { "label": "docs.rs", "href": "https://docs.rs/solti" },
-              { "label": "GitHub", "href": "https://github.com/soltiHQ" }
-            ]
-          }
-        ]
-      },
-      "contact": {
-        "label": "Write to me",
-        "headline": ["Tell me what", "is broken."],
-        "description": "PLACEHOLDER — one or two lines on what you are open to, and what makes a good message.",
-        "email": {
-          "label": "PLACEHOLDER@example.com",
-          "href": "mailto:PLACEHOLDER@example.com"
+  "home": {
+    "hero": {
+      "image": "hero",
+      "imageAlt": "Igor Chelyshkin",
+      "title": "Software Engineer, Infrastructure",
+      "headline": ["Software", "Engineer."],
+      "discipline": "Infrastructure"
+    },
+    "practice": {
+      "index": "01",
+      "label": "What I build",
+      "headline": ["The systems", "behind the", "product."],
+      "description": "I’m an independent software engineer. I build platforms, runtime systems and developer tools with clear interfaces.",
+      "areas": [
+        {
+          "caption": "What the team works with",
+          "title": "Developer platforms",
+          "description": "Self-service tools and APIs for building and running software."
+        },
+        {
+          "caption": "How the work runs",
+          "title": "Runtime systems",
+          "description": "Task execution, supervision and the services that connect them."
+        },
+        {
+          "caption": "What it runs on",
+          "title": "Infrastructure",
+          "description": "Cloud, on-premises and bare metal. Environments for development and production."
         }
+      ]
+    },
+    "commerce": {
+      "index": "02",
+      "label": "Commercial work",
+      "headline": ["Where the work", "was done."],
+      "description": "Platforms and tooling built inside product teams. Banking, consumer products and cloud security.",
+      "hint": "Explore the names",
+      "companies": [
+        {
+          "name": "Raiffeisen Bank",
+          "meta": "Banking · Quality engineering",
+          "note": "Internal banking systems and test automation.",
+          "colors": {
+            "primary": "#fee600",
+            "secondary": "#171717"
+          }
+        },
+        {
+          "name": "VK",
+          "meta": "Consumer products · Platform engineering",
+          "note": "Self-service cloud tools and platforms for running services.",
+          "colors": {
+            "primary": "#0077ff",
+            "secondary": "#70b5ff"
+          }
+        },
+        {
+          "name": "Ozon Tech",
+          "meta": "Commerce · Developer infrastructure",
+          "note": "A platform for building, testing and releasing mobile apps.",
+          "colors": {
+            "primary": "#005bff",
+            "secondary": "#f91155"
+          }
+        },
+        {
+          "name": "Aqua Security",
+          "meta": "Cloud security · Infrastructure engineering",
+          "note": "Cloud services, infrastructure APIs and database automation.",
+          "colors": {
+            "primary": "#00b8d4",
+            "secondary": "#153b58"
+          }
+        },
+        {
+          "name": "Banank",
+          "meta": "Commercial collaboration",
+          "note": "Digital banking and payments.",
+          "colors": {
+            "primary": "#f8df50",
+            "secondary": "#193000"
+          }
+        },
+        {
+          "name": "ForkJoin",
+          "meta": "Commercial collaboration",
+          "note": "Software engineering consultancy.",
+          "colors": {
+            "primary": "#626b76",
+            "secondary": "#263db4"
+          }
+        }
+      ]
+    },
+    "openSource": {
+      "index": "03",
+      "label": "Open source",
+      "headline": ["Work that", "stays public."],
+      "description": "Independent tools for running tasks and building development environments. Explore the code, or use them in your own work.",
+      "projects": [
+        {
+          "name": "Taskvisor",
+          "summary": "Task supervision for async Rust services. Retries, cancellation and clean shutdown, inside your application.",
+          "specs": [
+            {
+              "term": "Focus",
+              "value": "Task supervision"
+            },
+            {
+              "term": "Language",
+              "value": "Rust"
+            },
+            {
+              "term": "License",
+              "value": "Apache-2.0"
+            }
+          ],
+          "links": [
+            {
+              "label": "GitHub",
+              "href": "https://github.com/soltiHQ/taskvisor"
+            },
+            {
+              "label": "Docs",
+              "href": "https://docs.rs/taskvisor"
+            }
+          ]
+        },
+        {
+          "name": "Solti",
+          "summary": "A task-execution stack. Build agents with the Rust SDK and coordinate them through a Go control plane.",
+          "specs": [
+            {
+              "term": "Focus",
+              "value": "Agent runtime"
+            },
+            {
+              "term": "Languages",
+              "value": "Rust / Go"
+            },
+            {
+              "term": "License",
+              "value": "Apache-2.0"
+            }
+          ],
+          "links": [
+            {
+              "label": "GitHub",
+              "href": "https://github.com/soltiHQ"
+            },
+            {
+              "label": "Website",
+              "href": "https://solti.io"
+            }
+          ]
+        },
+        {
+          "name": "LimaNix",
+          "summary": "Linux development environments on your Mac. Keep your editor close and run tools, services and builds in a modular NixOS VM.",
+          "specs": [
+            {
+              "term": "Focus",
+              "value": "Developer environments"
+            },
+            {
+              "term": "Built with",
+              "value": "Lima / NixOS"
+            },
+            {
+              "term": "Host",
+              "value": "macOS"
+            }
+          ],
+          "links": [
+            {
+              "label": "GitHub",
+              "href": "https://github.com/limanix"
+            },
+            {
+              "label": "Website",
+              "href": "https://limanix.dev"
+            }
+          ]
+        }
+      ]
+    },
+    "contact": {
+      "label": "Write to me",
+      "headline": ["Tell me what", "you’re building."],
+      "description": "For independent project work or a platform engineering role, send me a short note about the product and where you need help.",
+      "email": {
+        "label": "mr.chelyshkin@icloud.com",
+        "href": "mailto:mr.chelyshkin@icloud.com"
       }
     }
   }

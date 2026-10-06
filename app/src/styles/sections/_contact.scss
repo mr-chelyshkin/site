@@ -1,9 +1,9 @@
 @use '../tools';
 
-@layer views {
+@layer sections {
   /* The one tinted surface on the page and the only section without a rail.
      Geometry comes from `.o-poster--open`. */
-  .content-contact {
+  .contact {
     /* Scoped so the signal slices mask against this surface, the muted ink keeps
        its contrast on the tint, and hairlines stay visible on it. */
     --signal-surface: var(--color-background-tint);
@@ -13,11 +13,11 @@
     color: var(--color-text-main);
   }
 
-  .content-contact__lead {
+  .contact__lead {
     color: var(--color-text-muted);
   }
 
-  .content-contact__reply {
+  .contact__reply {
     display: grid;
     justify-items: start;
     gap: clamp(1.25rem, 2.4vw, 2rem);
@@ -25,37 +25,25 @@
     border-top: 1px solid var(--color-rule-main);
   }
 
-  /* The single action on the page, so it is set at display size; the shared
-     link rule would strike it through, which reads as cancelled at this scale. */
-  .content-contact__email {
-    font-family: var(--font-display);
+  /* The single action on the page, so it is set at display size and lights
+     up with the signal fringe instead of the struck-through link hover, which
+     reads as cancelled at this scale. */
+  .contact__email {
+    @include tools.display-caps;
     font-size: clamp(1.5rem, 4vw, 3.5rem);
-    font-weight: 600;
     line-height: 1;
-    letter-spacing: -0.035em;
-    text-transform: uppercase;
     overflow-wrap: anywhere;
     transition: text-shadow var(--motion-fast) ease;
 
-    &::after {
-      content: none;
-    }
-
     &:hover,
     &:focus-visible {
-      text-shadow:
-        -0.022em 0 var(--signal-cool),
-        0.018em 0 var(--signal-warm);
-    }
-
-    &:focus-visible {
-      @include tools.focus-ring;
+      @include tools.signal-fringe;
     }
   }
 
-  @media (max-width: 64rem) {
+  @include tools.below(lg) {
     /* Sized so a full-length address still sets on one line at 375px. */
-    .content-contact__email {
+    .contact__email {
       font-size: clamp(1.125rem, 5.6vw, 2rem);
       letter-spacing: -0.025em;
     }

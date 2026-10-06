@@ -3,27 +3,27 @@ import BaseLink from '@/components/ui/BaseLink.vue'
 import SocialLinks from '@/components/ui/SocialLinks.vue'
 import { siteContent } from '@/contents'
 
-interface Props {
+defineProps<{
+  id: string
   isOpen: boolean
-}
+}>()
 const emit = defineEmits<{ close: [] }>()
-const closeMenu = () => {
-  emit('close')
-}
-defineProps<Props>()
+
+const close = () => emit('close')
 </script>
 
 <template>
-  <div v-if="isOpen" class="site-navigation__nav-overlay" @click="closeMenu"></div>
+  <div v-if="isOpen" class="site-navigation__scrim" @click="close" />
   <nav
-    :class="['site-navigation', { 'site-navigation__open': isOpen }]"
-    id="navigation-menu"
+    :id="id"
+    class="site-navigation"
+    :class="{ 'site-navigation--open': isOpen }"
     :inert="!isOpen"
   >
     <div class="site-navigation__content">
       <ul class="site-navigation__list">
         <li class="site-navigation__item">
-          <BaseLink :to="siteContent.links.home" @click="closeMenu">
+          <BaseLink :to="siteContent.links.home" @click="close">
             {{ siteContent.actions.home }}
           </BaseLink>
         </li>
@@ -31,7 +31,7 @@ defineProps<Props>()
       <SocialLinks
         class="site-navigation__socials"
         :profiles="siteContent.socialProfiles"
-        @click="closeMenu"
+        @click="close"
       />
     </div>
   </nav>

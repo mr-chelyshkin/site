@@ -1,16 +1,18 @@
-@mixin focus-ring {
-  outline: 2px solid currentColor;
-  outline-offset: 4px;
+@use 'sass:map';
+@use '../settings';
+
+/* Media */
+
+// Styles for viewports at or below a breakpoint from `settings.$breakpoints`.
+@mixin below($name) {
+  @media (max-width: map.get(settings.$breakpoints, $name)) {
+    @content;
+  }
 }
 
-@mixin component-title {
-  font-family: var(--font-display);
-  font-size: clamp(1.5rem, 2vw, 2rem);
-  font-weight: 600;
-  line-height: 1.1;
-  letter-spacing: -0.025em;
-}
+/* Type */
 
+// Small mono caps for indices, captions and labels.
 @mixin meta-text {
   font-family: var(--font-mono);
   font-size: var(--text-size-xsm);
@@ -20,8 +22,63 @@
   text-transform: uppercase;
 }
 
-@mixin interaction-offset {
-  box-shadow:
-    -2px 0 var(--color-accent-cool),
-    2px 0 var(--color-accent-warm);
+// A mid-size display title.
+@mixin component-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2vw, 2rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
+// Tight uppercase display type for names set in a list or a grid.
+@mixin display-caps {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+}
+
+/* Interaction */
+
+@mixin focus-ring {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+// The hero's color split as a text shadow. Offsets are signed: the cool
+// fringe sits to the left, the warm one to the right.
+@mixin signal-fringe(
+  $cool-offset: -0.022em,
+  $warm-offset: 0.018em,
+  $cool: var(--signal-cool),
+  $warm: var(--signal-warm)
+) {
+  text-shadow:
+    $cool-offset 0 $cool,
+    $warm-offset 0 $warm;
+}
+
+// A rule struck through the text on hover. The element becomes the
+// containing block of its `::after`.
+@mixin strike-on-hover($thickness: max(1px, 0.025em)) {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -0.5rem;
+    left: -0.5rem;
+    height: $thickness;
+    background: currentColor;
+    transform: translateY(-50%) scaleX(0);
+    transform-origin: left;
+    transition: transform var(--motion-base) cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  &:hover::after {
+    transform: translateY(-50%) scaleX(1);
+  }
 }

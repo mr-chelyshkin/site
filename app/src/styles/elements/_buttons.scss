@@ -1,0 +1,12 @@
+@layer elements {
+  /* Buttons start bare and take the type around them; each component that
+     uses one draws its own control. */
+  button {
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+}

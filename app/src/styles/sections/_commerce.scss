@@ -1,0 +1,143 @@
+@use '../tools';
+
+@layer sections {
+  /* Names flow as a wall over a readout that follows the pointer and keyboard
+     focus; a click or tap pins a name. The section takes a faint tint from the
+     active name's brand colors, set inline by `CommerceSection`. Geometry comes
+     from `.o-poster`. */
+  .commerce {
+    --company-surface: color-mix(in srgb, var(--company-primary) 7%, var(--color-background-main));
+    --company-ink: color-mix(in srgb, var(--company-primary) 35%, var(--color-text-main));
+    --signal-surface: var(--company-surface);
+    background: var(--company-surface);
+    color: var(--color-text-main);
+    transition: background-color var(--motion-fast) ease;
+  }
+
+  .commerce__wall {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: clamp(1.75rem, 3.4vw, 3rem) clamp(2rem, 4.4vw, 4rem);
+
+    > li {
+      min-width: 0;
+      max-width: 100%;
+    }
+  }
+
+  .commerce__entry {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    max-width: 100%;
+    min-height: 44px;
+    text-align: left;
+  }
+
+  .commerce__entry-index {
+    @include tools.meta-text;
+    color: var(--color-text-muted);
+    transition: color var(--motion-fast) ease;
+
+    .commerce__entry--active & {
+      color: var(--company-ink);
+    }
+  }
+
+  .commerce__entry-name {
+    @include tools.display-caps;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-size: clamp(1.75rem, 4.2vw, 3.75rem);
+    transition:
+      color var(--motion-fast) ease,
+      text-shadow var(--motion-fast) ease;
+
+    /* Full ink at rest; the wall dims around whichever name is being read. */
+    .commerce__wall--tuned & {
+      color: var(--color-text-muted);
+    }
+
+    .commerce__entry--active & {
+      color: var(--company-ink);
+      @include tools.signal-fringe(
+        -0.02em,
+        0.016em,
+        color-mix(in srgb, var(--company-primary) 45%, transparent),
+        color-mix(in srgb, var(--company-secondary) 35%, transparent)
+      );
+    }
+  }
+
+  /* Every state shares one grid cell. Its natural maximum height reserves space
+     at any viewport or text size, so choosing a name never moves the page. */
+  .commerce__readout {
+    display: grid;
+    align-content: start;
+    max-width: 54ch;
+    padding-top: clamp(1.25rem, 2vw, 1.75rem);
+    border-top: 1px solid var(--color-rule-main);
+  }
+
+  .commerce__readout-state {
+    display: grid;
+    grid-area: 1 / 1;
+    align-content: start;
+    gap: 0.65rem;
+    visibility: hidden;
+
+    &--active {
+      visibility: visible;
+    }
+  }
+
+  .commerce__readout-meta {
+    @include tools.meta-text;
+    color: var(--color-text-muted);
+
+    /* A terminal caret marks the readout as a live line rather than a caption. */
+    &::after {
+      content: '';
+      display: inline-block;
+      width: 0.45em;
+      height: 0.95em;
+      margin-left: 0.4em;
+      background: currentcolor;
+      vertical-align: -0.1em;
+    }
+  }
+
+  .commerce__readout-note {
+    font-size: clamp(1rem, 1.35vw, 1.25rem);
+    line-height: 1.5;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes commerce-caret {
+      0%,
+      54% {
+        opacity: 1;
+      }
+
+      55%,
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .commerce__readout-meta::after {
+      animation: commerce-caret 1.1s steps(1, end) 3;
+    }
+  }
+
+  @include tools.below(lg) {
+    .commerce__wall {
+      gap: 1.5rem 2rem;
+    }
+
+    .commerce__readout {
+      max-width: 46ch;
+    }
+  }
+}

@@ -1,13 +1,16 @@
+@use 'sass:color';
+
+// Palette
 $color-white: #f7f7f2;
 $color-dark: #171717;
-$color-accent-cool: #8eaabb;
-$color-accent: #bbc3c4;
-$color-accent-warm: #d2c6b0;
+$color-sand: #e0d6c2;
+$color-muted: #5f5f5c;
+$color-muted-strong: #4a4a47;
+$color-selection: #8eaabb;
 $color-signal-cool: #58b9c0;
 $color-signal-warm: #d58c64;
-$color-muted: #5f5f5c;
-$color-sand: #e0d6c2;
-$color-muted-strong: #4a4a47;
+
+// Roles
 $color-background-main: $color-white;
 $color-background-contrast: $color-dark;
 $color-background-tint: $color-sand;
@@ -16,6 +19,6 @@ $color-text-muted: $color-muted;
 $color-text-muted-tint: $color-muted-strong;
 $color-text-contrast: $color-white;
 $color-border-main: $color-dark;
-$color-rule-main: rgb(23 23 23 / 16%);
-$color-scrim: rgb(23 23 23 / 55%);
-$color-rule-tint: rgb(23 23 23 / 24%);
+$color-rule-main: color.change($color-dark, $alpha: 0.16);
+$color-rule-tint: color.change($color-dark, $alpha: 0.24);
+$color-scrim: color.change($color-dark, $alpha: 0.55);

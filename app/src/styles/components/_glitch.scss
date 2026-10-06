@@ -1,4 +1,7 @@
 @layer components {
+  /* One-shot glitches triggered by `useGlitch`. Both run for 400ms, the
+     composable's default timeout, and animate `translate` rather than
+     `transform` so a rotated label keeps its rotation. */
   @keyframes digital-corruption {
     0%,
     100% {
@@ -73,7 +76,7 @@
   }
 
   .c-glitch-digital {
-    animation: digital-corruption var(--glitch-duration, 400ms) ease-in-out;
+    animation: digital-corruption 400ms ease-in-out;
   }
 
   @keyframes matrix-split {
@@ -161,7 +164,7 @@
   }
 
   .c-glitch-matrix {
-    animation: matrix-split 0.4s ease-in-out;
+    animation: matrix-split 400ms ease-in-out;
   }
 
   @media (prefers-reduced-motion: reduce) {

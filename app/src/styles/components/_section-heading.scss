@@ -1,8 +1,9 @@
+@use '../tools';
+
 @layer components {
   /* Display headline for a section: hand-broken lines, each torn by its own
      signal cut so the block reads like the hero's photo tears. */
   .c-section-heading {
-    margin: 0;
     font-size: clamp(2.5rem, 5.6vw, 5.5rem);
     font-weight: 600;
     line-height: 0.9;
@@ -46,7 +47,7 @@
     }
   }
 
-  @media (max-width: 64rem) {
+  @include tools.below(lg) {
     .c-section-heading {
       font-size: clamp(2.25rem, 8vw, 4rem);
     }

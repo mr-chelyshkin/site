@@ -2,6 +2,7 @@
   html {
     font-size: var(--text-size-md);
     scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--header-height) + 1rem);
     touch-action: manipulation;
 
     @media (prefers-reduced-motion: reduce) {
@@ -21,6 +22,6 @@
 
   ::selection {
     color: var(--color-text-main);
-    background: var(--color-accent-cool);
+    background: var(--color-selection);
   }
 }

@@ -9,6 +9,12 @@
     padding: 0;
   }
 
+  /* A list that carries a class is layout, not prose. */
+  ul[class],
+  ol[class] {
+    list-style: none;
+  }
+
   :focus-visible {
     @include tools.focus-ring;
   }
