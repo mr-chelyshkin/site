@@ -5,6 +5,7 @@ import SprayText from '@/components/ui/SprayText.vue'
 import WallSection from '@/components/ui/WallSection.vue'
 import { usePassPhysics } from '@/composables/usePassPhysics'
 import type { HomeContent } from '@/contents'
+import { SHAPES, kindOf } from '@/utils/pass-kinds'
 
 defineProps<{
   content: HomeContent['commerce']
@@ -56,13 +57,24 @@ function centerFocusedPass(event: FocusEvent) {
       role="list"
       @focusin="centerFocusedPass"
     >
-      <li v-for="(company, i) in content.companies" :key="company.name" class="commerce__hook">
+      <li
+        v-for="(company, i) in content.companies"
+        :key="company.name"
+        class="commerce__hook"
+        :class="`commerce__hook--${SHAPES[kindOf(company.pass)].cord}`"
+      >
         <!-- The hook's stretch of cable and the pass's cord, drawn by script
-             while the passes are live, and blank until then. -->
+             while the passes are live, and blank until then. The seam runs
+             along the cord: a ribbon's stripe, a chain's highlights. -->
         <svg class="commerce__wire" aria-hidden="true" focusable="false">
           <polyline class="commerce__line" />
           <path class="commerce__cord" />
+          <path class="commerce__seam" />
         </svg>
+        <!-- A reel pass hangs from a retractable reel clipped to the ring. -->
+        <span v-if="kindOf(company.pass) === 'reel'" class="commerce__reel" aria-hidden="true">
+          <span class="commerce__reel-cap" />
+        </span>
         <AccessPass :company="company" :index="i" :holder="holder" />
       </li>
     </ul>

@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import { computed, useId } from 'vue'
-import BarCode from '@/components/ui/BarCode.vue'
-import face from '@/assets/images/hero-face.png'
+import { computed, useId, type Component } from 'vue'
+import PassHolder from '@/components/sections/passes/PassHolder.vue'
+import PassLaminated from '@/components/sections/passes/PassLaminated.vue'
+import PassMetal from '@/components/sections/passes/PassMetal.vue'
+import PassReel from '@/components/sections/passes/PassReel.vue'
+import PassSmartCard from '@/components/sections/passes/PassSmartCard.vue'
+import PassVisitor from '@/components/sections/passes/PassVisitor.vue'
 import type { Company } from '@/contents'
 import { padIndex } from '@/utils/format'
+import { SHAPES, kindOf, type PassKind } from '@/utils/pass-kinds'
 import { seeded } from '@/utils/seeded'
 
 const props = defineProps<{
@@ -13,20 +18,36 @@ const props = defineProps<{
   holder: string
 }>()
 
+const KINDS: Record<PassKind, Component> = {
+  holder: PassHolder,
+  reel: PassReel,
+  laminated: PassLaminated,
+  smartcard: PassSmartCard,
+  metal: PassMetal,
+  visitor: PassVisitor,
+}
+
 const nameId = `pass-${useId()}`
 const number = computed(() => padIndex(props.index))
+const kind = computed(() => kindOf(props.company.pass))
 // Each pass hangs at its own angle and drop, the same on every visit;
 // neighbors lean opposite ways, but little enough that six in a row never
-// cover each other's text.
+// cover each other's text. A reel hangs lower, under its reel. The kind's
+// shape goes to the stylesheet and to usePassPhysics.
 const hang = computed(() => {
   const rand = seeded(`${props.company.name}:hang`)
   const lean = props.index % 2 ? 1 : -1
+  const shape = SHAPES[kind.value]
   return {
     '--tilt': `${(lean * (1 + rand() * 1.25)).toFixed(2)}deg`,
-    // pass-physics needs at least 36px, room for the clip under the ring even
-    // when the pass is lifted in hand (`slotY` ≥ `R_MIN + LIFT`); 48 to 82
-    // clears it.
-    '--drop': `${48 + Math.round(rand() * 34)}px`,
+    // pass-physics needs each pivot at least 16px past `hookY + tie`, room for
+    // the hardware under the hook even lifted in hand. The reel clears that by
+    // only 3px at the shortest drop: 48 + 32 + 13 = 93 against 90.
+    '--drop': `${48 + Math.round(rand() * 34) + shape.dropExtra}px`,
+    '--w': `${shape.width}px`,
+    '--slot': `${shape.slot}px`,
+    '--tie': `${shape.tie}px`,
+    '--hook-y': `${shape.hookY}px`,
   }
 })
 </script>
@@ -34,40 +55,23 @@ const hang = computed(() => {
 <template>
   <!-- Focusable, so a keyboard can take a pass in hand, and reach every pass
        on a phone's scrolling cable. -->
-  <article class="pass" :style="hang" tabindex="0" :aria-labelledby="nameId">
+  <article
+    class="pass"
+    :class="`pass--${kind}`"
+    :style="hang"
+    :data-kind="kind"
+    tabindex="0"
+    :aria-labelledby="nameId"
+  >
     <!-- Turns round the cord when the pass is poked; see usePassPhysics. -->
     <div class="pass__twist">
-      <span class="pass__clip" aria-hidden="true" />
-      <div class="pass__card">
-        <!-- First, so a screen reader meets the company before its facts; the
-             grid still shows it under the photo. -->
-        <h3 :id="nameId" class="pass__name">{{ company.name }}</h3>
-        <span class="pass__slot" aria-hidden="true" />
-        <p class="pass__band" aria-hidden="true">
-          <span>Access</span>{{ ' ' }}<span>{{ number }}</span>
-        </p>
-        <!-- Not draggable, so pulling a pass by its photo pulls the pass. -->
-        <img class="pass__face" :src="face" alt="" width="42" height="56" draggable="false" />
-        <dl class="pass__facts">
-          <!-- The same holder on every pass: printed, not read out six times. -->
-          <div class="pass__fact" aria-hidden="true">
-            <dt class="pass__term">Name</dt>
-            <dd class="pass__value">{{ holder }}</dd>
-          </div>
-          <div class="pass__fact">
-            <dt class="pass__term">Unit</dt>
-            <dd class="pass__value">{{ company.unit }}</dd>
-          </div>
-          <div class="pass__fact">
-            <dt class="pass__term">Role</dt>
-            <dd class="pass__value">{{ company.role }}</dd>
-          </div>
-        </dl>
-        <p class="pass__note">{{ company.note }}</p>
-        <span class="pass__id" aria-hidden="true">IC-{{ number }}</span>
-        <BarCode class="pass__barcode" :seed="company.name" />
-        <span class="pass__shade" aria-hidden="true" />
-      </div>
+      <component
+        :is="KINDS[kind]"
+        :company="company"
+        :number="number"
+        :holder="holder"
+        :name-id="nameId"
+      />
     </div>
   </article>
 </template>

@@ -1,6 +1,6 @@
 import { onBeforeUnmount, onMounted, ref, type Ref } from 'vue'
+import { CORDS, SHAPES, kindOf } from '@/utils/pass-kinds'
 import {
-  SLOT,
   STEP,
   brush,
   createPass,
@@ -24,16 +24,19 @@ interface Parts {
   hook: HTMLElement
   el: HTMLElement
   twist: HTMLElement
-  card: HTMLElement
+  body: HTMLElement
   line: SVGPolylineElement
   cord: SVGPathElement
+  /** Drawn along the cord: a ribbon's stripe, a chain's highlights. */
+  seam: SVGPathElement | null
 }
 
 interface Hung extends Parts {
   pass: Pass
-  /** The cable's points and the cord's path as last written. */
+  /** The cable's points and the cord's and seam's paths as last written. */
   cablePoints: string
   cordPath: string
+  seamPath: string
 }
 
 /** Where a pointer was last, when, and how fast it went: px, ms, px/s. */
@@ -69,6 +72,10 @@ interface Press {
 const POKE_MS = 350
 const SLOP = { hand: 4, finger: 10 }
 
+// One decimal place, never "-0.0": a value settling to zero from below would
+// otherwise rewrite the inline style for no change, and read as not at rest.
+const tenths = (n: number) => (Math.round(n * 10) / 10 || 0).toFixed(1)
+
 /**
  * Lets the passes on a cable swing, stretch and twist under a pointer, a finger
  * or the keyboard, with `pass-physics` doing the motion. It collects the passes
@@ -95,18 +102,26 @@ export function usePassPhysics(cable: Ref<HTMLElement | null>) {
   // Each pass at rest: `offset*` ignore transforms.
   function fitOf(parts: Parts, gap: number, scale: number): PassFit {
     const deg = parseFloat(getComputedStyle(parts.el).getPropertyValue('--tilt'))
+    const tilt = Number.isFinite(deg) ? deg : 0
     // In fractions of a pixel, as the stylesheet places the ring and the cable.
     // Neither the hooks nor their ancestors are transformed, so the rect is the
     // hook's layout box.
     const hookWidth = parts.hook.getBoundingClientRect().width
+    // The kind's hardware and cord, from the same table the stylesheet's
+    // custom properties come from.
+    const shape = SHAPES[kindOf(parts.el.dataset.kind)]
     return {
       width: parts.el.offsetWidth,
-      height: parts.card.offsetHeight,
+      height: parts.body.offsetHeight,
       hookWidth,
       gap,
       ringX: hookWidth / 2,
-      slotY: parts.el.offsetTop + SLOT,
-      tilt: ((Number.isFinite(deg) ? deg : 0) * scale * Math.PI) / 180,
+      slotY: parts.el.offsetTop + shape.slot,
+      tilt: (tilt * scale * Math.PI) / 180,
+      slot: shape.slot,
+      tie: shape.tie,
+      hookY: shape.hookY,
+      cord: CORDS[shape.cord],
     }
   }
 
@@ -144,15 +159,18 @@ export function usePassPhysics(cable: Ref<HTMLElement | null>) {
   }
 
   function draw(item: Hung) {
-    const { pass, hook, el, twist, card, line, cord } = item
+    const { pass, hook, el, twist, body, line, cord, seam } = item
     const d = drawingOf(pass)
     el.style.transform = d.transform
     el.style.setProperty('--shadow-x', `${d.shadowX.toFixed(2)}px`)
     el.style.setProperty('--shadow-y', `${d.shadowY.toFixed(2)}px`)
+    el.style.setProperty('--glint', `${tenths(d.glint)}%`)
+    el.style.setProperty('--holo', `${tenths(d.holo)}deg`)
     twist.style.transform = d.twist
-    card.style.setProperty('--shade', d.shade.toFixed(3))
-    card.style.setProperty('--shade-side', String(d.shadeSide))
+    body.style.setProperty('--shade', d.shade.toFixed(3))
+    body.style.setProperty('--shade-side', String(d.shadeSide))
     hook.style.setProperty('--dip', `${d.dip.toFixed(2)}px`)
+    hook.style.setProperty('--cord-scale', d.cordScale.toFixed(3))
     // Rewriting an attribute with its own value still costs a style recalc and
     // a layout, unlike an inline style, and a still pass is redrawn whenever
     // another one moves.
@@ -164,19 +182,25 @@ export function usePassPhysics(cable: Ref<HTMLElement | null>) {
       item.cordPath = d.cord
       cord.setAttribute('d', d.cord)
     }
-    cord.style.strokeWidth = `${d.cordWidth.toFixed(2)}px`
+    if (seam && item.seamPath !== d.cord) {
+      item.seamPath = d.cord
+      seam.setAttribute('d', d.cord)
+    }
   }
 
-  function clear({ hook, el, twist, card, line, cord }: Hung) {
-    for (const name of ['transform', '--shadow-x', '--shadow-y']) el.style.removeProperty(name)
+  function clear({ hook, el, twist, body, line, cord, seam }: Hung) {
+    for (const name of ['transform', '--shadow-x', '--shadow-y', '--glint', '--holo']) {
+      el.style.removeProperty(name)
+    }
     delete el.dataset.held
     twist.style.removeProperty('transform')
-    card.style.removeProperty('--shade')
-    card.style.removeProperty('--shade-side')
+    body.style.removeProperty('--shade')
+    body.style.removeProperty('--shade-side')
     hook.style.removeProperty('--dip')
+    hook.style.removeProperty('--cord-scale')
     line.removeAttribute('points')
     cord.removeAttribute('d')
-    cord.style.removeProperty('stroke-width')
+    seam?.removeAttribute('d')
   }
 
   function wake() {
@@ -368,16 +392,18 @@ export function usePassPhysics(cable: Ref<HTMLElement | null>) {
     for (const hook of root.querySelectorAll<HTMLElement>('.commerce__hook')) {
       const el = hook.querySelector<HTMLElement>('.pass')
       const twist = hook.querySelector<HTMLElement>('.pass__twist')
-      const card = hook.querySelector<HTMLElement>('.pass__card')
+      const body = hook.querySelector<HTMLElement>('.pass__body')
       const line = hook.querySelector<SVGPolylineElement>('.commerce__line')
       const cord = hook.querySelector<SVGPathElement>('.commerce__cord')
-      if (!el || !twist || !card || !line || !cord) continue
-      const parts = { hook, el, twist, card, line, cord }
+      const seam = hook.querySelector<SVGPathElement>('.commerce__seam')
+      if (!el || !twist || !body || !line || !cord) continue
+      const parts = { hook, el, twist, body, line, cord, seam }
       items.push({
         ...parts,
         pass: createPass(fitOf(parts, gap, scale)),
         cablePoints: '',
         cordPath: '',
+        seamPath: '',
       })
     }
     passes = items.map((item) => item.pass)

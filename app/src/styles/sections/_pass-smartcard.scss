@@ -1,0 +1,160 @@
+@layer sections {
+  /* A clear polycarbonate smart card on a vinyl strap through its slot. The
+     copper antenna and the chip show through, and so does the wall behind,
+     blurred. The card grows with its text. */
+  .pass-smartcard {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-height: 316px;
+    padding: 30px 14px 14px;
+    border-radius: 11px;
+    color: rgb(244 251 253 / 94%);
+    background: linear-gradient(160deg, rgb(190 228 236 / 30%), rgb(105 160 174 / 17%));
+    -webkit-backdrop-filter: blur(2.5px) saturate(1.4) brightness(1.15);
+    backdrop-filter: blur(2.5px) saturate(1.4) brightness(1.15);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 40%),
+      inset 1px 1.5px 0 rgb(255 255 255 / 40%),
+      inset -1px -1px 0 rgb(0 0 0 / 22%),
+      var(--shadow-offset) 18px rgb(0 0 0 / 38%);
+  }
+
+  /* A clear vinyl strap with a snap, and the ring the cord ties to at its top,
+     mirrored in pass-kinds.ts as the smart card's `tie`. */
+  .pass-smartcard__strap {
+    position: absolute;
+    top: -27px;
+    left: 50%;
+    z-index: 6;
+    width: 13px;
+    height: 44px;
+    margin-left: -6.5px;
+    border-radius: 3px;
+    background: linear-gradient(
+      90deg,
+      rgb(255 255 255 / 16%),
+      rgb(255 255 255 / 34%) 45%,
+      rgb(255 255 255 / 12%)
+    );
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 35%),
+      0 1px 2px rgb(0 0 0 / 35%);
+
+    /* The snap. */
+    &::before {
+      content: '';
+      position: absolute;
+      top: 9px;
+      left: 2px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #fbfdfd, #a9b3b6 50%, #59636a);
+      box-shadow: 0 1px 1px rgb(0 0 0 / 50%);
+    }
+
+    /* The ring. */
+    &::after {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 2.5px;
+      width: 8px;
+      height: 8px;
+      border: 1.6px solid #b9c2c5;
+      border-radius: 50%;
+    }
+  }
+
+  .pass-smartcard__coil {
+    position: absolute;
+    inset: 10px;
+    z-index: 0;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+    overflow: visible;
+    opacity: 0.85;
+  }
+
+  .pass-smartcard__slot {
+    position: absolute;
+    /* The pivot is in it, mirrored in pass-kinds.ts as the smart card's `slot`. */
+    top: 9px;
+    left: 50%;
+    width: 30px;
+    height: 7px;
+    margin-left: -15px;
+    border-radius: 4px;
+    background: rgb(12 13 14 / 70%);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 30%);
+  }
+
+  /* The print, over the antenna. */
+  .pass-smartcard__band,
+  .pass-smartcard__row,
+  .pass-smartcard__name,
+  .pass-smartcard__note,
+  .pass-smartcard__foot {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* After the name in the source, shown above it. */
+  .pass-smartcard__band,
+  .pass-smartcard__row {
+    order: -1;
+  }
+
+  .pass-smartcard__band {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .pass-smartcard__row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .pass-smartcard__photo {
+    flex: none;
+    width: 66px;
+    height: 88px;
+    padding: 3px;
+    border-radius: 3px;
+    background: rgb(246 250 251 / 92%);
+  }
+
+  .pass-smartcard__face {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    mix-blend-mode: multiply;
+  }
+
+  .pass-smartcard__name {
+    font-size: 29px;
+    font-weight: 800;
+    line-height: 0.86;
+    letter-spacing: 0.01em;
+  }
+
+  .pass-smartcard__note {
+    font-size: 9px;
+    line-height: 1.45;
+    opacity: 0.85;
+  }
+
+  .pass-smartcard__foot {
+    display: flex;
+    justify-content: space-between;
+    margin-top: auto;
+    font-size: 8px;
+    letter-spacing: 0.16em;
+    opacity: 0.8;
+  }
+}

@@ -1,29 +1,30 @@
 /**
- * A visitor's pass on an elastic cord, hung from a ring on a cable: the motion
- * behind the passes in "Access granted". Free of the DOM, so the page draws it
- * and a script can test it.
+ * An access pass on its cord, hung from a ring on a cable: the motion behind
+ * the passes in "Access granted". Free of the DOM, so the page draws it and a
+ * script can test it.
  *
  * Positions are in the hook's own pixels: the cable runs along y = 0 and y
  * points down. Time is in seconds, angles in radians, clockwise as in CSS. A
- * pass is a cord that swings from its ring and stretches, a card that turns on
- * the clip at the cord's end and twists round the cord, and a ring that dips
- * as the cable gives. At rest it hangs at its own tilt, as the stylesheet
- * draws it.
+ * pass is a cord that swings from its hook and stretches, a card that turns
+ * about its pivot at the cord's end and twists round the cord, and a ring that
+ * dips as the cable gives. Each kind of pass brings its own pivot, cord, and
+ * point where the cord leaves the hook (`pass-kinds.ts`): a reel's line leaves
+ * from the reel's mouth, below the ring, and a metal card hangs by a hole on a
+ * ball chain. At rest a pass hangs at its own tilt, as the stylesheet draws it.
  */
 
 /**
- * The feel, tuned by hand in a live sketch. The constants below derive from it
- * once, at load.
+ * The feel every kind of pass shares, tuned by hand in a live sketch; each
+ * pass's cord brings its own spring and stretch. The constants below derive
+ * from it once, at load.
  */
 const TUNING = {
   /** A typical pass's swing, Hz, and its damping ratio. */
   swingHz: 1.1,
   swingDamping: 0.1,
-  /** The cord's bounce, Hz; how far past rest it stretches before it stiffens, px; damping. */
-  cordHz: 3.2,
-  cordStretch: 50,
+  /** The cord's damping ratio; its spring and stretch come with each pass's PassCord. */
   cordDamping: 0.35,
-  /** How much the card lags the cord's swing; its spring on the clip, Hz; damping ratio. */
+  /** How much the card lags the cord's swing; its spring about its pivot, Hz; damping ratio. */
   wobble: 0.8,
   cardHz: 2.8,
   cardDamping: 0.16,
@@ -41,22 +42,20 @@ const TUNING = {
 /** The fixed simulation step, s. */
 export const STEP = 1 / 480
 
-/**
- * From the card's top edge down to the slot the clip goes through, px: the
- * card's pivot. `_pass.scss` turns live passes about the same point.
- */
-export const SLOT = 16
-
 const TAU = Math.PI * 2
 // A typical pass's pendulum length, px: `swingHz` is quoted for it.
 const PENDULUM = 295
-// From the slot up to where the cord ties onto the clip, px.
-const CLIP_TOP = 36
 // How far a pass taken in hand rises, px.
 const LIFT = 8
-// The clip can't ride up past the ring, and the cord stretches no further, px.
-const R_MIN = 44
+// How close the cord's tie point may ride up to where the cord leaves the hook, px.
+const CLEARANCE = 8
+// The cord stretches no further past rest, px.
 const STRETCH_MAX = 260
+// A cord stiffens as it stretches past rest, but only up to this many of its
+// `stretch` scales; no hand gets a cord past 3. Uncapped, a ball chain stretched
+// far enough outruns the fixed step: the pass shakes in place and never
+// settles. 4 leaves the step a wide margin; it holds to about 16.
+const STIFFEST = 4
 // The hand: a stiff, damped spring from the point it holds to the pointer,
 // pulling no harder once the pointer is `GRIP_REACH` px ahead.
 const GRIP = 1200
@@ -71,7 +70,7 @@ const SWIPE_VERTICAL = 0.15
 // The largest push a brush or a swipe hands over, px/s per unit of mass. It caps
 // the impulse, not the speed that results; see `kick`.
 const KICK_MAX = 900
-// How far the swing, the card on its clip and the twist go before a soft stop, rad.
+// How far the swing, the card about its pivot and the twist go before a soft stop, rad.
 const SWING_LIMIT = 1.35
 const CARD_LIMIT = 0.7
 const TWIST_LIMIT = 1
@@ -82,20 +81,30 @@ const BOW = 0.0009
 const CABLE_HZ = 4.5
 const CABLE_DAMPING = 0.2
 const CABLE_COUPLING = 0.35
-// How far the card's shadow falls, px: `.pass__card`'s `box-shadow` in `_pass.scss`.
+// How far a card's shadow falls, px: the `box-shadow` offset of each kind's body (`_pass-*.scss`).
 const SHADOW = 16
 
-// Gravity, px/s², and the cord's spring.
+// Gravity, px/s².
 const G = (TAU * TUNING.swingHz) ** 2 * PENDULUM
-const CORD_OMEGA = TAU * TUNING.cordHz
-const CORD_K = CORD_OMEGA ** 2
-// The card's weight stretches the cord this far at rest.
-const PRESTRETCH = G / CORD_K
 const CARD_OMEGA = TAU * TUNING.cardHz
 const TWIST_OMEGA = TAU * TUNING.twistHz
 const CABLE_OMEGA = TAU * CABLE_HZ
 
-/** Where a pass hangs, measured from the page at rest. */
+/**
+ * A cord's feel: its bounce, Hz; how far past rest it stretches before it
+ * stiffens, px; and whether it narrows when stretched. Read-only, since passes
+ * of one kind share their cord.
+ */
+export interface PassCord {
+  readonly hz: number
+  readonly stretch: number
+  readonly thins: boolean
+}
+
+/**
+ * Where a pass hangs and how: its sizes and place, measured from the page at
+ * rest, and its kind's `slot`, `tie`, `hookY` and `cord` (`pass-kinds.ts`).
+ */
 export interface PassFit {
   /** The pass's width and its card's height. */
   width: number
@@ -106,11 +115,19 @@ export interface PassFit {
   /** The ring's x. */
   ringX: number
   /**
-   * The slot's y at rest: the pass's drop plus `SLOT`. It needs room for the clip
-   * under the ring, lifted in hand too: at least `R_MIN + LIFT`, 52px. The page's
-   * drops give 64px and more.
+   * The pivot's y at rest: the pass's drop plus `slot`. It needs room for the
+   * hardware under the hook, lifted in hand too: at least
+   * `hookY + tie + CLEARANCE + LIFT`, 16px past `hookY + tie`.
    */
   slotY: number
+  /** From the card's top edge down to its pivot: the slot or hole its hardware goes through. */
+  slot: number
+  /** From the pivot up to where the cord ties on. */
+  tie: number
+  /** Where the cord swings from below the ring: 0 at the ring, a reel's mouth lower. */
+  hookY: number
+  /** The cord it hangs on: `hz` and `stretch` set how it moves, `thins` how it's drawn. */
+  cord: PassCord
   /** The angle the pass rests at. */
   tilt: number
 }
@@ -134,10 +151,10 @@ export interface Pass extends PassFit {
   /** The cord's angle and how fast it turns. */
   theta: number
   omega: number
-  /** The length from the ring to the slot, and how fast it changes. */
+  /** The length from the hook, at `hookY`, to the slot, and how fast it changes. */
   r: number
   vr: number
-  /** The card's angle on its clip, against the cord. */
+  /** The card's angle about its pivot, against the cord. */
   phi: number
   vphi: number
   /** The card's twist round the cord. */
@@ -176,9 +193,15 @@ export interface PassDrawing {
   /** How dark the edge turned from the light is, 0 to 1, and which edge: 1 left, -1 right. */
   shade: number
   shadeSide: number
-  /** The cord as an SVG path, and its stroke width: a stretched cord thins. */
+  /** The cord as an SVG path, and how far a stretched cord has thinned: 1 for not at all. */
   cord: string
-  cordWidth: number
+  cordScale: number
+  /**
+   * Where the light catches a glossy surface, in percent across it, and how far
+   * a hologram's colors turn, in degrees.
+   */
+  glint: number
+  holo: number
   /** The ring's dip, and the hook's stretch of cable as SVG polyline points. */
   dip: number
   cable: string
@@ -203,7 +226,7 @@ export function createPass(fit: PassFit): Pass {
     ...fit,
     theta: fit.tilt,
     omega: 0,
-    r: fit.slotY,
+    r: fit.slotY - fit.hookY,
     vr: 0,
     phi: 0,
     vphi: 0,
@@ -233,27 +256,45 @@ export function refit(pass: Pass, fit: PassFit) {
   pass.gap = fit.gap
   pass.ringX = fit.ringX
   pass.slotY = fit.slotY
+  pass.slot = fit.slot
+  pass.tie = fit.tie
+  pass.hookY = fit.hookY
+  pass.cord = fit.cord
   pass.tilt = fit.tilt
+}
+
+// The shortest the hook-to-pivot length gets: the tie point stops just short
+// of where the cord leaves the hook.
+function reachMin(p: Pass) {
+  return p.tie + CLEARANCE
 }
 
 function restOf(p: Pass) {
   const inHand = p.inHand && !p.grip
-  // Never above the clip's stop: a rest the pass can't reach would keep it moving.
-  const r = Math.max(R_MIN, p.slotY - (inHand ? LIFT : 0))
+  // Never above the tie point's stop: a rest the pass can't reach would keep it moving.
+  const r = Math.max(reachMin(p), p.slotY - p.hookY - (inHand ? LIFT : 0))
   return { theta: inHand ? 0 : p.tilt, r, inHand }
 }
 
-// The pass about its ring: the arm to the card's middle and the moment of
+// The cord's spring: its angular frequency, stiffness, and how far the card's
+// weight stretches it at rest.
+function springOf(p: Pass) {
+  const omega = TAU * p.cord.hz
+  const k = omega * omega
+  return { omega, k, prestretch: G / k }
+}
+
+// The pass about its hook: the arm to the card's middle and the moment of
 // inertia, per unit of mass. The arm is at least 40px, so a card too small to
 // measure can't swing too fast.
 function swingMass(p: Pass) {
-  const arm = Math.max(40, p.r + p.height / 2 - SLOT)
+  const arm = Math.max(40, p.r + p.height / 2 - p.slot)
   return { arm, inertia: arm * arm + (p.height ** 2 + p.width ** 2) / 12 }
 }
 
 // The card about its slot, per unit of mass.
 function cardInertia(p: Pass) {
-  return (p.height ** 2 + p.width ** 2) / 12 + (p.height / 2 - SLOT) ** 2
+  return (p.height ** 2 + p.width ** 2) / 12 + (p.height / 2 - p.slot) ** 2
 }
 
 function frameOf(p: Pass): Frame {
@@ -267,7 +308,7 @@ function frameOf(p: Pass): Frame {
     sa: Math.sin(angle),
     ca: Math.cos(angle),
     x: p.ringX - p.r * st,
-    y: p.dip + p.r * ct,
+    y: p.dip + p.hookY + p.r * ct,
   }
 }
 
@@ -294,16 +335,16 @@ function velocityAt(p: Pass, j: Jacobian) {
   }
 }
 
-// The cord, from just under the ring's top to where it ties onto the clip; its
+// The cord, from just under where it leaves the hook to the tie point; its
 // length now, hanging straight at rest, and unstretched. Like `restOf`, it never
-// puts the slot above the clip's stop, so a pass hung too high can't make the
-// rest length negative.
+// puts the slot above the tie point's stop, so a pass hung too high can't make
+// the rest length negative.
 function cordOf(p: Pass, f: Frame) {
   const x0 = p.ringX
-  const y0 = p.dip + 1.5
-  const x1 = f.x + CLIP_TOP * f.sa
-  const y1 = f.y - CLIP_TOP * f.ca
-  const rest = Math.max(R_MIN, p.slotY) - CLIP_TOP - 1.5
+  const y0 = p.dip + p.hookY + 1.5
+  const x1 = f.x + p.tie * f.sa
+  const y1 = f.y - p.tie * f.ca
+  const rest = Math.max(reachMin(p), p.slotY - p.hookY) - p.tie - 1.5
   return {
     x0,
     y0,
@@ -311,14 +352,16 @@ function cordOf(p: Pass, f: Frame) {
     y1,
     length: Math.hypot(x1 - x0, y1 - y0) || 1,
     rest,
-    natural: rest - PRESTRETCH,
+    natural: rest - springOf(p).prestretch,
   }
 }
 
 // The cable's slope at the ring: the hook turns with it. A cable measured
-// before layout has no length; dividing by 1 then keeps the slope finite.
+// before layout has no length, so no slope to turn a hook with.
 function slopeAt(p: Pass) {
-  return ((p.right?.dip ?? 0) - (p.left?.dip ?? 0)) / (2 * (p.hookWidth + p.gap) || 1)
+  const span = 2 * (p.hookWidth + p.gap)
+  if (!span) return 0
+  return ((p.right?.dip ?? 0) - (p.left?.dip ?? 0)) / span
 }
 
 function advance(p: Pass) {
@@ -341,14 +384,15 @@ function advance(p: Pass) {
 
   // Stretch: the cord holds the card's weight with some stretch already in it,
   // stiffens once pulled past rest, and goes slack above its natural length.
+  const spring = springOf(p)
   const past = p.r - rest.r
-  const extension = past + PRESTRETCH
+  const extension = past + spring.prestretch
   let stretchAccel = G * Math.cos(off) + arm * p.omega ** 2
   p.tension = 0
   if (extension > 0) {
-    const over = Math.max(0, past) / TUNING.cordStretch
-    p.tension = CORD_K * (extension + Math.max(0, past) * over * over)
-    stretchAccel -= p.tension + 2 * TUNING.cordDamping * CORD_OMEGA * p.vr
+    const over = Math.min(STIFFEST, Math.max(0, past) / p.cord.stretch)
+    p.tension = spring.k * (extension + Math.max(0, past) * over * over)
+    stretchAccel -= p.tension + 2 * TUNING.cordDamping * spring.omega * p.vr
   } else {
     // A slack cord holds nothing: the card flies free, and the air slows it only a little.
     stretchAccel -= 0.8 * p.vr
@@ -393,12 +437,13 @@ function advance(p: Pass) {
   p.theta += p.omega * STEP
   p.vr += stretchAccel * STEP
   p.r += p.vr * STEP
-  if (p.r < R_MIN) {
-    p.r = R_MIN
+  if (p.r < reachMin(p)) {
+    p.r = reachMin(p)
     if (p.vr < 0) p.vr *= -0.25
   }
-  if (p.r > p.slotY + STRETCH_MAX) {
-    p.r = p.slotY + STRETCH_MAX
+  const longest = p.slotY - p.hookY + STRETCH_MAX
+  if (p.r > longest) {
+    p.r = longest
     if (p.vr > 0) p.vr = 0
   }
   p.vphi += turnAccel * STEP
@@ -407,8 +452,8 @@ function advance(p: Pass) {
   p.psi += p.vpsi * STEP
 
   // A slack cord bows out to one side until it's taut again.
-  const cord = cordOf(p, frameOf(p))
-  if (cord.length >= cord.natural) p.slackSide = 0
+  const line = cordOf(p, frameOf(p))
+  if (line.length >= line.natural) p.slackSide = 0
   else if (!p.slackSide) p.slackSide = p.omega < 0 ? -1 : 1
 }
 
@@ -547,16 +592,16 @@ const px = (n: number) => n.toFixed(2)
 /** The pass as it is now, in CSS and SVG values. A pass at rest draws as the stylesheet does. */
 export function drawingOf(p: Pass): PassDrawing {
   const f = frameOf(p)
-  const cord = cordOf(p, f)
+  const line = cordOf(p, f)
   // The cord's middle lags a swing's speed-up, and a slack cord bows out as far
   // as its spare length lets it.
   let bow = Math.max(-5, Math.min(5, -p.swingAccel * p.r * BOW))
   if (p.slackSide) {
-    const spare = Math.max(0, cord.natural - cord.length)
-    bow += p.slackSide * 2 * Math.sqrt((3 * cord.length * spare) / 8)
+    const spare = Math.max(0, line.natural - line.length)
+    bow += p.slackSide * 2 * Math.sqrt((3 * line.length * spare) / 8)
   }
-  const mx = (cord.x0 + cord.x1) / 2 - ((cord.y1 - cord.y0) / cord.length) * bow
-  const my = (cord.y0 + cord.y1) / 2 + ((cord.x1 - cord.x0) / cord.length) * bow
+  const mx = (line.x0 + line.x1) / 2 - ((line.y1 - line.y0) / line.length) * bow
+  const my = (line.y0 + line.y1) / 2 + ((line.x1 - line.x0) / line.length) * bow
   const twisted = Math.abs(p.psi) > 1e-4
   // Straight to the midpoints between rings, so neighbors' stretches meet.
   const overhang = p.gap / 2 + 0.5
@@ -575,8 +620,16 @@ export function drawingOf(p: Pass): PassDrawing {
     // the twist's soft stop.
     shade: twisted ? Math.min(1, Math.abs(Math.sin(p.psi)) * 1.3) : 0,
     shadeSide: p.psi > 0 ? -1 : 1,
-    cord: `M${px(cord.x0)} ${px(cord.y0)}Q${px(mx)} ${px(my)} ${px(cord.x1)} ${px(cord.y1)}`,
-    cordWidth: cord.length > cord.rest ? Math.max(1.6, 3 * Math.sqrt(cord.rest / cord.length)) : 3,
+    cord: `M${px(line.x0)} ${px(line.y0)}Q${px(mx)} ${px(my)} ${px(line.x1)} ${px(line.y1)}`,
+    // A cord that thins narrows as it stretches, to no less than 1.6px of a 3px cord.
+    cordScale:
+      p.cord.thins && line.length > line.rest
+        ? Math.max(1.6 / 3, Math.sqrt(line.rest / line.length))
+        : 1,
+    // 30% across at rest; a twist slides the glint, and so does the swing away from rest.
+    // The gains, 95 and 150 here and 420 and 300 for the hologram, were tuned in the sketch.
+    glint: 30 + 95 * Math.sin(p.psi) + 150 * fromRest,
+    holo: fromRest * 420 + p.psi * 300,
     dip: p.dip,
     cable: `${px(-overhang)},${px(1 + leftY)} ${px(p.ringX)},${px(1 + p.dip)} ${px(p.hookWidth + overhang)},${px(1 + rightY)}`,
   }

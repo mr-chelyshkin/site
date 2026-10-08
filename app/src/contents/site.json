@@ -94,38 +94,50 @@
         {
           "name": "Raiffeisen Bank",
           "unit": "Banking",
-          "role": "Quality engineering",
-          "note": "Internal banking systems and test automation."
+          "role": "Senior Quality Assurance Engineer",
+          "note": "Internal banking systems and test automation.",
+          "pass": "holder",
+          "kicker": ""
         },
         {
           "name": "VK",
           "unit": "Consumer products",
-          "role": "Platform engineering",
-          "note": "Self-service cloud tools and platforms for running services."
+          "role": "Senior Platform Engineer / DevOps Team Lead",
+          "note": "Self-service cloud tools and platforms for running services.",
+          "pass": "reel",
+          "kicker": ""
         },
         {
           "name": "Ozon Tech",
           "unit": "Commerce",
-          "role": "Developer infrastructure",
-          "note": "A platform for building, testing and releasing mobile apps."
+          "role": "Lead DevOps Engineer",
+          "note": "A platform for building, testing and releasing mobile apps.",
+          "pass": "laminated",
+          "kicker": ""
         },
         {
           "name": "Aqua Security",
           "unit": "Cloud security",
-          "role": "Infrastructure engineering",
-          "note": "Cloud services, infrastructure APIs and database automation."
+          "role": "Senior SRE / Infrastructure Developer",
+          "note": "Cloud services, infrastructure APIs and database automation.",
+          "pass": "smartcard",
+          "kicker": ""
         },
         {
           "name": "Banank",
           "unit": "Digital banking",
-          "role": "Collaboration",
-          "note": "Digital banking and payments."
+          "role": "Staff Engineer",
+          "note": "Digital banking infrastructure, all on Google Cloud.",
+          "pass": "metal",
+          "kicker": "Staff"
         },
         {
           "name": "ForkJoin",
           "unit": "Consultancy",
           "role": "Collaboration",
-          "note": "Software engineering consultancy."
+          "note": "Software engineering consultancy.",
+          "pass": "visitor",
+          "kicker": "Visitor"
         }
       ]
     },

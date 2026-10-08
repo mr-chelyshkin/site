@@ -1,5 +1,3 @@
-@use '../tools';
-
 // Taken in hand: the pass straightens and lifts, and its cord drops by as much
 // so it stays on the hook.
 @mixin in-hand {
@@ -12,10 +10,13 @@
 }
 
 @layer sections {
-  /* A visitor's pass on a cord. The tilt pivots on the hook above; hovering
-     takes the pass in hand. Live passes leave all of that to script; see the
-     block after this one. `--tilt` and `--drop` come from the component;
-     small screens keep less of the tilt. */
+  /* A pass on a cord, one of six kinds; each kind's partial (`_pass-*.scss`)
+     draws its body and hardware. The tilt pivots where the cord leaves the
+     hook, at the ring or at a reel's mouth; hovering takes the pass in hand.
+     Live passes leave all of that to script; see the block after the cords.
+     `--tilt` and `--drop` come from the component, and so does the kind's
+     shape from pass-kinds.ts: `--w`, `--slot`, `--tie` and `--hook-y`. Small
+     screens keep less of the tilt. */
   .pass {
     /* Mirrored in pass-physics.ts as `LIFT`, for live passes. */
     --lift: 8px;
@@ -23,23 +24,27 @@
     position: relative;
     /* As tall as its card, not the row, so the focus ring hugs the card. */
     align-self: start;
-    width: min(100%, 210px);
+    width: min(100%, var(--w, 210px));
     margin-top: var(--drop);
+    /* Rounds the focus ring. */
+    border-radius: 12px;
     rotate: calc(var(--tilt) * var(--tilt-scale));
-    transform-origin: 50% calc(var(--drop) * -1);
+    transform-origin: 50% calc((var(--drop) - var(--hook-y, 0px)) * -1);
     transition:
       rotate var(--motion-base) var(--ease-settle),
       translate var(--motion-base) var(--ease-settle);
 
-    /* The cord, up to the hook. Its 3px is mirrored in pass-physics.ts, which
-       draws the live cord. */
+    /* The cord, from the hook down to where it ties on, behind the pass's
+       hardware. Its 3px is mirrored in `.commerce__cord` (`_commerce.scss`),
+       the live cord, as `calc(3px * var(--cord-scale, 1))`; pass-physics.ts
+       keeps only the floor a stretched cord thins to, 1.6px of the 3. */
     &::before {
       content: '';
       position: absolute;
-      top: calc(var(--drop) * -1);
+      top: calc((var(--drop) - var(--hook-y, 0px)) * -1);
       left: 50%;
       width: 3px;
-      height: calc(var(--drop) - 18px);
+      height: calc(var(--drop) - var(--hook-y, 0px) + var(--slot) - var(--tie));
       margin-left: -1.5px;
       border-radius: 2px;
       background: var(--color-ink);
@@ -76,15 +81,53 @@
     }
   }
 
+  /* The other kinds of cord, as `_commerce.scss` draws them live. A reel's
+     nylon line is drawn ten times as wide and scaled down: a box 1.3px wide
+     would be painted to whole pixels, heavier than the live line. */
+  .pass--reel::before {
+    width: 13px;
+    margin-left: -6.5px;
+    border-radius: 0;
+    background: #c8cfd2;
+    scale: 0.1 1;
+  }
+
+  /* A ribbon's stitches and a chain's beads, each bead lit up and to the left,
+     repeat from 1.5px under the hook, where the live cord starts, so the two
+     agree at rest. */
+  .pass--visitor::before {
+    width: 9px;
+    margin-left: -4.5px;
+    border-radius: 0;
+    background:
+      linear-gradient(90deg, #24343b calc(50% - 0.7px), transparent 0 calc(50% + 0.7px), #24343b 0),
+      linear-gradient(rgb(95 176 191 / 70%) 5px, transparent 0) 0 1.5px / 100% 8px,
+      #24343b;
+  }
+
+  .pass--metal::before {
+    width: 4.6px;
+    margin-left: -2.3px;
+    border-radius: 0;
+    background:
+      radial-gradient(
+          circle at calc(50% - 0.7px) calc(50% - 0.7px),
+          rgb(255 255 255 / 70%) 0.55px,
+          transparent 0.95px
+        )
+        0 -1.6px / 4.6px 6.2px repeat-y,
+      radial-gradient(circle, #a9b2b5 2.1px, transparent 2.4px) 0 -1.6px / 4.6px 6.2px repeat-y;
+  }
+
   /* Live, script moves the pass and draws its cord (usePassPhysics), so the
      tilt, the hover lift and the cord above stand down. The pivot is the slot
-     the clip goes through, `SLOT` in pass-physics.ts. A press is a pull, so
-     the pass's text doesn't select. */
+     or hole the hardware goes through, `slot` in pass-kinds.ts. A press is a
+     pull, so the pass's text doesn't select. */
   .commerce__cable--live .pass {
     z-index: 2;
     rotate: none;
     translate: none;
-    transform-origin: 50% 16px;
+    transform-origin: 50% var(--slot);
     transition: none;
     -webkit-user-select: none;
     user-select: none;
@@ -113,53 +156,58 @@
     }
   }
 
-  /* Turns round the cord when the pass is poked. Positioned, so the clip keeps
-     the same containing block whether a twist transforms it or not. The origin
-     is the perspective's vanishing point, near the card's middle. */
+  /* Turns round the cord when the pass is poked. Positioned, so the hardware
+     keeps the same containing block whether a twist transforms it or not. The
+     origin is the perspective's vanishing point, near the card's middle. */
   .pass__twist {
     position: relative;
     transform-origin: 50% 40%;
   }
 
-  /* Its place is mirrored in pass-physics.ts, where `CLIP_TOP` ties the live
-     cord on just under the clip's top, hidden behind it. */
-  .pass__clip {
-    position: absolute;
-    top: -24px;
-    left: 50%;
-    width: 22px;
-    height: 30px;
-    margin-left: -11px;
-    border-radius: 3px;
-    background: linear-gradient(
-      90deg,
-      var(--color-steel),
-      color-mix(in srgb, var(--color-steel) 30%, var(--color-paper)) 45%,
-      color-mix(in srgb, var(--color-steel) 85%, var(--color-paper))
-    );
-    box-shadow: 0 2px 3px rgb(0 0 0 / 50%);
-    z-index: 1;
-  }
+  /* Each kind's body: the card, the holder or the sleeve, with its light and
+     shade on top. Its layers, from the bottom: a smart card's antenna 0 and
+     its print 1, a laminate's bubbles 2, a sleeve's wrinkles and the gloss 3,
+     the shade 4 and a laminate's eyelet 5; the hardware, over the body, is 6. */
+  .pass__body {
+    /* Each kind's shadow falls this far. Live passes counter-turn the offset
+       as they swing, so the shadow keeps falling the way it does at rest. The
+       16px is mirrored in pass-physics.ts as `SHADOW`. */
+    --shadow-offset: var(--shadow-x, 0) var(--shadow-y, 16px);
 
-  .pass__card {
     position: relative;
-    display: grid;
-    grid-template-columns: 84px minmax(0, 1fr);
-    gap: 8px;
-    padding: 40px 12px 12px 14px;
-    border-radius: 10px;
-    background: tools.$paper-grain, var(--color-paper-white);
-    color: var(--color-ink);
-    /* Live passes counter-turn the offset as they swing, so the shadow keeps
-       falling the way it does at rest. The 16px is mirrored in pass-physics.ts
-       as `SHADOW`. */
-    box-shadow: var(--shadow-x, 0) var(--shadow-y, 16px) 24px rgb(0 0 0 / 50%);
   }
 
-  /* Darkens the edge a twist turns away from the light. */
+  /* A glossy surface: a band of light where the light catches it, and a fainter
+     one after it. Live, script slides `--glint` across as the pass swings and
+     twists; at rest it sits 30% across. */
+  .pass__gloss {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border-radius: inherit;
+    background:
+      linear-gradient(
+        112deg,
+        transparent calc(var(--glint, 30%) - 20%),
+        rgb(255 255 255 / 48%) calc(var(--glint, 30%) - 2%),
+        rgb(255 255 255 / 14%) calc(var(--glint, 30%) + 4%),
+        transparent calc(var(--glint, 30%) + 20%)
+      ),
+      linear-gradient(
+        112deg,
+        transparent calc(var(--glint, 30%) + 22%),
+        rgb(255 255 255 / 14%) calc(var(--glint, 30%) + 27%),
+        transparent calc(var(--glint, 30%) + 31%)
+      );
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+
+  /* Darkens the edge a twist turns away from the light, gloss and all. */
   .pass__shade {
     position: absolute;
     inset: 0;
+    z-index: 4;
     border-radius: inherit;
     background: linear-gradient(90deg, rgb(0 0 0 / 50%), transparent 75%);
     opacity: var(--shade, 0);
@@ -167,37 +215,7 @@
     pointer-events: none;
   }
 
-  .pass__slot {
-    position: absolute;
-    top: 12px;
-    left: 50%;
-    width: 46px;
-    height: 9px;
-    margin-left: -23px;
-    border-radius: 5px;
-    background: var(--color-wall);
-    box-shadow: inset 0 1px 2px rgb(0 0 0 / 60%);
-  }
-
-  .pass__band {
-    display: flex;
-    grid-column: 1 / -1;
-    justify-content: space-between;
-    margin: -10px -12px 4px -14px;
-    padding: 5px 12px 5px 14px;
-    background: var(--color-ink);
-    color: var(--color-paper);
-    font-size: 9.5px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-  }
-
-  .pass__face {
-    width: 84px;
-    height: 112px;
-    image-rendering: pixelated;
-  }
-
+  /* The printed facts, on light stock or dark; the terms are fainter. */
   .pass__facts {
     font-size: 8.5px;
     line-height: 1.35;
@@ -206,43 +224,15 @@
   }
 
   .pass__term {
-    color: var(--color-ink-soft);
+    opacity: 0.7;
   }
 
   /* The owner may edit the copy: a word too long for the column breaks
      rather than running off the card. */
   .pass__value {
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     font-weight: 600;
     letter-spacing: 0.05em;
     overflow-wrap: anywhere;
-  }
-
-  /* First in the source, shown in the third row: under the band and the photo. */
-  .pass__name {
-    grid-column: 1 / -1;
-    grid-row: 3;
-    font-size: 29px;
-    line-height: 0.88;
-  }
-
-  .pass__note {
-    grid-column: 1 / -1;
-    color: var(--color-ink-soft);
-    font-size: 9.5px;
-    line-height: 1.45;
-  }
-
-  .pass__id {
-    grid-column: 1 / -1;
-    justify-self: end;
-    color: var(--color-ink-soft);
-    font-size: 8px;
-    letter-spacing: 0.14em;
-  }
-
-  .pass__barcode {
-    grid-column: 1 / -1;
-    height: 26px;
   }
 }

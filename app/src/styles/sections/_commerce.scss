@@ -88,14 +88,121 @@
   .commerce__cord {
     fill: none;
     stroke: var(--color-ink);
-    /* As thick as the stylesheet's cord; mirrored in pass-physics.ts, which
-       thins it inline as it stretches. */
-    stroke-width: 3px;
+    /* As thick as the stylesheet's cord, `.pass::before`. Script thins it
+       through `--cord-scale` as it stretches, to no less than 1.6px, a floor
+       mirrored in pass-physics.ts. */
+    stroke-width: calc(3px * var(--cord-scale, 1));
     stroke-linecap: round;
   }
 
+  /* Drawn along the cord, over it: the ribbon's stripe and the chain's
+     highlights. A plain cord or a nylon line has none. */
+  .commerce__seam {
+    fill: none;
+  }
+
+  .commerce__hook--cord,
+  .commerce__hook--nylon {
+    .commerce__seam {
+      display: none;
+    }
+  }
+
+  /* A reel's nylon line: thin and light. */
+  .commerce__hook--nylon .commerce__cord {
+    stroke: #c8cfd2;
+    stroke-width: 1.3px;
+  }
+
+  /* A woven ribbon with a stitched stripe down its middle. */
+  .commerce__hook--ribbon {
+    .commerce__cord {
+      stroke: #24343b;
+      stroke-width: 9px;
+      stroke-linecap: butt;
+    }
+
+    .commerce__seam {
+      stroke: rgb(95 176 191 / 70%);
+      stroke-width: 1.4px;
+      stroke-dasharray: 5 3;
+    }
+  }
+
+  /* A ball chain: round beads, each with a highlight up and to the left. */
+  .commerce__hook--chain {
+    .commerce__cord {
+      stroke: #a9b2b5;
+      stroke-width: 4.6px;
+      stroke-dasharray: 0 6.2;
+    }
+
+    .commerce__seam {
+      stroke: rgb(255 255 255 / 70%);
+      stroke-width: 1.5px;
+      stroke-linecap: round;
+      stroke-dasharray: 0 6.2;
+      transform: translate(-0.7px, -0.7px);
+    }
+  }
+
+  /* A retractable reel clipped to the ring, for a pass on a nylon line: the
+     line pays out of its mouth, 44px under the ring (`hookY` in
+     pass-kinds.ts). Above a pass taken in hand, as the ring is. */
+  .commerce__reel {
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    width: 38px;
+    height: 44px;
+    margin-left: -19px;
+    pointer-events: none;
+    z-index: 3;
+
+    /* The casing. */
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 34% 28%, #6a7478, #2a3033 52%, #15181a);
+      box-shadow:
+        inset 0 1px 1px rgb(255 255 255 / 35%),
+        inset 0 -2px 3px rgb(0 0 0 / 50%),
+        0 4px 6px rgb(0 0 0 / 55%);
+    }
+
+    /* The mouth the line pays out of. */
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 15px;
+      width: 8px;
+      height: 9px;
+      border-radius: 2px 2px 4px 4px;
+      background: linear-gradient(90deg, #2a3033, #59636a 50%, #2a3033);
+    }
+  }
+
+  .commerce__reel-cap {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fbfdfd, #b9c2c5 45%, #6f797d);
+    box-shadow:
+      0 0 0 1.5px rgb(0 0 0 / 35%),
+      inset 0 -1px 1px rgb(0 0 0 / 30%);
+  }
+
   /* Live, the drawn cable takes over from each hook's stretch, and the ring
-     rides it down, under the passes, which can rise past it. */
+     and a reel ride it down, under the passes, which can rise past them. */
   .commerce__cable--live .commerce__hook {
     &::before {
       content: none;
@@ -105,6 +212,11 @@
       z-index: 1;
       translate: 0 var(--dip, 0px);
     }
+  }
+
+  .commerce__cable--live .commerce__reel {
+    z-index: 1;
+    translate: 0 var(--dip, 0px);
   }
 
   /* Six to a cable only where a pass is wide enough for its facts. */

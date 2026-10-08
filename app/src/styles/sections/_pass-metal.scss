@@ -1,0 +1,106 @@
+@layer sections {
+  /* A brushed aluminum staff card, laser-etched, on a ball chain through a
+     drilled hole. The brushed highlight follows the light with `--glint`. The
+     card grows with its text. */
+  .pass-metal {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 262px;
+    padding: 30px 14px 14px;
+    border-radius: 16px;
+    color: #283033;
+    background:
+      linear-gradient(
+        90deg,
+        transparent calc(var(--glint, 30%) - 32%),
+        rgb(255 255 255 / 42%) var(--glint, 30%),
+        transparent calc(var(--glint, 30%) + 32%)
+      ),
+      repeating-linear-gradient(
+        0deg,
+        rgb(255 255 255 / 9%) 0 1px,
+        rgb(0 0 0 / 7%) 1px 2px,
+        rgb(255 255 255 / 3%) 2px 3px
+      ),
+      linear-gradient(180deg, #ccd3d6, #a8b0b3 58%, #bfc6c9);
+    box-shadow:
+      inset 0 1.5px 0 rgb(255 255 255 / 75%),
+      inset 0 -1.5px 0 rgb(0 0 0 / 30%),
+      inset 1px 0 0 rgb(255 255 255 / 40%),
+      inset -1px 0 0 rgb(0 0 0 / 20%),
+      0 0 0 0.5px rgb(0 0 0 / 55%),
+      var(--shadow-offset) 16px rgb(0 0 0 / 55%);
+    /* Laser etching: dark, with a faint frosted rim. */
+    text-shadow: 0 0.6px 0 rgb(255 255 255 / 45%);
+  }
+
+  /* The wall shows through it. */
+  .pass-metal__hole {
+    position: absolute;
+    /* Mirrored in pass-kinds.ts: its middle is the metal card's `slot`, and the
+       chain ties on just above it, at its `tie`. */
+    top: 9px;
+    left: 50%;
+    width: 13px;
+    height: 13px;
+    margin-left: -6.5px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      var(--color-wall) 0 4.6px,
+      #5f686c 5px,
+      #eef3f4 5.7px,
+      #9aa3a6 6.5px
+    );
+  }
+
+  /* After the name in the source, shown above it. */
+  .pass-metal__kicker {
+    order: -1;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.3em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .pass-metal__name {
+    font-size: 34px;
+    line-height: 0.86;
+    text-align: center;
+  }
+
+  .pass-metal__mid {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* The portrait, etched. */
+  .pass-metal__face {
+    display: block;
+    width: 50px;
+    height: 66px;
+    border-radius: 3px;
+    image-rendering: pixelated;
+    filter: grayscale(1) contrast(1.3);
+    mix-blend-mode: multiply;
+    opacity: 0.7;
+  }
+
+  .pass-metal__line {
+    font-size: 8.5px;
+    line-height: 1.45;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .pass-metal__id {
+    margin-top: auto;
+    font-size: 8px;
+    letter-spacing: 0.18em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+}

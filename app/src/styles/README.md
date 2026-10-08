@@ -366,11 +366,12 @@ them.
 matches the stylesheet's drawing only while these copies agree with their
 sources:
 
-- `SLOT`, 16: the live `transform-origin: 50% 16px` in `sections/_pass.scss`;
-- `SHADOW`, 16: the offset of `.pass__card`'s `box-shadow`;
+- `SHAPES` in `utils/pass-kinds.ts`: each kind's `slot`, `tie` and `hookY` match where
+  its `_pass-*.scss` partial draws the slot and hardware (a reel's mouth is
+  `.commerce__reel`); `AccessPass` hands them to the stylesheet as `--slot`,
+  `--tie` and `--hook-y`;
+- `SHADOW`, 16: `--shadow-offset` on `.pass__body`;
 - `LIFT`, 8: `--lift` on `.pass`, how far a pass taken in hand rises;
-- `CLIP_TOP`, 36: the clip's place, `.pass__clip`, which hides where the cord
-  ties on;
 - the cable's 2px stroke, drawn 1px under the hook's top, and its
   `gap / 2 + 0.5` overhang: `.commerce__hook::before` in
   `sections/_commerce.scss`, and `.commerce__line`;
