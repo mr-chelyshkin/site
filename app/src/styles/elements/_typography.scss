@@ -1,5 +1,3 @@
-@use '../tools';
-
 @layer elements {
   h1,
   h2,
@@ -8,46 +6,29 @@
   h5,
   h6 {
     font-family: var(--font-display);
-    font-weight: 600;
-    line-height: 1.02;
-    letter-spacing: -0.035em;
-    text-wrap: balance;
+    font-weight: 900;
+    line-height: 0.9;
+    text-transform: uppercase;
     overflow-wrap: anywhere;
   }
-  h1 {
-    font-size: clamp(3.25rem, 6.8vw, 7rem);
-  }
-  h2 {
-    font-size: clamp(2.5rem, 4.8vw, 5rem);
-  }
-  h3 {
-    font-size: clamp(2rem, 3.5vw, 3.5rem);
-  }
-  h4 {
-    @include tools.component-title;
-  }
-  h5 {
-    font-size: 1.25rem;
-  }
-  h6 {
-    font-size: 1rem;
-  }
+
   p {
     text-wrap: pretty;
   }
-  strong {
-    font-weight: 700;
+
+  strong,
+  b {
+    font-weight: 800;
   }
+
   small {
     font-size: var(--text-size-sm);
   }
+
   code,
   pre,
   kbd,
   samp {
     font-family: var(--font-mono);
-  }
-  code {
-    font-size: 0.875em;
   }
 }

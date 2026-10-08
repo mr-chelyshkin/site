@@ -1,0 +1,32 @@
+@layer components {
+  /* The photo one bit per pixel, scaled up without smoothing. */
+  .c-dither {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-ink);
+  }
+
+  .c-dither__base {
+    display: block;
+    width: 100%;
+    height: auto;
+    image-rendering: pixelated;
+  }
+
+  .c-dither__layer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+
+  .c-dither__ghost {
+    top: 0;
+    bottom: 0;
+    background-size: 100% 100%;
+    mix-blend-mode: screen;
+    opacity: 0.85;
+  }
+}

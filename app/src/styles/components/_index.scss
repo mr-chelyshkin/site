@@ -1,20 +1,14 @@
-// Shared objects
-@forward 'icon';
-@forward 'image';
-@forward 'link';
-@forward 'external-link';
-@forward 'external-link-list';
-@forward 'social-links';
-@forward 'signal-text';
-@forward 'glitch';
-
-// Section parts
-@forward 'section-rail';
-@forward 'section-band';
-@forward 'section-heading';
+// Wall objects
+@forward 'kicker';
+@forward 'sheet';
+@forward 'spray';
+@forward 'label';
+@forward 'barcode';
+@forward 'qr';
+@forward 'tear-tabs';
+@forward 'dither';
+@forward 'wall-section';
 
 // Chrome
 @forward 'site-header';
-@forward 'site-menu-toggle';
-@forward 'site-navigation';
 @forward 'site-footer';

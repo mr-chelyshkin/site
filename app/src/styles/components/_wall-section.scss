@@ -1,0 +1,32 @@
+@layer components {
+  /* A stretch of the wall. Its number is sprayed big and faint behind the
+     sheets and may run off the edge; the layout clips it. */
+  .c-wall-section {
+    position: relative;
+    padding-top: var(--section-space);
+  }
+
+  .c-wall-section > .o-wall {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* The parent in the selector outranks `.c-spray`'s position in any load order. */
+  .c-wall-section > .c-wall-section__numeral {
+    position: absolute;
+    top: calc(var(--section-space) * 0.45);
+    font-size: clamp(220px, 39vw, 560px);
+    opacity: 0.13;
+    pointer-events: none;
+  }
+
+  /* On a screen wider than the wall, a numeral keeps to the wall's edge rather
+     than drifting out to the screen's. */
+  .c-wall-section__numeral--left {
+    left: max(-0.06em, calc((100% - var(--wall-max)) / 2 - 0.06em));
+  }
+
+  .c-wall-section__numeral--right {
+    right: max(-0.06em, calc((100% - var(--wall-max)) / 2 - 0.06em));
+  }
+}

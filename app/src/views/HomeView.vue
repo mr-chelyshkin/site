@@ -6,13 +6,13 @@ import OpenSourceSection from '@/components/sections/OpenSourceSection.vue'
 import PracticeSection from '@/components/sections/PracticeSection.vue'
 import { siteContent } from '@/contents'
 
-const { home, socialProfiles } = siteContent
+const { brand, home, socialProfiles, tearTabs } = siteContent
 </script>
 
 <template>
-  <HeroSection :content="home.hero" />
+  <HeroSection :content="home.hero" :email="home.contact.email" :copied="tearTabs.copied" />
   <PracticeSection :content="home.practice" />
-  <CommerceSection :content="home.commerce" />
+  <CommerceSection :content="home.commerce" :holder="brand.shortName" />
   <OpenSourceSection :content="home.openSource" />
-  <ContactSection :content="home.contact" :profiles="socialProfiles" />
+  <ContactSection :content="home.contact" :profiles="socialProfiles" :copied="tearTabs.copied" />
 </template>

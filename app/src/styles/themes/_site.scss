@@ -1,53 +1,53 @@
 @use '../settings';
+@use '../tools';
 
 :root {
-  /* Surfaces and ink */
-  --color-background-main: #{settings.$color-background-main};
-  --color-background-contrast: #{settings.$color-background-contrast};
-  --color-background-tint: #{settings.$color-background-tint};
-  --color-text-main: #{settings.$color-text-main};
-  --color-text-muted: #{settings.$color-text-muted};
-  --color-text-muted-tint: #{settings.$color-text-muted-tint};
-  --color-text-contrast: #{settings.$color-text-contrast};
-  --color-border-main: #{settings.$color-border-main};
-  --color-rule-main: #{settings.$color-rule-main};
-  --color-rule-tint: #{settings.$color-rule-tint};
-  --color-scrim: #{settings.$color-scrim};
-  --color-selection: #{settings.$color-selection};
-
-  /* Signal fringes */
-  --signal-cool: #{settings.$color-signal-cool};
-  --signal-warm: #{settings.$color-signal-warm};
-
   /* Type */
-  --font-main: #{settings.$font-main};
   --font-display: #{settings.$font-display};
+  --font-stencil: #{settings.$font-stencil};
   --font-mono: #{settings.$font-mono};
+  --font-serif: #{settings.$font-serif};
   --text-size-md: #{settings.$text-size-md};
   --text-size-sm: #{settings.$text-size-sm};
   --text-size-xsm: #{settings.$text-size-xsm};
-
-  /* Poster geometry shared by every full-bleed section: the rail runs the
-     height of the page, the gutter sets one left edge for display type, and the
-     block rhythm keeps the sections on a single vertical cadence. */
-  --poster-rail: clamp(3rem, 6.5vw, 7rem);
-  --poster-gutter: clamp(1.25rem, 5vw, 5rem);
-  --poster-block: clamp(3.5rem, 7vw, 7rem);
-  --poster-gap: clamp(2.5rem, 5vw, 5rem);
-
-  /* Layout and chrome */
-  --max-width: #{settings.$max-width};
-  --header-height: #{settings.$header-height};
-  --z-index-header: #{settings.$z-index-header};
-  --z-index-nav-scrim: #{settings.$z-index-nav-scrim};
-  --z-index-nav-menu: #{settings.$z-index-nav-menu};
-  --z-index-nav-button: #{settings.$z-index-nav-button};
 
   /* Motion. Transitions take their durations from here, so a reader who asks
      for less motion gets every change at once. */
   --motion-fast: 160ms;
   --motion-base: 300ms;
-  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  /* Quick to move, slow to come to rest: paper settling, a pass taken in hand. */
+  --ease-settle: cubic-bezier(0.2, 0.7, 0.3, 1);
+
+  /* Palette: the wall and what's pasted on it */
+  --color-wall: #{settings.$color-wall};
+  --color-wall-text: #{settings.$color-wall-text};
+  --color-paper: #{settings.$color-paper};
+  --color-paper-white: #{settings.$color-paper-white};
+  --color-ink: #{settings.$color-ink};
+  --color-ink-soft: #{settings.$color-ink-soft};
+  --color-stock-cyan: #{settings.$color-stock-cyan};
+  --color-cyan: #{settings.$color-cyan};
+  --color-cyan-deep: #{settings.$color-cyan-deep};
+  --color-cyan-pale: #{settings.$color-cyan-pale};
+  --color-steel: #{settings.$color-steel};
+  --color-tape: #{settings.$color-tape};
+
+  /* The width the collage is composed for, its gutters and gaps, and the
+     section spacing. `public/404.html` keeps a copy of the width, gutter, gap
+     and tilt scale; mirror changes there. */
+  --wall-max: 1440px;
+  --wall-gutter: clamp(16px, 4vw, 56px);
+  --wall-gap: clamp(12px, 2vw, 32px);
+  --section-space: clamp(72px, 10vw, 150px);
+
+  /* The share of its tilt a sheet or label keeps; phones keep less. */
+  --tilt-scale: 1;
+}
+
+@include tools.below(md) {
+  :root {
+    --tilt-scale: 0.45;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

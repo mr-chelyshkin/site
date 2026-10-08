@@ -1,47 +1,72 @@
-@layer components {
-  .site-header {
-    position: fixed;
-    top: 0;
-    right: 0;
-    left: 0;
-    z-index: var(--z-index-header);
-    display: flex;
-    align-items: center;
-    height: var(--header-height);
-    border-bottom: 1px solid var(--color-border-main);
-    background: var(--color-background-main);
-    color: var(--color-text-main);
-  }
+@use '../tools';
 
-  .site-header__bar {
+@layer components {
+  /* Printed straight onto the wall above the hero; it scrolls away with it.
+     Where name and links don't fit one row, the links drop below as a whole.
+     `public/404.html` keeps a written-out copy; mirror changes there. */
+  .site-header {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
-    gap: 1rem;
+    align-items: baseline;
+    gap: 12px 32px;
+    padding-top: 28px;
+    color: var(--color-wall-text);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+
+    @include tools.below(md) {
+      flex-direction: column;
+      gap: 10px;
+      padding-top: 18px;
+      font-size: 11px;
+    }
   }
 
   .site-header__identity {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.625rem;
-    min-width: 0;
-    min-height: 44px;
-    font-size: var(--text-size-sm);
-    font-weight: 600;
-    letter-spacing: -0.025em;
-  }
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 0.9em;
 
-  .site-header__logo {
-    flex: none;
+    /* Name over role on a phone; the slash only separates them on one line. */
+    @include tools.below(md) {
+      flex-direction: column;
+      gap: 4px;
+    }
   }
 
   .site-header__name {
-    min-width: 0;
-    line-height: 1.2;
-    overflow-wrap: anywhere;
+    color: var(--color-paper);
   }
 
-  /* The toggle stays above the open panel, so the same button closes it. */
-  .site-header .site-menu-toggle {
-    z-index: var(--z-index-nav-button);
+  /* Drawn, not read: the second declaration gives the slash empty alternative
+     text where supported; elsewhere the first applies. It ends the name's
+     line, so a wrapped role never starts with it. */
+  .site-header__name::after {
+    content: '/';
+    content: '/' / '';
+    margin-left: 0.9em;
+    color: var(--color-wall-text);
+    font-weight: 400;
+
+    @include tools.below(md) {
+      display: none;
+    }
+  }
+
+  .site-header__nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+
+    @include tools.below(md) {
+      gap: 8px 18px;
+    }
+  }
+
+  .site-header__identity:hover .site-header__role,
+  .site-header__link:hover {
+    color: var(--color-paper);
   }
 }

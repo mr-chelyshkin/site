@@ -1,6 +1,8 @@
 // Widths below which the layout changes. Media queries cannot read custom
 // properties, so these stay Sass values; use them through `tools.below()`.
+// `public/404.html` writes `md` out as 47.99rem; mirror changes there.
 $breakpoints: (
   'md': 48rem,
-  'lg': 64rem,
+  'xl': 75rem,
+  'xxl': 87.5rem,
 );

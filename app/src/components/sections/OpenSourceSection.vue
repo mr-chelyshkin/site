@@ -1,44 +1,35 @@
 <script setup lang="ts">
-import ExternalLinkList from '@/components/ui/ExternalLinkList.vue'
-import PosterSection from '@/components/ui/PosterSection.vue'
-import SectionHeading from '@/components/ui/SectionHeading.vue'
+import ProjectFlyer from '@/components/sections/ProjectFlyer.vue'
+import SprayText from '@/components/ui/SprayText.vue'
+import WallLabel from '@/components/ui/WallLabel.vue'
+import WallSection from '@/components/ui/WallSection.vue'
 import type { HomeContent } from '@/contents'
-import { padIndex } from '@/utils/format'
 
 defineProps<{ content: HomeContent['openSource'] }>()
 </script>
 
 <template>
-  <PosterSection
-    v-slot="{ titleId }"
-    class="open-source"
-    :index="content.index"
-    :label="content.label"
-  >
-    <div class="o-poster__split u-reveal__item">
-      <SectionHeading :id="titleId" :lines="content.headline" />
-      <p class="o-poster__aside">{{ content.description }}</p>
+  <WallSection v-slot="{ titleId }" :id="content.id" :index="content.index" class="open-source">
+    <header class="open-source__head">
+      <h2 :id="titleId" class="open-source__title">
+        <SprayText :lines="content.headline" aria-hidden="true" />
+        <span class="u-visually-hidden">{{ content.label }}</span>
+      </h2>
+      <p class="open-source__lede">{{ content.description }}</p>
+    </header>
+
+    <div class="open-source__board">
+      <ProjectFlyer
+        v-for="(project, i) in content.projects"
+        :key="project.name"
+        class="open-source__flyer"
+        :project="project"
+        :order="i"
+      />
     </div>
 
-    <ul class="open-source__grid u-reveal__group">
-      <li
-        v-for="(project, index) in content.projects"
-        :key="project.name"
-        class="open-source__plate u-reveal__item"
-      >
-        <p class="open-source__plate-index" aria-hidden="true">{{ padIndex(index) }}</p>
-        <h3 class="open-source__plate-name">{{ project.name }}</h3>
-        <p class="open-source__plate-summary">{{ project.summary }}</p>
-
-        <dl class="open-source__specs">
-          <template v-for="spec in project.specs" :key="spec.term">
-            <dt class="open-source__spec-term">{{ spec.term }}</dt>
-            <dd class="open-source__spec-value">{{ spec.value }}</dd>
-          </template>
-        </dl>
-
-        <ExternalLinkList :links="project.links" :label-prefix="`${project.name} on`" />
-      </li>
-    </ul>
-  </PosterSection>
+    <div v-if="content.labels.length" class="open-source__labels">
+      <WallLabel v-for="(label, i) in content.labels" :key="i" :text="label" :tilt="-3" />
+    </div>
+  </WallSection>
 </template>

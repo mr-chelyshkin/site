@@ -1,51 +1,185 @@
 @use '../tools';
 
 @layer sections {
-  /* The one tinted surface on the page and the only section without a rail.
-     Geometry comes from `.o-poster--open`. */
-  .contact {
-    /* Scoped so the signal slices mask against this surface, the muted ink keeps
-       its contrast on the tint, and hairlines stay visible on it. */
-    --signal-surface: var(--color-background-tint);
-    --color-text-muted: var(--color-text-muted-tint);
-    --color-rule-main: var(--color-rule-tint);
-    background: var(--color-background-tint);
-    color: var(--color-text-main);
+  /* The last notice: the address in stencil and tear-off tabs, with a photo
+     booth strip beside it. From xl up the booth also spans a flexible third
+     row, which takes whatever height it has beyond the sheet and the hint, so
+     the hint stays close under the tabs. */
+  .contact__board {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: auto auto 1fr auto;
+    align-items: start;
+    column-gap: var(--wall-gap);
+  }
+
+  .contact__sheet {
+    grid-column: 1 / 9;
+    grid-row: 1;
+  }
+
+  .contact__body {
+    padding: clamp(28px, 3.4vw, 44px) clamp(22px, 3.6vw, 48px) 26px;
+  }
+
+  .contact__title {
+    margin-top: 22px;
+    font-size: clamp(48px, 7.2vw, 104px);
+    line-height: 0.84;
+  }
+
+  .contact__title-line {
+    display: block;
   }
 
   .contact__lead {
-    color: var(--color-text-muted);
+    max-width: 52ch;
+    margin-top: 20px;
+    color: var(--color-ink-soft);
+    font-size: var(--text-size-sm);
+    line-height: 1.65;
   }
 
-  .contact__reply {
-    display: grid;
-    justify-items: start;
-    gap: clamp(1.25rem, 2.4vw, 2rem);
-    padding-top: clamp(1.5rem, 2.6vw, 2.25rem);
-    border-top: 1px solid var(--color-rule-main);
-  }
-
-  /* The single action on the page, so it is set at display size and lights
-     up with the signal fringe instead of the struck-through link hover, which
-     reads as cancelled at this scale. */
+  /* The smallest size still sets the whole address on one line at 320px. A
+     longer address or a fallback face folds at the `<wbr>` after the "@";
+     `overflow-wrap` breaks inside a word only if one part alone can't fit. */
   .contact__email {
-    @include tools.display-caps;
-    font-size: clamp(1.5rem, 4vw, 3.5rem);
-    line-height: 1;
+    display: inline-block;
+    margin-top: 22px;
+    font: 900 clamp(21px, 4.3vw, 62px) / 1 var(--font-stencil);
+    text-transform: uppercase;
     overflow-wrap: anywhere;
-    transition: text-shadow var(--motion-fast) ease;
 
-    &:hover,
-    &:focus-visible {
-      @include tools.signal-fringe;
+    &:hover {
+      text-decoration: underline;
+      text-decoration-thickness: 0.06em;
+      text-underline-offset: 0.12em;
     }
   }
 
-  @include tools.below(lg) {
-    /* Sized so a full-length address still sets on one line at 375px. */
-    .contact__email {
-      font-size: clamp(1.125rem, 5.6vw, 2rem);
-      letter-spacing: -0.025em;
+  .contact__tabs {
+    height: 150px;
+  }
+
+  .contact__hint {
+    grid-column: 5 / 9;
+    grid-row: 2;
+    margin-top: 18px;
+    font-size: var(--text-size-sm);
+  }
+
+  /* Drawn rather than written into the copy: at every width the hint sits
+     under the tabs, so it points up at them. Hidden from screen readers. */
+  .contact__hint::before {
+    content: '↑ ';
+  }
+
+  .contact__booth {
+    grid-column: 10 / 12;
+    grid-row: 1 / 4;
+    margin-top: -10px;
+  }
+
+  .contact__frames {
+    display: grid;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .contact__frame {
+    aspect-ratio: 156 / 150;
+    background: url('../../assets/images/hero-poster.png') no-repeat;
+    image-rendering: pixelated;
+
+    &--1 {
+      background-size: 320% auto;
+      background-position: 50% 22%;
+    }
+
+    /* A negative. Inverting alone turns the grays warm; the half turn of hue
+       cools them again, as the wall keeps no warm colors. */
+    &--2 {
+      background-size: 320% auto;
+      background-position: 48% 21%;
+      filter: invert(1) hue-rotate(180deg);
+    }
+
+    &--3 {
+      background-size: 240% auto;
+      background-position: 50% 30%;
+    }
+
+    &--4 {
+      background-size: 320% auto;
+      background-position: 52% 26%;
+    }
+  }
+
+  .contact__labels {
+    display: flex;
+    flex-wrap: wrap;
+    grid-column: 9 / 13;
+    grid-row: 4;
+    justify-content: flex-end;
+    gap: 14px;
+    margin-top: 24px;
+  }
+
+  @include tools.below(xl) {
+    .contact__board {
+      grid-template-rows: none;
+    }
+
+    .contact__sheet {
+      grid-column: 1 / -1;
+    }
+
+    .contact__hint {
+      grid-column: 1 / 7;
+    }
+
+    .contact__labels {
+      grid-column: 7 / 13;
+      grid-row: 2;
+      margin-top: 18px;
+    }
+
+    .contact__booth {
+      grid-column: 1 / -1;
+      grid-row: 3;
+      margin-top: 32px;
+    }
+
+    .contact__frames {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @include tools.below(md) {
+    .contact__board {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .contact__hint,
+    .contact__labels,
+    .contact__booth {
+      grid-column: 1;
+    }
+
+    .contact__labels {
+      grid-row: 3;
+      justify-content: flex-start;
+    }
+
+    .contact__booth {
+      grid-row: 4;
+    }
+
+    /* Eleven tabs across a phone: smaller type keeps both lines of the address
+       on every tab. */
+    .contact__tabs {
+      height: 120px;
+      font-size: 9px;
     }
   }
 }

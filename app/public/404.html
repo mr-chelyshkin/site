@@ -3,49 +3,91 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
     <title>404 - Page Not Found | Igor Chelyshkin</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      rel="preload"
-      href="/fonts/inter-display-semibold-4.1.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Big+Shoulders+Stencil+Display:wght@900&family=Chivo+Mono:wght@400;600;800&family=Old+Standard+TT:ital@1&display=swap"
     />
+    <meta name="theme-color" content="#17191a" />
 
     <style>
-      @font-face {
-        font-family: 'Inter Display';
-        src: url('/fonts/inter-display-semibold-4.1.woff2') format('woff2');
-        font-style: normal;
-        font-weight: 600;
-        font-display: swap;
-      }
-
-      /* CloudFront serves this document directly, including at nested URLs.
-         Keep it self-contained; mirror the site's paper, type and poster spacing. */
+      /* CloudFront serves this document directly, at any URL, so it stays one
+         self-contained file: no app bundle, absolute URLs. It can't read the
+         app's CSS, so the wall's values are written out here. They mirror, in
+         `src/styles/`: `settings/_colors.scss` and `settings/_typography.scss`
+         (palette, font stacks), `settings/_breakpoints.scss` (`md`, written out
+         as 47.99rem), `themes/_site.scss` (gutter, gap, width, tilt),
+         `tools/_noise.scss` (the three textures), `generic/_reset.scss` and the
+         `focus-ring` mixin, `generic/_document.scss` (body, selection),
+         `objects/_wall.scss` (as `.wall`), `components/_kicker.scss` (as
+         `.kicker`), `_sheet.scss`, `_spray.scss` and `_site-header.scss`, and
+         `sections/_flyer.scss` (the links), with the link and bold defaults of
+         `elements/`. The name, role and GitHub link come from
+         `contents/site.json`. No motion: the page holds still. */
       :root {
-        --color-background-main: #f7f7f2;
-        --color-text-main: #171717;
-        --color-text-muted: #5f5f5c;
-        --color-rule-main: rgb(23 23 23 / 16%);
-        --signal-cool: #58b9c0;
-        --signal-warm: #d58c64;
-        --poster-gutter: clamp(1.25rem, 5vw, 5rem);
-        --poster-block: clamp(3.5rem, 7vw, 7rem);
-        --poster-gap: clamp(2.5rem, 5vw, 5rem);
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        color: var(--color-text-main);
-        background: var(--color-background-main);
+        --color-wall: #17191a;
+        --color-wall-text: #aeb7b9;
+        --color-paper: #e6e9e9;
+        --color-ink: #0c0d0e;
+        --color-ink-soft: #34404a;
+        --color-cyan-pale: #d2e7ec;
+        --color-tape: rgb(222 228 229 / 60%);
+        --font-display:
+          'Big Shoulders Display', 'Avenir Next Condensed', 'DIN Condensed', 'Arial Narrow',
+          sans-serif-condensed, Impact, sans-serif;
+        --font-stencil:
+          'Big Shoulders Stencil Display', 'Big Shoulders Display', 'Avenir Next Condensed',
+          'DIN Condensed', 'Arial Narrow', sans-serif-condensed, Impact, sans-serif;
+        --font-mono: 'Chivo Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+        --wall-max: 1440px;
+        --wall-gutter: clamp(16px, 4vw, 56px);
+        --wall-gap: clamp(12px, 2vw, 32px);
+        /* The share of its tilt the notice keeps; phones keep less. */
+        --tilt-scale: 1;
+        /* The most of the screen's height the sprayed number may take. */
+        --code-cap: 60vh;
+        color-scheme: dark;
+        background: var(--color-wall);
       }
 
-      * {
+      /* The small viewport height ignores a phone's collapsing toolbar. Kept in
+         its own property: an unknown unit inside `--code-size` would void the
+         number's whole `font` in an older browser. */
+      @supports (height: 1svh) {
+        :root {
+          --code-cap: 60svh;
+        }
+      }
+
+      *,
+      *::before,
+      *::after {
         box-sizing: border-box;
+        margin: 0;
+        padding: 0;
       }
 
+      /* The wall: concrete grain overlaid on its tone, so it adds texture
+         without lifting it. */
       body {
-        margin: 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
         min-height: 100svh;
+        font-family: var(--font-mono);
+        color: var(--color-wall-text);
+        line-height: 1.6;
+        background:
+          url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='1 0 0 0 0  1 0 0 0 0  1 0 0 0 0  0 0 0 0 .5'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"),
+          var(--color-wall);
+        background-blend-mode: overlay;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
 
       a {
@@ -53,222 +95,325 @@
         text-decoration: none;
       }
 
-      a:focus-visible {
+      b {
+        font-weight: 800;
+      }
+
+      :focus-visible {
         outline: 2px solid currentColor;
         outline-offset: 4px;
       }
 
-      .site-header {
-        border-bottom: 1px solid var(--color-text-main);
+      ::selection {
+        color: var(--color-ink);
+        background: var(--color-cyan-pale);
       }
 
-      .site-header__inner {
-        display: flex;
-        align-items: center;
-        min-height: 72px;
-        max-width: 1600px;
+      /* The width the wall is composed for; the wall itself runs full bleed. */
+      .wall {
+        width: 100%;
+        max-width: var(--wall-max);
         margin-inline: auto;
-        padding-inline: var(--poster-gutter);
+        padding-inline: var(--wall-gutter);
+      }
+
+      /* Printed straight onto the wall, as on the home page. */
+      .site-header {
+        display: flex;
+        padding-top: 28px;
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
       }
 
       .site-header__identity {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.625rem;
-        min-height: 44px;
-        font-size: 0.875rem;
-        font-weight: 600;
-        letter-spacing: -0.025em;
-      }
-
-      .site-header__identity img {
-        flex: none;
-      }
-
-      .not-found {
-        max-width: 1600px;
-        margin-inline: auto;
-        padding: var(--poster-block) var(--poster-gutter);
-      }
-
-      .not-found-code {
-        --signal-offset: -0.025em;
-        position: relative;
-        width: fit-content;
-        margin: 0 0 var(--poster-gap);
-        font-size: clamp(7rem, 22vw, 20rem);
-        font-weight: 600;
-        line-height: 0.8;
-        letter-spacing: -0.05em;
-      }
-
-      .not-found-code,
-      .not-found-title {
-        font-family: 'Inter Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      }
-
-      .not-found-code__slice {
-        position: absolute;
-        inset: 0;
-        background: var(--color-background-main);
-        clip-path: inset(31% 0 57% 4%);
-        transform: translateX(var(--signal-offset));
-        text-shadow:
-          -0.012em 0 var(--signal-cool),
-          0.012em 0 var(--signal-warm);
-        pointer-events: none;
-        user-select: none;
-      }
-
-      .not-found-code__slice--echo {
-        --signal-drift: -1;
-        clip-path: inset(74% 58% 16% 0);
-        transform: translateX(calc(var(--signal-offset) * -1));
-      }
-
-      .not-found-title {
-        margin: 0;
-        font-size: clamp(2.5rem, 5.6vw, 5.5rem);
-        font-weight: 600;
-        line-height: 0.9;
-        letter-spacing: -0.04em;
-        text-transform: uppercase;
-        text-wrap: balance;
-      }
-
-      .not-found-message {
-        max-width: 46ch;
-        margin: 1.5rem 0 0;
-        color: var(--color-text-muted);
-        font-size: clamp(1rem, 1.35vw, 1.25rem);
-        line-height: 1.5;
-        letter-spacing: -0.01em;
-      }
-
-      .not-found-actions {
         display: flex;
         flex-wrap: wrap;
-        align-items: center;
-        gap: 1rem 2.5rem;
-        margin-top: var(--poster-gap);
-        padding-top: 1.25rem;
-        border-top: 1px solid var(--color-rule-main);
+        gap: 4px 0.9em;
       }
 
-      .not-found-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.625rem;
-        min-height: 44px;
-        font-size: 1rem;
-        font-weight: 600;
-        letter-spacing: -0.025em;
+      .site-header__name {
+        color: var(--color-paper);
       }
 
-      .not-found-link__label {
+      /* Drawn, not read: the second declaration gives the slash empty
+         alternative text where supported. */
+      .site-header__name::after {
+        content: '/';
+        content: '/' / '';
+        margin-left: 0.9em;
+        color: var(--color-wall-text);
+        font-weight: 400;
+      }
+
+      .site-header__identity:hover .site-header__role {
+        color: var(--color-paper);
+      }
+
+      /* The sprayed number and the notice pasted over its last digit, on the
+         home page's twelve columns, in the middle of the free height. Both
+         take their sizes from `--code-size`. At every width it stays within
+         `--code-cap` (60% of the small viewport height), measured so a
+         landscape phone (667×375, 844×390) still shows the title and a
+         1280×600 laptop the links on the first screen.
+         Portrait phones, tablets and taller desktops keep the width-based
+         size; on a short laptop the smaller number reaches less far under the
+         notice, and at 1280×600 it stops short of it. */
+      .not-found {
+        --code-size: clamp(150px, min(34vw, var(--code-cap)), 490px);
+        flex: 1;
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        align-content: center;
+        align-items: start;
+        column-gap: var(--wall-gap);
+        padding-top: clamp(40px, 5vw, 72px);
+        padding-bottom: clamp(72px, 10vw, 150px);
+        /* As on the home page: a wide fallback face must not scroll the page
+           sideways. */
+        overflow-x: clip;
+      }
+
+      /* Paint through a stencil: grainy coverage and a little overspray. */
+      .spray {
+        grid-column: 1 / -1;
+        grid-row: 1;
+        width: fit-content;
+        margin-left: -0.03em;
+        color: var(--color-paper);
+        font: 900 var(--code-size) / 0.8 var(--font-stencil);
+        white-space: nowrap;
+        text-shadow: 0 0 14px color-mix(in srgb, var(--color-paper) 8%, transparent);
+        -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 8 -1.9'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+        mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 8 -1.9'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+      }
+
+      /* Paper pasted to the wall. The wrapper casts the shadow, so it follows
+         the torn outline of the paper inside. */
+      .sheet {
+        grid-column: 7 / -1;
+        grid-row: 1;
         position: relative;
+        z-index: 1;
+        margin-top: calc(var(--code-size) * 0.42);
+        rotate: calc(-1.2deg * var(--tilt-scale));
+        filter: drop-shadow(0 18px 22px rgb(0 0 0 / 55%));
       }
 
-      .not-found-link__label::after {
-        content: '';
+      /* The top edge is torn once, by the same rule as the home page's sheets:
+         the polygon is `tornClipPath('404:torn', ['top'])` from
+         `src/utils/torn.ts`, so it can be generated again. */
+      .sheet__paper {
+        padding: clamp(28px, 3.4vw, 44px) clamp(22px, 3.6vw, 48px) clamp(30px, 3.4vw, 44px);
+        background:
+          url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.3' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .05  0 0 0 0 .05  0 0 0 0 .06  0 0 0 -2.5 .9'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"),
+          var(--color-paper);
+        color: var(--color-ink);
+        clip-path: polygon(
+          0% 0%,
+          2.08% min(1.07%, 7.48px),
+          4.17% min(0.43%, 3.03px),
+          6.25% min(0.36%, 2.54px),
+          8.33% min(0.08%, 0.57px),
+          10.42% min(0.76%, 5.33px),
+          12.5% min(1.13%, 7.91px),
+          14.58% min(1.04%, 7.28px),
+          16.67% min(1.03%, 7.23px),
+          18.75% min(0.27%, 1.86px),
+          20.83% min(0.84%, 5.9px),
+          22.92% min(0.18%, 1.26px),
+          25% min(0.69%, 4.86px),
+          27.08% min(0.76%, 5.35px),
+          29.17% min(0.39%, 2.76px),
+          31.25% min(0.03%, 0.19px),
+          33.33% min(0.73%, 5.08px),
+          35.42% min(0.05%, 0.37px),
+          37.5% min(1.2%, 8.38px),
+          39.58% min(0.12%, 0.82px),
+          41.67% min(1.4%, 9.8px),
+          43.75% min(0.44%, 3.07px),
+          45.83% min(0.11%, 0.79px),
+          47.92% min(1.2%, 8.42px),
+          50% min(0.75%, 5.28px),
+          52.08% min(1.39%, 9.75px),
+          54.17% min(0.59%, 4.11px),
+          56.25% min(0.09%, 0.64px),
+          58.33% min(0.42%, 2.96px),
+          60.42% min(0.17%, 1.21px),
+          62.5% min(0.04%, 0.27px),
+          64.58% min(0.19%, 1.33px),
+          66.67% min(1.19%, 8.33px),
+          68.75% min(0.34%, 2.38px),
+          70.83% min(0.19%, 1.35px),
+          72.92% min(1.19%, 8.34px),
+          75% min(0.1%, 0.69px),
+          77.08% min(0.91%, 6.36px),
+          79.17% min(1.08%, 7.58px),
+          81.25% min(1.2%, 8.42px),
+          83.33% min(0.42%, 2.96px),
+          85.42% min(0.97%, 6.82px),
+          87.5% min(1.26%, 8.82px),
+          89.58% min(1.38%, 9.66px),
+          91.67% min(0.85%, 5.98px),
+          93.75% min(0.25%, 1.77px),
+          95.83% min(0.49%, 3.42px),
+          97.92% min(1.25%, 8.76px),
+          100% 0%,
+          100% 100%,
+          0% 100%
+        );
+      }
+
+      .sheet__tape {
         position: absolute;
-        top: 50%;
-        right: -0.25rem;
-        left: -0.25rem;
-        height: max(1px, 0.025em);
-        background: currentColor;
-        transform: translateY(-50%) scaleX(0);
-        transform-origin: left;
-        transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        top: -18px;
+        left: 50%;
+        width: 150px;
+        height: 40px;
+        margin-left: -75px;
+        background: var(--color-tape);
+        box-shadow: 0 1px 2px rgb(0 0 0 / 18%);
+        rotate: -2.8deg;
+        pointer-events: none;
       }
 
-      .not-found-link:hover .not-found-link__label::after {
-        transform: translateY(-50%) scaleX(1);
+      /* The header row of a notice: small caps pushed to its two ends. */
+      .kicker {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 0.4em 1em;
+        font-size: 0.6875rem;
+        line-height: 1.4;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
       }
 
-      @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-        .not-found-code:hover .not-found-code__slice {
-          animation: signal-drift 520ms steps(1, end) 1;
+      .not-found__title {
+        margin-top: 22px;
+        font: 900 clamp(48px, 6.4vw, 96px) / 0.84 var(--font-display);
+        text-transform: uppercase;
+        text-wrap: balance;
+        overflow-wrap: anywhere;
+      }
+
+      .not-found__message {
+        max-width: 52ch;
+        margin-top: 20px;
+        color: var(--color-ink-soft);
+        font-size: 0.8125rem;
+        line-height: 1.65;
+        text-wrap: pretty;
+      }
+
+      .not-found__links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 22px;
+        margin-top: 26px;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .not-found__link {
+        padding-bottom: 2px;
+        border-bottom: 2px solid currentColor;
+      }
+
+      /* Below 1024px the notice moves under the number and covers its foot. */
+      @media (max-width: 63.99rem) {
+        .not-found {
+          --code-size: min(50vw, var(--code-cap));
         }
 
-        .not-found-code:hover .not-found-code__slice--echo {
-          animation-duration: 640ms;
-        }
-
-        @keyframes signal-drift {
-          0%,
-          100% {
-            transform: translateX(calc(var(--signal-offset) * var(--signal-drift, 1)));
-          }
-          15% {
-            transform: translateX(calc(var(--signal-offset) * var(--signal-drift, 1) * -3.5));
-          }
-          35% {
-            transform: translateX(calc(var(--signal-offset) * var(--signal-drift, 1) * 4.5));
-          }
-          55% {
-            transform: translateX(calc(var(--signal-offset) * var(--signal-drift, 1) * -1.5));
-          }
-          75% {
-            transform: translateX(calc(var(--signal-offset) * var(--signal-drift, 1) * 5.5));
-          }
-          90% {
-            transform: translateX(calc(var(--signal-offset) * var(--signal-drift, 1) * -2.5));
-          }
+        .sheet {
+          grid-column: 4 / -1;
+          grid-row: 2;
+          justify-self: end;
+          width: min(100%, 560px);
+          margin-top: calc(var(--code-size) * -0.18);
         }
       }
 
-      @media (max-width: 64rem) {
-        .not-found-title {
-          font-size: clamp(2.25rem, 8vw, 4rem);
+      /* Phones: name over role, the notice across the width, and less tilt. */
+      @media (max-width: 47.99rem) {
+        :root {
+          --tilt-scale: 0.45;
         }
-      }
 
-      @media (prefers-reduced-motion: reduce) {
-        .not-found-link__label::after {
-          transition: none;
+        .site-header {
+          padding-top: 18px;
+          font-size: 11px;
+        }
+
+        .site-header__identity {
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .site-header__name::after {
+          display: none;
+        }
+
+        .not-found {
+          --code-size: min(56vw, var(--code-cap));
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .spray {
+          grid-column: 1;
+        }
+
+        .sheet {
+          grid-column: 1;
+          justify-self: stretch;
+          width: auto;
+          margin-top: calc(var(--code-size) * -0.14);
+          filter: drop-shadow(0 10px 14px rgb(0 0 0 / 50%));
+        }
+
+        .sheet__tape {
+          width: 104px;
+          height: 30px;
+          margin-left: -52px;
         }
       }
     </style>
   </head>
   <body>
-    <header class="site-header">
-      <div class="site-header__inner">
-        <a class="site-header__identity" href="/" aria-label="Igor Chelyshkin, home">
-          <img src="/favicon.svg" alt="" width="28" height="28" />
-          <span>Igor Chelyshkin</span>
-        </a>
-      </div>
+    <header class="site-header wall">
+      <a class="site-header__identity" href="/">
+        <b class="site-header__name">Igor Chelyshkin</b>
+        <span class="site-header__role">Software engineer, infrastructure</span>
+      </a>
     </header>
-    <main class="not-found">
-      <p class="not-found-code">
-        404
-        <span class="not-found-code__slice" aria-hidden="true">404</span>
-        <span class="not-found-code__slice not-found-code__slice--echo" aria-hidden="true"
-          >404</span
-        >
-      </p>
-      <h1 class="not-found-title">Page not found</h1>
-      <p class="not-found-message">
-        The requested resource could not be located on this server. Perhaps you were looking for
-        something else?
-      </p>
-      <nav class="not-found-actions" aria-label="Continue browsing">
-        <a href="/" class="not-found-link">
-          <span aria-hidden="true">←</span>
-          <span class="not-found-link__label">Return to Home</span>
-        </a>
-        <a
-          href="https://github.com/mr-chelyshkin"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="not-found-link"
-          aria-label="Check GitHub (opens in a new tab)"
-        >
-          <span class="not-found-link__label">Check GitHub</span>
-          <span aria-hidden="true">↗</span>
-        </a>
-      </nav>
+    <main class="not-found wall">
+      <div class="spray" aria-hidden="true">404</div>
+      <div class="sheet">
+        <div class="sheet__paper">
+          <p class="kicker"><span>Notice no. 404</span> <span>Missing</span></p>
+          <h1 class="not-found__title">Page not found</h1>
+          <p class="not-found__message">
+            The requested resource could not be located on this server. Perhaps you were looking for
+            something else?
+          </p>
+          <nav class="not-found__links" aria-label="Continue browsing">
+            <a class="not-found__link" href="/"><span aria-hidden="true">← </span>Return to Home</a>
+            <a
+              class="not-found__link"
+              href="https://github.com/mr-chelyshkin"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Check GitHub (opens in a new tab)"
+              >Check GitHub ↗</a
+            >
+          </nav>
+        </div>
+        <span class="sheet__tape" aria-hidden="true"></span>
+      </div>
     </main>
   </body>
 </html>

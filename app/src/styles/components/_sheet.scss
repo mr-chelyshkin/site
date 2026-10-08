@@ -1,0 +1,105 @@
+@use '../tools';
+
+@layer components {
+  /* Paper pasted to the wall. The wrapper casts the shadow, so it follows the
+     torn outline of the paper it wraps. A block whatever its tag, as an inline
+     box would not rotate. */
+  .c-sheet {
+    display: block;
+    position: relative;
+    rotate: calc(var(--tilt, 0deg) * var(--tilt-scale));
+    filter: drop-shadow(0 18px 22px rgb(0 0 0 / 55%));
+
+    @include tools.below(md) {
+      filter: drop-shadow(0 10px 14px rgb(0 0 0 / 50%));
+    }
+  }
+
+  /* `flow-root` keeps the content's margins on the paper; one that collapsed
+     through would open a gap to the wall above the foot. */
+  .c-sheet__paper {
+    display: flow-root;
+    position: relative;
+    height: 100%;
+    background: tools.$paper-grain, var(--sheet-stock);
+    color: var(--sheet-ink);
+  }
+
+  .c-sheet--paper {
+    --sheet-stock: var(--color-paper);
+    --sheet-ink: var(--color-ink);
+  }
+
+  .c-sheet--white,
+  .c-sheet--grid {
+    --sheet-stock: var(--color-paper-white);
+    --sheet-ink: var(--color-ink);
+  }
+
+  .c-sheet--cyan {
+    --sheet-stock: var(--color-stock-cyan);
+    --sheet-ink: var(--color-ink);
+  }
+
+  .c-sheet--ink {
+    --sheet-stock: var(--color-ink);
+    --sheet-ink: var(--color-paper);
+
+    .c-sheet__paper {
+      background: var(--sheet-stock);
+    }
+  }
+
+  /* Millimeter paper for drawings. */
+  .c-sheet--grid .c-sheet__paper {
+    $fine: color-mix(in srgb, var(--color-ink) 4.5%, transparent);
+    $bold: color-mix(in srgb, var(--color-ink) 8%, transparent);
+
+    background-image:
+      linear-gradient($fine 1px, transparent 1px),
+      linear-gradient(90deg, $fine 1px, transparent 1px),
+      linear-gradient($bold 1px, transparent 1px),
+      linear-gradient(90deg, $bold 1px, transparent 1px), tools.$paper-grain;
+    background-size:
+      8px 8px,
+      8px 8px,
+      40px 40px,
+      40px 40px,
+      auto;
+  }
+
+  .c-sheet__tape {
+    position: absolute;
+    width: 150px;
+    height: 40px;
+    background: var(--color-tape);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 18%);
+    rotate: var(--tape-angle);
+    pointer-events: none;
+
+    &--top-left {
+      left: -38px;
+      top: -8px;
+    }
+
+    &--top {
+      left: 50%;
+      top: -18px;
+      margin-left: -75px;
+    }
+
+    &--top-right {
+      right: -36px;
+      top: -2px;
+    }
+
+    @include tools.below(md) {
+      width: 104px;
+      height: 30px;
+
+      &--top {
+        margin-left: -52px;
+      }
+    }
+  }
+}

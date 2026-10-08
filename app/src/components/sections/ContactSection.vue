@@ -1,30 +1,81 @@
 <script setup lang="ts">
-import ExternalLinkList from '@/components/ui/ExternalLinkList.vue'
-import PosterSection from '@/components/ui/PosterSection.vue'
-import SectionHeading from '@/components/ui/SectionHeading.vue'
+import { computed } from 'vue'
+import PastedSheet from '@/components/ui/PastedSheet.vue'
+import TearTabs from '@/components/ui/TearTabs.vue'
+import WallLabel from '@/components/ui/WallLabel.vue'
+import WallSection from '@/components/ui/WallSection.vue'
 import type { HomeContent, SocialProfiles } from '@/contents'
+import { foldAddress } from '@/utils/email'
 
-// Outside the numbered index: no rail, no number, its own surface. The page
-// stops describing work here and asks for a reply instead.
-defineProps<{
+const props = defineProps<{
   content: HomeContent['contact']
   profiles: SocialProfiles
+  copied: string
 }>()
+
+// A line that runs out folds the address after its "@" rather than inside a word.
+const address = computed(() => foldAddress(props.content.email))
 </script>
 
 <template>
-  <PosterSection v-slot="{ titleId }" class="contact" :label="content.label">
-    <div class="o-poster__split u-reveal__item">
-      <SectionHeading :id="titleId" :lines="content.headline" />
-      <p class="o-poster__aside contact__lead">{{ content.description }}</p>
-    </div>
+  <WallSection v-slot="{ titleId }" :id="content.id" class="contact">
+    <div class="contact__board">
+      <PastedSheet class="contact__sheet" seed="contact" stock="white" :tape="['top']" :tilt="-1">
+        <div class="contact__body">
+          <p class="c-kicker">
+            <span>{{ content.label }}</span
+            >{{ ' ' }}<span>{{ content.notice }}</span>
+          </p>
+          <h2 :id="titleId" class="contact__title">
+            <!-- The space keeps copied text and reader modes from running the lines together. -->
+            <template v-for="(line, i) in content.headline" :key="i">
+              <span class="contact__title-line">{{ line }}</span
+              >{{ ' ' }}
+            </template>
+          </h2>
+          <p class="contact__lead">{{ content.description }}</p>
+          <!-- Hidden, the break keeps the link's name whole: Chrome would add a space at it. -->
+          <a class="contact__email" :href="`mailto:${content.email}`"
+            >{{ address.first }}<wbr aria-hidden="true" />{{ address.rest }}</a
+          >
+        </div>
+        <template #foot>
+          <TearTabs
+            class="contact__tabs"
+            :email="content.email"
+            :count="11"
+            :gone="[3, 7]"
+            :copied="copied"
+          />
+        </template>
+      </PastedSheet>
 
-    <div class="contact__reply u-reveal__item">
-      <a class="contact__email" :href="content.email.href">
-        {{ content.email.label }}
-      </a>
+      <p class="contact__hint" aria-hidden="true">{{ content.hint }}</p>
 
-      <ExternalLinkList :links="Object.values(profiles)" />
+      <PastedSheet
+        class="contact__booth"
+        seed="booth"
+        stock="white"
+        :torn="['bottom']"
+        :tape="['top']"
+        :tilt="2.8"
+        :order="1"
+        aria-hidden="true"
+      >
+        <div class="contact__frames">
+          <span v-for="n in 4" :key="n" class="contact__frame" :class="`contact__frame--${n}`" />
+        </div>
+      </PastedSheet>
+
+      <div class="contact__labels">
+        <WallLabel
+          v-for="(profile, platform, i) in profiles"
+          :key="platform"
+          :text="profile.label"
+          :href="profile.href"
+          :tilt="i % 2 ? 3 : -4"
+        />
+      </div>
     </div>
-  </PosterSection>
+  </WallSection>
 </template>

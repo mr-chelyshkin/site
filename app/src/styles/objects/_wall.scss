@@ -1,0 +1,10 @@
+@layer objects {
+  /* The width the collage is composed for; the wall itself runs full bleed.
+     `public/404.html` keeps a copy as `.wall`. */
+  .o-wall {
+    width: 100%;
+    max-width: var(--wall-max);
+    margin-inline: auto;
+    padding-inline: var(--wall-gutter);
+  }
+}

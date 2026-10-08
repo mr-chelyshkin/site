@@ -1,106 +1,51 @@
 <script setup lang="ts">
-import { computed, ref, useId } from 'vue'
-import PosterSection from '@/components/ui/PosterSection.vue'
-import SectionHeading from '@/components/ui/SectionHeading.vue'
+import AccessPass from '@/components/sections/AccessPass.vue'
+import SprayText from '@/components/ui/SprayText.vue'
+import WallSection from '@/components/ui/WallSection.vue'
 import type { HomeContent } from '@/contents'
-import { padIndex } from '@/utils/format'
 
-const props = defineProps<{ content: HomeContent['commerce'] }>()
+defineProps<{
+  content: HomeContent['commerce']
+  holder: string
+}>()
 
-const readoutId = `commerce-readout-${useId()}`
-
-// The readout follows pointer and keyboard alike; with nothing selected it
-// carries the section's own lede.
-const hoveredIndex = ref<number | null>(null)
-const focusedIndex = ref<number | null>(null)
-const selectedIndex = ref<number | null>(null)
-const prefersFocus = ref(false)
-const activeIndex = computed(() =>
-  prefersFocus.value
-    ? (focusedIndex.value ?? hoveredIndex.value ?? selectedIndex.value)
-    : (hoveredIndex.value ?? focusedIndex.value ?? selectedIndex.value),
-)
-const activeCompany = computed(() =>
-  activeIndex.value === null ? null : props.content.companies[activeIndex.value],
-)
-const brandColors = computed(() => ({
-  '--company-primary': activeCompany.value?.colors.primary ?? 'var(--color-background-main)',
-  '--company-secondary': activeCompany.value?.colors.secondary ?? 'var(--color-background-main)',
-}))
-const readouts = computed(() => [
-  { meta: props.content.hint, note: props.content.description },
-  ...props.content.companies,
-])
-const readoutIndex = computed(() => (activeIndex.value === null ? 0 : activeIndex.value + 1))
-
-const selectHovered = (index: number) => {
-  hoveredIndex.value = index
-  prefersFocus.value = false
-}
-const selectFocused = (index: number) => {
-  focusedIndex.value = index
-  prefersFocus.value = true
-}
-const selectCompany = (index: number) => {
-  selectedIndex.value = index
-  focusedIndex.value = null
-  hoveredIndex.value = null
-  prefersFocus.value = true
-}
-const clearSelection = () => {
-  selectedIndex.value = null
-  focusedIndex.value = null
-  hoveredIndex.value = null
+// Chrome scrolls a focused element sideways only when none of it shows, and on
+// a phone the next pass always peeks in, so the cable centers the pass that
+// takes focus. Sideways only: scrolling the page to a partly visible pass is
+// left to the browser, so a tap never moves the page. And only a cable that
+// scrolls: on wider screens its overhanging ends count in `scrollWidth` too.
+function centerFocusedPass(event: FocusEvent) {
+  const cable = event.currentTarget as HTMLElement
+  const hook = (event.target as Element).closest('.commerce__hook')
+  const scrolls = getComputedStyle(cable).overflowX !== 'visible'
+  if (!hook || !scrolls || cable.scrollWidth <= cable.clientWidth) return
+  const c = cable.getBoundingClientRect()
+  const h = hook.getBoundingClientRect()
+  cable.scrollBy({ left: h.left + h.width / 2 - (c.left + c.width / 2) })
 }
 </script>
 
 <template>
-  <PosterSection
+  <WallSection
     v-slot="{ titleId }"
-    class="commerce"
-    :style="brandColors"
+    :id="content.id"
     :index="content.index"
-    :label="content.label"
-    @keydown.esc.stop="clearSelection"
+    numeral-at="right"
+    class="commerce"
   >
-    <SectionHeading :id="titleId" :lines="content.headline" class="u-reveal__item" />
+    <header class="commerce__head">
+      <h2 :id="titleId" class="commerce__title">
+        <SprayText :lines="content.headline" aria-hidden="true" />
+        <span class="u-visually-hidden">{{ content.label }}</span>
+      </h2>
+      <p class="commerce__lede">{{ content.description }}</p>
+    </header>
 
-    <ul
-      class="commerce__wall u-reveal__group"
-      :class="{ 'commerce__wall--tuned': activeIndex !== null }"
-    >
-      <li v-for="(company, index) in content.companies" :key="company.name" class="u-reveal__item">
-        <button
-          type="button"
-          class="commerce__entry"
-          :class="{ 'commerce__entry--active': activeIndex === index }"
-          :aria-pressed="selectedIndex === index"
-          :aria-controls="readoutId"
-          @click="selectCompany(index)"
-          @mouseenter="selectHovered(index)"
-          @focus="selectFocused(index)"
-          @mouseleave="hoveredIndex = null"
-          @blur="focusedIndex = null"
-        >
-          <span class="commerce__entry-index" aria-hidden="true">
-            {{ padIndex(index) }}
-          </span>
-          <span class="commerce__entry-name">{{ company.name }}</span>
-        </button>
+    <!-- The role, because Safari drops list semantics under `list-style: none`. -->
+    <ul class="commerce__cable" role="list" @focusin="centerFocusedPass">
+      <li v-for="(company, i) in content.companies" :key="company.name" class="commerce__hook">
+        <AccessPass :company="company" :index="i" :holder="holder" />
       </li>
     </ul>
-
-    <div :id="readoutId" class="commerce__readout u-reveal__item" aria-live="polite">
-      <p
-        v-for="(readout, index) in readouts"
-        :key="index"
-        class="commerce__readout-state"
-        :class="{ 'commerce__readout-state--active': readoutIndex === index }"
-        :aria-hidden="readoutIndex !== index"
-      >
-        <span class="commerce__readout-meta">{{ readout.meta }}</span>
-        <span class="commerce__readout-note">{{ readout.note }}</span>
-      </p>
-    </div>
-  </PosterSection>
+  </WallSection>
 </template>

@@ -5,6 +5,8 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    /* Numerals and sprayed names run off the edge; the page never scrolls sideways. */
+    overflow-x: clip;
   }
 
   .o-app-layout__main {

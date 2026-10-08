@@ -8,34 +8,16 @@ interface UseRevealOptions {
   threshold?: number
   /** Holds the reveal back until the element's edge is clear of the fold. */
   rootMargin?: string
-  /** How long the section keeps its one-shot signal lock, in milliseconds. */
-  tuningDuration?: number
 }
 
-/**
- * Reveals an element once, the first time it comes into view.
- *
- * `isTuning` is transient on purpose: it drives the heading's one-shot signal
- * drift and is dropped again so the same animation stays available on hover.
- */
+/** Reveals an element once, the first time it comes into view. */
 export function useReveal(options: UseRevealOptions = {}) {
-  const { threshold = 0, rootMargin = '0px', tuningDuration = 1000 } = options
+  const { threshold = 0, rootMargin = '0px' } = options
 
   const target = ref<HTMLElement | null>(null)
   const isRevealed = ref(false)
-  const isTuning = ref(false)
 
   let observer: IntersectionObserver | undefined
-  let timeout: ReturnType<typeof setTimeout> | undefined
-
-  const reveal = () => {
-    isRevealed.value = true
-    isTuning.value = true
-    timeout = setTimeout(() => {
-      isTuning.value = false
-      timeout = undefined
-    }, tuningDuration)
-  }
 
   onMounted(() => {
     // A reader who asked for less motion, or a browser without the observer,
@@ -53,7 +35,7 @@ export function useReveal(options: UseRevealOptions = {}) {
 
         observer?.disconnect()
         observer = undefined
-        reveal()
+        isRevealed.value = true
       },
       { threshold, rootMargin },
     )
@@ -63,8 +45,7 @@ export function useReveal(options: UseRevealOptions = {}) {
 
   onBeforeUnmount(() => {
     observer?.disconnect()
-    if (timeout !== undefined) clearTimeout(timeout)
   })
 
-  return { target, isRevealed, isTuning }
+  return { target, isRevealed }
 }

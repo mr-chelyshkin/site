@@ -1,0 +1,42 @@
+@use '../tools';
+
+@layer components {
+  /* Paint through a stencil: grainy coverage and a little overspray. Size comes
+     from the caller's `font-size`. */
+  .c-spray {
+    position: relative;
+    display: block;
+    width: fit-content;
+    color: var(--color-paper);
+    line-height: 0.8;
+    text-transform: uppercase;
+  }
+
+  .c-spray--stencil {
+    font-family: var(--font-stencil);
+    font-weight: 900;
+  }
+
+  .c-spray--display {
+    font-family: var(--font-display);
+    font-weight: 900;
+  }
+
+  .c-spray__paint {
+    display: block;
+    text-shadow: 0 0 14px color-mix(in srgb, var(--color-paper) 8%, transparent);
+    @include tools.spray-mask;
+  }
+
+  .c-spray__line {
+    display: block;
+    white-space: nowrap;
+  }
+
+  .c-spray__tear {
+    position: absolute;
+    inset: 0;
+    clip-path: inset(44% 0 41% 0);
+    translate: 0.06em 0;
+  }
+}

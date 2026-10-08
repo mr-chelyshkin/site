@@ -1,0 +1,42 @@
+@use '../tools';
+
+@layer components {
+  /* A printed sticker with a code to scan from the screen; shown only where a
+     pointer can hover, so never on a phone. */
+  .c-qr {
+    display: none;
+    width: 162px;
+    /* With the code's own one-module border, this padding and the label's
+       margin keep at least four modules of quiet zone on every side, as
+       scanners expect. */
+    padding: 16px 16px 10px;
+    background: var(--color-paper-white);
+    color: var(--color-ink);
+    box-shadow: 0 3px 6px rgb(0 0 0 / 35%);
+    /* A code only scans in its own ink and stock; under a dark forced palette
+       the blend below would turn it solid black. */
+    forced-color-adjust: none;
+
+    @include tools.qr-shown {
+      display: block;
+    }
+  }
+
+  .c-qr__code {
+    display: block;
+    width: 130px;
+    height: 130px;
+    image-rendering: pixelated;
+    /* The code's white modules take the sticker's stock. */
+    mix-blend-mode: multiply;
+  }
+
+  .c-qr__label {
+    display: block;
+    margin-top: 15px;
+    font: 800 9.5px/1.2 var(--font-mono);
+    letter-spacing: 0.14em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+}

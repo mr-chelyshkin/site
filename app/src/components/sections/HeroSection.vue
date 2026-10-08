@@ -1,114 +1,95 @@
 <script setup lang="ts">
-import { computed, useId } from 'vue'
-import BaseImage from '@/components/ui/BaseImage.vue'
-import { useGlitch } from '@/composables/useGlitch'
+import DitherPhoto from '@/components/ui/DitherPhoto.vue'
+import PastedSheet from '@/components/ui/PastedSheet.vue'
+import SprayText from '@/components/ui/SprayText.vue'
+import TearTabs from '@/components/ui/TearTabs.vue'
+import WallLabel from '@/components/ui/WallLabel.vue'
 import type { HomeContent } from '@/contents'
 
-const props = defineProps<{ content: HomeContent['hero'] }>()
+defineProps<{
+  content: HomeContent['hero']
+  email: string
+  copied: string
+}>()
 
-const titleId = `hero-${useId()}`
-const signalFilterId = `hero-signal-${useId()}`
-const { isGlitching, trigger, glitchClass } = useGlitch()
-
-// The photo, its torn strips and the face layer draw the same frame from one
-// source, so the browser makes a single request for all of them.
-const photo = computed(() => ({
-  src: props.content.image,
-  width: 1600,
-  assetWidth: 1600,
-  height: 900,
-  // In tall frames, cover scales the landscape image to the hero's height.
-  sizes: '(min-aspect-ratio: 16/9) 100vw, 178vh',
-  priority: true,
-}))
-
-const tears = [
-  { top: '16%', bottom: '82%', shift: '-2.5%' },
-  { top: '38%', bottom: '57%', shift: '4%' },
-  { top: '59%', bottom: '33%', shift: '-5%' },
-  { top: '84%', bottom: '14%', shift: '3%' },
+// Where the cyan channel slips, in percent of the photo; the smear stretches
+// row 120 of the render across its band.
+const bands = [
+  { at: 25, height: 4.5, shift: -1.2 },
+  { at: 60, height: 2.4, shift: 1.6 },
 ]
+const smear = { at: 47.8, height: 6, row: 120, shift: -4.2 }
 </script>
 
 <template>
-  <section class="hero" :aria-labelledby="titleId">
-    <svg class="hero__filters" aria-hidden="true" focusable="false">
-      <defs>
-        <filter
-          :id="signalFilterId"
-          x="-10%"
-          y="-10%"
-          width="120%"
-          height="120%"
-          primitiveUnits="objectBoundingBox"
-          color-interpolation-filters="sRGB"
-        >
-          <feComponentTransfer in="SourceGraphic" result="contrast">
-            <feFuncR type="linear" slope="1.28" intercept="-0.16" />
-            <feFuncG type="linear" slope="1.28" intercept="-0.16" />
-            <feFuncB type="linear" slope="1.28" intercept="-0.16" />
-          </feComponentTransfer>
-          <feColorMatrix
-            in="contrast"
-            type="matrix"
-            values="0.0733 0.2467 0.0249 0 0
-                    0.1541 0.5185 0.0523 0 0
-                    0.1601 0.5385 0.0544 0 0
-                    0 0 0 1 0"
-            result="cool"
-          />
-          <feOffset in="cool" dx="-0.022" result="cool-shift" />
-          <feColorMatrix
-            in="contrast"
-            type="matrix"
-            values="0.1786 0.6008 0.0606 0 0
-                    0.1169 0.3934 0.0397 0 0
-                    0.0829 0.2789 0.0282 0 0
-                    0 0 0 1 0"
-            result="warm"
-          />
-          <feOffset in="warm" dx="0.016" result="warm-shift" />
-          <feBlend in="cool-shift" in2="warm-shift" mode="screen" />
-        </filter>
-      </defs>
-    </svg>
+  <section class="hero o-wall" aria-labelledby="hero-title">
+    <h1 id="hero-title" class="u-visually-hidden">{{ content.title }}</h1>
 
-    <div class="hero__image">
-      <div class="hero__exposure" :style="{ filter: `url(#${signalFilterId})` }">
-        <BaseImage class="hero__photo" v-bind="photo" :alt="content.imageAlt" />
-        <div
-          v-for="tear in tears"
-          :key="tear.top"
-          class="hero__tear"
-          :style="{
-            '--tear-top': tear.top,
-            '--tear-bottom': tear.bottom,
-            '--tear-shift': tear.shift,
-          }"
-          aria-hidden="true"
-        >
-          <BaseImage v-bind="photo" alt="" />
-        </div>
-      </div>
-      <div class="hero__signal" aria-hidden="true">
-        <span v-for="block in 5" :key="block" class="hero__signal-block" />
-      </div>
-      <BaseImage class="hero__face" v-bind="photo" alt="" aria-hidden="true" />
+    <PastedSheet
+      class="hero__poster"
+      seed="hero-poster"
+      stock="ink"
+      :torn="['right', 'bottom']"
+      :tape="['top-left', 'top-right']"
+      :tilt="-1.6"
+    >
+      <DitherPhoto
+        :image="content.image"
+        :alt="content.imageAlt"
+        :width="470"
+        :height="385"
+        :bands="bands"
+        :smear="smear"
+        priority
+      />
+      <span class="hero__caption" aria-hidden="true">{{ content.caption }}</span>
+    </PastedSheet>
+
+    <SprayText class="hero__first" :lines="[content.firstName]" aria-hidden="true" />
+    <div class="hero__labels" aria-hidden="true">
+      <WallLabel
+        v-for="(label, i) in content.labels"
+        :key="i"
+        :text="label"
+        :tilt="i % 2 ? 5 : -4"
+      />
     </div>
 
-    <h1 :id="titleId" class="hero__title" :aria-label="content.title">
-      <span class="hero__headline" aria-hidden="true">
-        <span v-for="line in content.headline" :key="line" class="hero__line">
-          {{ line }}
-        </span>
-      </span>
-      <span class="hero__discipline" aria-hidden="true">
-        <span @mouseenter="trigger">
-          <span class="hero__discipline-text" :class="{ [glitchClass]: isGlitching }">
-            {{ content.discipline }}
-          </span>
-        </span>
-      </span>
-    </h1>
+    <PastedSheet class="hero__notice" seed="hero-notice" stock="cyan" :tape="['top']" :tilt="2.6">
+      <div class="hero__notice-body">
+        <p class="c-kicker hero__kicker">
+          <template v-for="(part, i) in content.notice.kicker" :key="i">
+            <span>{{ part }}</span
+            >{{ ' ' }}
+          </template>
+        </p>
+        <p class="hero__headline">
+          <!-- The space keeps copied text and reader modes from running the lines together. -->
+          <template v-for="(line, i) in content.notice.headline" :key="i">
+            <span class="hero__headline-line">{{ line }}</span
+            >{{ ' ' }}
+          </template>
+        </p>
+        <p class="hero__discipline">{{ content.notice.discipline }}</p>
+        <!-- The role, because Safari drops list semantics under `list-style: none`. -->
+        <ul class="hero__points" role="list">
+          <li v-for="(point, i) in content.notice.points" :key="i" class="hero__point">
+            {{ point }}
+          </li>
+        </ul>
+        <p class="hero__note">{{ content.notice.note }}</p>
+      </div>
+      <template #foot>
+        <TearTabs :email="email" :count="8" :gone="[2, 5]" :copied="copied" />
+      </template>
+    </PastedSheet>
+
+    <SprayText
+      class="hero__last"
+      :lines="[content.lastName]"
+      face="display"
+      tear
+      aria-hidden="true"
+    />
   </section>
 </template>

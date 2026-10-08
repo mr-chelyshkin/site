@@ -1,24 +1,14 @@
-@use 'sass:color';
-
-// Palette
-$color-white: #f7f7f2;
-$color-dark: #171717;
-$color-sand: #e0d6c2;
-$color-muted: #5f5f5c;
-$color-muted-strong: #4a4a47;
-$color-selection: #8eaabb;
-$color-signal-cool: #58b9c0;
-$color-signal-warm: #d58c64;
-
-// Roles
-$color-background-main: $color-white;
-$color-background-contrast: $color-dark;
-$color-background-tint: $color-sand;
-$color-text-main: $color-dark;
-$color-text-muted: $color-muted;
-$color-text-muted-tint: $color-muted-strong;
-$color-text-contrast: $color-white;
-$color-border-main: $color-dark;
-$color-rule-main: color.change($color-dark, $alpha: 0.16);
-$color-rule-tint: color.change($color-dark, $alpha: 0.24);
-$color-scrim: color.change($color-dark, $alpha: 0.55);
+// Palette: the wall and what's pasted on it. `public/404.html` keeps a
+// written-out copy of these values; mirror changes there.
+$color-wall: #17191a;
+$color-wall-text: #aeb7b9;
+$color-paper: #e6e9e9;
+$color-paper-white: #eff1f1;
+$color-ink: #0c0d0e;
+$color-ink-soft: #34404a;
+$color-stock-cyan: #a3bec6;
+$color-cyan: #5fb0bf;
+$color-cyan-deep: #2b7d8c;
+$color-cyan-pale: #d2e7ec;
+$color-steel: #6d777b;
+$color-tape: rgb(222 228 229 / 60%);

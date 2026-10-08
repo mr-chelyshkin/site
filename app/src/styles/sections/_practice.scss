@@ -1,66 +1,200 @@
-@use '../tools';
-
 @layer sections {
-  /* A stack of layers read from what the team works with down to what it runs
-     on. Geometry comes from `.o-poster`. */
-  .practice {
-    background: var(--color-background-main);
-    color: var(--color-text-main);
+  /* The drawing sheet. Under 880px wide its content flows in one column, the
+     callouts beside the drawing on a tablet. From 880px
+     (`.practice__drawing--wide`) it is laid out as on paper, in proportion
+     and with type in container units, so it scales like a drawing. */
+  .practice__sheet {
+    width: 100%;
+    max-width: 1184px;
+    margin-inline: auto;
   }
 
-  .practice__layer {
-    padding-block: clamp(1.5rem, 2.6vw, 2.5rem);
-    border-top: 1px solid var(--color-rule-main);
-    transition: border-color var(--motion-fast) ease;
-
-    &:last-child {
-      border-bottom: 1px solid var(--color-rule-main);
-    }
-
-    &:hover {
-      border-top-color: var(--color-text-main);
-    }
+  /* The top padding keeps the kicker clear of the corner tape, which is
+     larger from the tablet breakpoint up. */
+  .practice__drawing {
+    container: practice-drawing / inline-size;
+    padding: clamp(31px, 7.2vw, 56px) 18px 30px;
   }
 
-  .practice__layer-name {
-    @include tools.display-caps;
-    font-size: clamp(1.75rem, 3.4vw, 3.25rem);
-    transition: text-shadow var(--motion-fast) ease;
+  /* The wide sheet is a grid: the kicker across the top, the statement and
+     then the callouts in the right-hand column, the figure under the drawing
+     and the title block in the corner. The measures are those of the full-size
+     1184 × 872 sheet, as fractions of its width; content that needs more room
+     makes the sheet taller instead of overlapping. The kicker keeps pixels, as
+     the tape at the corners doesn't scale. The first two rows size from
+     `min-content`: an `auto` row would take its items' min-height as the floor
+     and let longer copy overflow it. */
+  .practice__drawing--wide {
+    --sheet-column-start: 59.1%;
+    --sheet-column-width: 37.2%;
+    --sheet-kicker-top: 40px;
+    --sheet-kicker-inset: 44px;
+    --sheet-statement-top: 7.77cqw;
+    --sheet-statement-gap: 1.5cqw;
+    --sheet-callouts-top: 33.446cqw;
+    --sheet-figure-top: 68.272cqw;
+    --sheet-figure-bottom: 3.249cqw;
+    --sheet-block-width: 27.9cqw;
+    --sheet-block-gap: 1.2cqw;
+    --sheet-edge-left: 3.7cqw;
+    --sheet-edge-right: 2.4cqw;
+    --sheet-edge-bottom: 2.357cqw;
 
-    .practice__layer:hover & {
-      @include tools.signal-fringe;
-    }
-  }
-
-  .practice__layer-copy {
+    position: relative;
     display: grid;
-    gap: 0.5rem;
-    padding-bottom: 0.2em;
+    grid-template:
+      'kicker kicker kicker' minmax(min-content, auto)
+      'figure statement .' minmax(min-content, auto)
+      'figure callouts .' 1fr
+      'figure block block' auto
+      / var(--sheet-column-start) var(--sheet-column-width) 1fr;
+    aspect-ratio: 1184 / 872;
+    padding: 0;
   }
 
-  .practice__layer-caption {
-    @include tools.meta-text;
-    color: var(--color-text-muted);
+  .practice__title {
+    font: inherit;
+    letter-spacing: inherit;
   }
 
-  .practice__layer-description {
-    max-width: 38ch;
-    font-size: var(--text-size-md);
-    line-height: 1.5;
-    color: var(--color-text-muted);
+  .practice__statement {
+    margin-top: 20px;
+    font: 900 clamp(30px, 7.4vw, 44px) / 0.93 var(--font-display);
+    text-transform: uppercase;
   }
 
-  @include tools.below(lg) {
-    .practice__layer {
-      gap: 0.875rem;
+  .practice__mark--highlight {
+    position: relative;
+    display: inline-block;
+    z-index: 0;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 8% -0.18em 4% -0.22em;
+      z-index: -1;
+      background: var(--color-stock-cyan);
+      transform: skew(-4deg) rotate(-1deg);
+    }
+  }
+
+  .practice__mark--stencil {
+    font-family: var(--font-stencil);
+  }
+
+  .practice__mark--underline {
+    display: inline-block;
+    padding-bottom: 0.08em;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'><path d='M2 10 C 40 4, 80 14, 120 7 S 180 6, 198 9' stroke='%230c0d0e' stroke-width='6' fill='none' stroke-linecap='round'/></svg>")
+      left bottom / 100% 0.32em no-repeat;
+  }
+
+  .practice__stack {
+    margin-top: 18px;
+  }
+
+  .practice__figure {
+    margin-top: 16px;
+    color: var(--color-ink-soft);
+    font: italic 16px / 1.4 var(--font-serif);
+  }
+
+  /* The title block of a drawing: the title across the top, then pairs. */
+  .practice__title-block {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    max-width: 340px;
+    margin-top: 18px;
+    border: 2px solid var(--color-ink);
+    background: var(--color-paper-white);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .practice__title-row {
+    padding: 0.6em 0.9em;
+    border-top: 1px solid var(--color-ink);
+
+    /* Pairs follow the title row, so each pair's right-hand cell is odd. */
+    &:nth-child(odd):not(.practice__title-row--main) {
+      border-left: 1px solid var(--color-ink);
+    }
+  }
+
+  .practice__title-row--main {
+    grid-column: 1 / -1;
+    border-top: 0;
+
+    .practice__title-value {
+      font: 900 2em / 1 var(--font-display);
+    }
+  }
+
+  .practice__title-term {
+    margin-bottom: 0.2em;
+    color: var(--color-ink-soft);
+    font-size: 0.8em;
+    letter-spacing: 0.14em;
+  }
+
+  .practice__drawing--wide {
+    /* Its box reaches down to where the statement starts. */
+    .practice__kicker {
+      grid-area: kicker;
+      min-height: calc(var(--sheet-statement-top) - var(--sheet-kicker-top));
+      margin: var(--sheet-kicker-top) var(--sheet-kicker-inset) 0;
     }
 
-    .practice__layer-copy {
-      padding-bottom: 0;
+    /* Its box reaches down to where the callouts start as drawn; a longer
+       statement pushes them down. */
+    .practice__statement {
+      grid-area: statement;
+      min-height: calc(
+        var(--sheet-callouts-top) - var(--sheet-statement-top) - var(--sheet-statement-gap)
+      );
+      margin: 0 0 var(--sheet-statement-gap);
+      font-size: 3.55cqw;
     }
 
-    .practice__layer-description {
-      max-width: 46ch;
+    .practice__stack {
+      grid-area: callouts;
+      margin: 0;
+    }
+
+    /* At the foot of the sheet, but never higher than just under the drawing:
+       a longer caption makes the sheet taller rather than rising into it. */
+    .practice__figure {
+      grid-area: figure;
+      align-self: end;
+      margin: calc(var(--sheet-figure-top) - var(--sheet-statement-top)) 0
+        var(--sheet-figure-bottom) var(--sheet-edge-left);
+      font-size: max(13px, 1.52cqw);
+    }
+
+    .practice__title-block {
+      grid-area: block;
+      align-self: end;
+      justify-self: end;
+      width: var(--sheet-block-width);
+      max-width: none;
+      margin: var(--sheet-block-gap) var(--sheet-edge-right) var(--sheet-edge-bottom) 0;
+      font-size: max(10px, 0.85cqw);
+    }
+  }
+
+  .practice__label {
+    position: absolute;
+    z-index: 2;
+
+    &--1 {
+      left: var(--wall-gutter);
+      bottom: -18px;
+    }
+
+    &--2 {
+      right: var(--wall-gutter);
+      bottom: -24px;
     }
   }
 }

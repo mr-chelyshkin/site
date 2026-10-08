@@ -1,6 +1,13 @@
+// `public/404.html` keeps a written-out copy of the font stacks; mirror changes
+// there.
 $text-size-md: 1rem;
-$text-size-sm: 0.875rem;
-$text-size-xsm: 0.75rem;
-$font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-$font-display: 'Inter Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-$font-mono: 'Roboto Mono', 'SFMono-Regular', Consolas, monospace;
+$text-size-sm: 0.8125rem;
+$text-size-xsm: 0.6875rem;
+$font-display:
+  'Big Shoulders Display', 'Avenir Next Condensed', 'DIN Condensed', 'Arial Narrow',
+  sans-serif-condensed, Impact, sans-serif;
+$font-stencil:
+  'Big Shoulders Stencil Display', 'Big Shoulders Display', 'Avenir Next Condensed',
+  'DIN Condensed', 'Arial Narrow', sans-serif-condensed, Impact, sans-serif;
+$font-mono: 'Chivo Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+$font-serif: 'Old Standard TT', Georgia, serif;

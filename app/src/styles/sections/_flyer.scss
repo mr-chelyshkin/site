@@ -1,0 +1,90 @@
+@use '../tools';
+
+@layer sections {
+  /* A project on its own stock. The name fills the sheet; `--fit` comes from
+     the component. Room is kept at the bottom for the QR sticker where it
+     shows. */
+  .flyer__body {
+    position: relative;
+    padding: 26px 28px 30px;
+    container-type: inline-size;
+  }
+
+  .flyer--paper .flyer__body {
+    padding-right: 52px;
+  }
+
+  /* The sticker is 182px tall and tilted; where it shows, this keeps it clear
+     of the last link and its focus ring. */
+  .flyer--with-qr .flyer__body {
+    @include tools.qr-shown {
+      padding-bottom: 226px;
+    }
+  }
+
+  .flyer__name {
+    margin-top: 18px;
+    font-size: min(calc(var(--fit) * 100cqw), 140px);
+    line-height: 0.82;
+  }
+
+  .flyer__summary {
+    max-width: 34ch;
+    margin-top: 16px;
+    font-size: var(--text-size-sm);
+    line-height: 1.6;
+  }
+
+  .flyer__specs {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 4px 18px;
+    margin-top: 18px;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* Opacity rather than a color: the same flyer comes on light and ink stock. */
+  .flyer__spec-term {
+    opacity: 0.75;
+  }
+
+  .flyer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 22px;
+    margin-top: 26px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .flyer__link {
+    padding-bottom: 2px;
+    border-bottom: 2px solid currentColor;
+  }
+
+  .flyer__barcode {
+    position: absolute;
+    top: 26px;
+    right: 14px;
+    bottom: 26px;
+    width: 18px;
+    height: auto;
+  }
+
+  .flyer__qr {
+    position: absolute;
+    right: 7%;
+    bottom: 26px;
+    rotate: 3deg;
+    z-index: 1;
+  }
+
+  /* Paper carries the barcode 32px in; the tilted sticker stays left of it. */
+  .flyer--paper .flyer__qr {
+    right: max(7%, 44px);
+  }
+}

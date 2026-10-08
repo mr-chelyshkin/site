@@ -1,27 +1,43 @@
+@use '../tools';
+
 @layer generic {
   html {
     font-size: var(--text-size-md);
     scroll-behavior: smooth;
-    scroll-padding-top: calc(var(--header-height) + 1rem);
+    scroll-padding-top: 1rem;
     touch-action: manipulation;
+    color-scheme: dark;
+    /* The overscroll color; it also keeps the body's own background on the body box. */
+    background: var(--color-wall);
 
     @media (prefers-reduced-motion: reduce) {
       scroll-behavior: auto;
     }
   }
 
+  /* The wall: concrete grain overlaid on a few uneven patches of light. The
+     patches are sized in `vw`, so they stay patches on a tall, narrow page. */
   body {
     min-height: 100vh;
-    font-family: var(--font-main);
-    background-color: var(--color-background-main);
-    color: var(--color-text-main);
-    line-height: 1.55;
+    font-family: var(--font-mono);
+    color: var(--color-wall-text);
+    line-height: 1.6;
+    background:
+      tools.$wall-grain,
+      radial-gradient(50vw 36vw at 14% 6%, rgb(255 255 255 / 5%), transparent 70%),
+      radial-gradient(40vw 30vw at 86% 30%, rgb(0 0 0 / 45%), transparent 70%),
+      radial-gradient(50vw 30vw at 40% 48%, rgb(255 255 255 / 3.5%), transparent 70%),
+      radial-gradient(45vw 32vw at 70% 70%, rgb(0 0 0 / 40%), transparent 70%),
+      radial-gradient(50vw 30vw at 20% 90%, rgb(255 255 255 / 4%), transparent 70%),
+      var(--color-wall);
+    /* One value per layer: a shorter list would repeat over the patches. */
+    background-blend-mode: overlay, normal, normal, normal, normal, normal;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   ::selection {
-    color: var(--color-text-main);
-    background: var(--color-selection);
+    color: var(--color-ink);
+    background: var(--color-cyan-pale);
   }
 }

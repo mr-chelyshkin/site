@@ -1,36 +1,43 @@
 @use '../tools';
 
 @layer components {
-  /* Closes the page on the same dark ground the hero opens it with; the change
-     of surface is the divider, so no rule is needed above it. */
+  /* A strip of black tape across the bottom of the wall. */
   .site-footer {
-    background: var(--color-background-contrast);
-    color: var(--color-text-contrast);
-    padding-block: clamp(2rem, 4vw, 3.5rem);
+    padding: clamp(64px, 9vw, 120px) 0 32px;
+    overflow-x: clip;
   }
 
-  .site-footer__content {
+  /* Wider than the screen by 20px a side, so the tilted ends never show. The
+     footer cuts the overhang on the horizontal axis only, so the shadow stays
+     whole; the padding brings the row back to the screen's width. */
+  .site-footer__tape {
+    margin-inline: -20px;
+    padding: 18px 20px;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    rotate: calc(-0.6deg * var(--tilt-scale));
+    box-shadow: 0 6px 14px rgb(0 0 0 / 50%);
+
+    @include tools.below(md) {
+      font-size: 11px;
+    }
+  }
+
+  /* The text keeps to the wall's column, in line with the header at any width. */
+  .site-footer__row {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
     justify-content: space-between;
-    gap: 2rem 3rem;
-  }
+    gap: 6px 24px;
 
-  .site-footer__identity {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    max-width: 100%;
-  }
-
-  .site-footer__name {
-    @include tools.component-title;
-    text-transform: uppercase;
-    overflow-wrap: anywhere;
-  }
-
-  .site-footer__copyright {
-    @include tools.meta-text;
+    /* One item per line on a phone, as in the header, so nothing jumps sides
+       between widths. */
+    @include tools.below(md) {
+      flex-direction: column;
+      gap: 4px;
+    }
   }
 }

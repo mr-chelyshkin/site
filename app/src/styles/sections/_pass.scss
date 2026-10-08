@@ -1,0 +1,184 @@
+@use '../tools';
+
+// Taken in hand: the pass straightens and lifts, and its cord drops by as much
+// so it stays on the hook.
+@mixin in-hand {
+  rotate: 0deg;
+  translate: 0 calc(var(--lift) * -1);
+
+  &::before {
+    translate: 0 var(--lift);
+  }
+}
+
+@layer sections {
+  /* A visitor's pass on a cord. The tilt pivots on the hook above; hovering
+     takes the pass in hand. `--tilt` and `--drop` come from the component;
+     small screens keep less of the tilt. */
+  .pass {
+    --lift: 8px;
+
+    position: relative;
+    /* As tall as its card, not the row, so the focus ring hugs the card. */
+    align-self: start;
+    width: min(100%, 210px);
+    margin-top: var(--drop);
+    rotate: calc(var(--tilt) * var(--tilt-scale));
+    transform-origin: 50% calc(var(--drop) * -1);
+    transition:
+      rotate var(--motion-base) var(--ease-settle),
+      translate var(--motion-base) var(--ease-settle);
+
+    /* The cord, up to the hook. */
+    &::before {
+      content: '';
+      position: absolute;
+      top: calc(var(--drop) * -1);
+      left: 50%;
+      width: 3px;
+      height: calc(var(--drop) - 18px);
+      margin-left: -1.5px;
+      border-radius: 2px;
+      background: var(--color-ink);
+      transition: translate var(--motion-base) var(--ease-settle);
+    }
+
+    &:hover,
+    &:focus-visible {
+      z-index: 2;
+    }
+
+    /* Only for a reader who doesn't ask for less motion; hover only where a
+       pointer hovers, so a tap leaves no pass lifted. */
+    @media (prefers-reduced-motion: no-preference) {
+      &:focus-visible {
+        @include in-hand;
+      }
+
+      @media (hover: hover) {
+        &:hover {
+          @include in-hand;
+        }
+
+        /* A strip behind the card keeps a pointer near its edge on the pass
+           as it lifts away, so it doesn't drop and lift again. Behind, so the
+           card's text stays selectable. */
+        &:hover::after {
+          content: '';
+          position: absolute;
+          inset: 0 -18px -12px;
+          z-index: -1;
+        }
+      }
+    }
+  }
+
+  .pass__clip {
+    position: absolute;
+    top: -24px;
+    left: 50%;
+    width: 22px;
+    height: 30px;
+    margin-left: -11px;
+    border-radius: 3px;
+    background: linear-gradient(
+      90deg,
+      var(--color-steel),
+      color-mix(in srgb, var(--color-steel) 30%, var(--color-paper)) 45%,
+      color-mix(in srgb, var(--color-steel) 85%, var(--color-paper))
+    );
+    box-shadow: 0 2px 3px rgb(0 0 0 / 50%);
+    z-index: 1;
+  }
+
+  .pass__card {
+    position: relative;
+    display: grid;
+    grid-template-columns: 84px minmax(0, 1fr);
+    gap: 8px;
+    padding: 40px 12px 12px 14px;
+    border-radius: 10px;
+    background: tools.$paper-grain, var(--color-paper-white);
+    color: var(--color-ink);
+    box-shadow: 0 16px 24px rgb(0 0 0 / 50%);
+  }
+
+  .pass__slot {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    width: 46px;
+    height: 9px;
+    margin-left: -23px;
+    border-radius: 5px;
+    background: var(--color-wall);
+    box-shadow: inset 0 1px 2px rgb(0 0 0 / 60%);
+  }
+
+  .pass__band {
+    display: flex;
+    grid-column: 1 / -1;
+    justify-content: space-between;
+    margin: -10px -12px 4px -14px;
+    padding: 5px 12px 5px 14px;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .pass__face {
+    width: 84px;
+    height: 112px;
+    image-rendering: pixelated;
+  }
+
+  .pass__facts {
+    font-size: 8.5px;
+    line-height: 1.35;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .pass__term {
+    color: var(--color-ink-soft);
+  }
+
+  /* The owner may edit the copy: a word too long for the column breaks
+     rather than running off the card. */
+  .pass__value {
+    margin-bottom: 6px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    overflow-wrap: anywhere;
+  }
+
+  /* First in the source, shown in the third row: under the band and the photo. */
+  .pass__name {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    font-size: 29px;
+    line-height: 0.88;
+  }
+
+  .pass__note {
+    grid-column: 1 / -1;
+    color: var(--color-ink-soft);
+    font-size: 9.5px;
+    line-height: 1.45;
+  }
+
+  .pass__id {
+    grid-column: 1 / -1;
+    justify-self: end;
+    color: var(--color-ink-soft);
+    font-size: 8px;
+    letter-spacing: 0.14em;
+  }
+
+  .pass__barcode {
+    grid-column: 1 / -1;
+    height: 26px;
+  }
+}
