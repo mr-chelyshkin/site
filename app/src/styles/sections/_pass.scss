@@ -13,9 +13,11 @@
 
 @layer sections {
   /* A visitor's pass on a cord. The tilt pivots on the hook above; hovering
-     takes the pass in hand. `--tilt` and `--drop` come from the component;
+     takes the pass in hand. Live passes leave all of that to script; see the
+     block after this one. `--tilt` and `--drop` come from the component;
      small screens keep less of the tilt. */
   .pass {
+    /* Mirrored in pass-physics.ts as `LIFT`, for live passes. */
     --lift: 8px;
 
     position: relative;
@@ -29,7 +31,8 @@
       rotate var(--motion-base) var(--ease-settle),
       translate var(--motion-base) var(--ease-settle);
 
-    /* The cord, up to the hook. */
+    /* The cord, up to the hook. Its 3px is mirrored in pass-physics.ts, which
+       draws the live cord. */
     &::before {
       content: '';
       position: absolute;
@@ -73,6 +76,53 @@
     }
   }
 
+  /* Live, script moves the pass and draws its cord (usePassPhysics), so the
+     tilt, the hover lift and the cord above stand down. The pivot is the slot
+     the clip goes through, `SLOT` in pass-physics.ts. A press is a pull, so
+     the pass's text doesn't select. */
+  .commerce__cable--live .pass {
+    z-index: 2;
+    rotate: none;
+    translate: none;
+    transform-origin: 50% 16px;
+    transition: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+
+    &::before,
+    &::after {
+      content: none;
+    }
+
+    &:hover,
+    &:focus-visible {
+      z-index: 3;
+    }
+
+    &[data-held] {
+      z-index: 4;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      cursor: grab;
+
+      &[data-held] {
+        cursor: grabbing;
+      }
+    }
+  }
+
+  /* Turns round the cord when the pass is poked. Positioned, so the clip keeps
+     the same containing block whether a twist transforms it or not. The origin
+     is the perspective's vanishing point, near the card's middle. */
+  .pass__twist {
+    position: relative;
+    transform-origin: 50% 40%;
+  }
+
+  /* Its place is mirrored in pass-physics.ts, where `CLIP_TOP` ties the live
+     cord on just under the clip's top, hidden behind it. */
   .pass__clip {
     position: absolute;
     top: -24px;
@@ -100,7 +150,21 @@
     border-radius: 10px;
     background: tools.$paper-grain, var(--color-paper-white);
     color: var(--color-ink);
-    box-shadow: 0 16px 24px rgb(0 0 0 / 50%);
+    /* Live passes counter-turn the offset as they swing, so the shadow keeps
+       falling the way it does at rest. The 16px is mirrored in pass-physics.ts
+       as `SHADOW`. */
+    box-shadow: var(--shadow-x, 0) var(--shadow-y, 16px) 24px rgb(0 0 0 / 50%);
+  }
+
+  /* Darkens the edge a twist turns away from the light. */
+  .pass__shade {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(90deg, rgb(0 0 0 / 50%), transparent 75%);
+    opacity: var(--shade, 0);
+    scale: var(--shade-side, 1) 1;
+    pointer-events: none;
   }
 
   .pass__slot {

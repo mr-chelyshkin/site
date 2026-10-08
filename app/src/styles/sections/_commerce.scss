@@ -37,7 +37,8 @@
     padding-bottom: 24px;
 
     /* Neighbors' stretches overlap by a pixel, so no seam shows where they
-       meet at fractional widths and pixel ratios. */
+       meet at fractional widths and pixel ratios. The overhang and the 2px are
+       mirrored in pass-physics.ts, which draws the live cable as far. */
     &::before {
       content: '';
       position: absolute;
@@ -64,6 +65,48 @@
     }
   }
 
+  /* The hook's stretch of cable and the pass's cord, drawn in the hook's own
+     pixels while the passes are live; overflow shows them past its box. */
+  .commerce__wire {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .commerce__line {
+    fill: none;
+    stroke: var(--color-steel);
+    /* Mirrored in pass-physics.ts, which runs the line 1px down, so it covers
+       the same 2px as the stretch it replaces. */
+    stroke-width: 2px;
+  }
+
+  .commerce__cord {
+    fill: none;
+    stroke: var(--color-ink);
+    /* As thick as the stylesheet's cord; mirrored in pass-physics.ts, which
+       thins it inline as it stretches. */
+    stroke-width: 3px;
+    stroke-linecap: round;
+  }
+
+  /* Live, the drawn cable takes over from each hook's stretch, and the ring
+     rides it down, under the passes, which can rise past it. */
+  .commerce__cable--live .commerce__hook {
+    &::before {
+      content: none;
+    }
+
+    &::after {
+      z-index: 1;
+      translate: 0 var(--dip, 0px);
+    }
+  }
+
   /* Six to a cable only where a pass is wide enough for its facts. */
   @include tools.below(xxl) {
     .commerce__cable {
@@ -80,8 +123,13 @@
       margin-inline: calc(var(--wall-gutter) * -1);
       padding: 8px var(--wall-gutter) 24px;
       overflow-x: auto;
+      /* A swinging pass never scrolls the cable up and down. */
+      overflow-y: hidden;
       overscroll-behavior-x: contain;
       scroll-snap-type: x mandatory;
+      /* The padding's width, so the last hook's end snap (below) is where the
+         cable stops at rest; on both sides, so centered snaps don't move. */
+      scroll-padding-inline: var(--wall-gutter);
       scrollbar-width: none;
     }
 
@@ -94,6 +142,13 @@
 
     .commerce__hook {
       scroll-snap-align: center;
+    }
+
+    /* Centered, the last hook's snap would lie past the end of the scroll and
+       be held at that end, which a swinging pass pushes out, so the cable
+       would follow the swing. Its end edge gives a snap that stays put. */
+    .commerce__hook:last-child {
+      scroll-snap-align: end;
     }
   }
 }

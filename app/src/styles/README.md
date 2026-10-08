@@ -209,11 +209,18 @@ A section partial contains only what makes that section different:
   layer, and their numbered callouts.
 - `_commerce.scss` — the sprayed heading and the cable the passes hang from.
   Each grid cell draws its own stretch of cable and a hook, so the cable follows
-  the grid at any number of columns.
+  the grid at any number of columns. Each hook also holds a wire, an SVG with a
+  polyline for its stretch of cable and a path for its pass's cord, which
+  `usePassPhysics` draws while the passes are live; `commerce__cable--live` then
+  hides the CSS stretches and lets each ring ride the cable down.
 - `_pass.scss` — `AccessPass`: a visitor's pass with the dithered face, the
   company, unit, role, one line of what was built and a barcode. Each pass hangs
   at its own seeded angle and drop (`--tilt`, `--drop`) and pivots on its hook.
-  Passes are focusable, so a keyboard can take one in hand.
+  Passes are focusable, so a keyboard can take one in hand. Under
+  `commerce__cable--live`, script moves each pass about the slot its clip goes
+  through, and the stylesheet's tilt, hover lift and cord stand down. The clip
+  and the card sit in `pass__twist`, which turns round the cord when the pass is
+  poked, and `pass__shade` darkens the edge a twist turns from the light.
 - `_open-source.scss` — the sprayed heading and the board, which places the
   first three flyers at different widths and heights; any further flyer takes a
   third of the board, or half below `xl`.
@@ -236,7 +243,8 @@ reduced-motion rule of its own. Animations, and moves that would still jump at
 
 Tilts and moves use the standalone `rotate`, `translate` and `scale` properties
 rather than `transform`, so an animation or a hover that moves an object keeps
-its tilt.
+its tilt. Live passes are the exception: script draws each one with an inline
+`transform`, and their `rotate` and `translate` are `none` while it does.
 
 - Paste-in (`utilities/_paste.scss`). `WallSection` carries `u-paste`, and
   `useReveal` adds `u-paste--shown` the first time the section comes into view.
@@ -254,12 +262,16 @@ its tilt.
   straight from the scroll, with no transition, which would restart every frame
   and lag behind. A mouse over a plate or a callout lights the pair; touch and
   pen don't, as a tap would leave it lit.
-- Pass hover. A hovering pointer or keyboard focus takes a pass in hand: the
-  `in-hand` mixin in `_pass.scss` straightens it and lifts it by `--lift`, and
-  drops its cord by as much, so the cord stays on the hook. While a pass is
-  hovered, a strip behind the card keeps a pointer near its edge on the pass as
-  it lifts away. The hover lift applies only where a pointer can hover, so a tap
-  leaves no pass lifted.
+- Passes. While motion is allowed, `usePassPhysics` moves them, with the model
+  in `utils/pass-physics.ts`: a hovering pointer brushes a pass and sways it, a
+  press pulls it on its elastic cord, a click or a tap twists it, and keyboard
+  focus takes it in hand, straight and lifted 8px as by `--lift`, on a spring
+  in script. The `in-hand` mixin in `_pass.scss` does the stylesheet's version: it
+  straightens the pass, lifts it by `--lift` and drops its cord by as much, and
+  a strip behind a hovered card keeps the pointer on it as it lifts. It applies
+  only without the physics, where motion is allowed but the passes aren't live
+  (the `commerce__cable--live` rules cancel it), and its hover lift only where a
+  pointer can hover, so a tap leaves no pass lifted.
 - Tear-off. A torn tab falls, turns and fades. If it had focus, focus moves to
   the next intact tab, and the copy is announced after that move, as moving
   focus can cancel speech already queued.
@@ -349,6 +361,22 @@ at any missing URL, so it has no app bundle and can't read the app's CSS or
 sources (`tools/_mixins.scss`, `generic/`, `components/_sheet.scss`,
 `_spray.scss` and `sections/_flyer.scss`) don't, so check the 404 when changing
 them.
+
+`app/src/utils/pass-physics.ts` draws the live passes, and a pass at rest
+matches the stylesheet's drawing only while these copies agree with their
+sources:
+
+- `SLOT`, 16: the live `transform-origin: 50% 16px` in `sections/_pass.scss`;
+- `SHADOW`, 16: the offset of `.pass__card`'s `box-shadow`;
+- `LIFT`, 8: `--lift` on `.pass`, how far a pass taken in hand rises;
+- `CLIP_TOP`, 36: the clip's place, `.pass__clip`, which hides where the cord
+  ties on;
+- the cable's 2px stroke, drawn 1px under the hook's top, and its
+  `gap / 2 + 0.5` overhang: `.commerce__hook::before` in
+  `sections/_commerce.scss`, and `.commerce__line`;
+- the 3px cord: `.pass::before` and `.commerce__cord`.
+
+Each of those stylesheet values points back to it.
 
 Elsewhere:
 
