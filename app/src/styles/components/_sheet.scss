@@ -68,10 +68,12 @@
       auto;
   }
 
+  /* Each piece is cut to its own length; `--tape-sx` and `--tape-sy` come from
+     the sheet's seed. */
   .c-sheet__tape {
     position: absolute;
-    width: 150px;
-    height: 40px;
+    width: calc(150px * var(--tape-sx, 1));
+    height: calc(40px * var(--tape-sy, 1));
     rotate: var(--tape-angle);
     pointer-events: none;
 
@@ -92,8 +94,8 @@
     }
 
     @include tools.below(md) {
-      width: 104px;
-      height: 30px;
+      width: calc(104px * var(--tape-sx, 1));
+      height: calc(30px * var(--tape-sy, 1));
 
       &--top {
         margin-left: -52px;
@@ -101,33 +103,70 @@
     }
   }
 
-  /* Clear matte office tape: what's under it shows through a little softer and
-     lighter, a sheen runs along its length, and its ends keep the dispenser's
-     teeth. The film is the pseudo-element, so the shadow survives the clip. */
+  /* Clear matte office tape, as handled: torn by hand, frosted unevenly, with a
+     crease, air under it in places and dust stuck to the glue. What's under it
+     shows through softer and lighter. The film and the wear are pseudo-elements
+     clipped to the torn outline, so the shadow survives the clip. */
   .c-sheet__tape--real {
     filter: drop-shadow(0 1px 1px rgb(0 0 0 / 28%));
 
-    &::before {
+    &::before,
+    &::after {
       content: '';
       position: absolute;
       inset: 0;
+      clip-path: var(--tape-clip);
+    }
+
+    &::before {
       background:
+        radial-gradient(60% 90% at var(--mottle, 50% 50%), rgb(255 255 255 / 12%), transparent 70%),
         linear-gradient(
           180deg,
-          rgb(255 255 255 / 26%),
+          rgb(255 255 255 / 22%),
           rgb(255 255 255 / 4%) 28%,
           transparent 60%,
-          rgb(255 255 255 / 12%)
+          rgb(255 255 255 / 10%)
         ),
-        linear-gradient(100deg, transparent 20%, rgb(255 255 255 / 16%) 48%, transparent 72%),
-        repeating-linear-gradient(90deg, transparent 0 17px, rgb(255 255 255 / 5%) 17px 18px),
-        rgb(236 241 239 / 65%);
+        linear-gradient(100deg, transparent 20%, rgb(255 255 255 / 14%) 48%, transparent 72%),
+        tools.$paper-grain, rgb(236 241 239 / 65%);
       box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 40%),
+        inset 0 1px 0 rgb(255 255 255 / 34%),
         inset 0 -1px 0 rgb(0 0 0 / 10%);
-      clip-path: var(--tape-clip);
       -webkit-backdrop-filter: blur(0.7px) brightness(1.12) saturate(0.85);
       backdrop-filter: blur(0.7px) brightness(1.12) saturate(0.85);
+    }
+
+    &::after {
+      background:
+        linear-gradient(
+          var(--crease-angle, 90deg),
+          transparent calc(var(--crease-x, 50%) - 1.5px),
+          rgb(255 255 255 / 45%) calc(var(--crease-x, 50%) - 0.5px),
+          rgb(0 0 0 / 14%) calc(var(--crease-x, 50%) + 0.8px),
+          transparent calc(var(--crease-x, 50%) + 2px)
+        ),
+        radial-gradient(
+          circle at var(--bubble-a, 30% 50%),
+          rgb(255 255 255 / 40%) 0 2px,
+          rgb(0 0 0 / 10%) 2.6px,
+          transparent 3.4px
+        ),
+        radial-gradient(
+          circle at var(--bubble-b, 70% 40%),
+          rgb(255 255 255 / 30%) 0 1.4px,
+          transparent 2.2px
+        ),
+        radial-gradient(
+          circle at var(--speck-a, 20% 60%),
+          rgb(0 0 0 / 55%) 0 0.7px,
+          transparent 1.2px
+        ),
+        radial-gradient(
+          circle at var(--speck-b, 80% 30%),
+          rgb(0 0 0 / 45%) 0 0.6px,
+          transparent 1px
+        );
     }
   }
 
@@ -164,5 +203,103 @@
     stroke-width: 1.3px;
     vector-effect: non-scaling-stroke;
     opacity: 0.55;
+  }
+
+  /* Only the top is taped, so a fold leaves the paper standing off the wall
+     where nothing holds it: the part below a horizontal fold, further the lower
+     it hangs, or the sides of a vertical one, the right more, as the light comes
+     from the upper left. Their shadows on the wall grow toward the bottom, a
+     foot's tabs and all. The horizontal fold's share of the sheet includes the
+     foot, close enough for a shadow that fades in. Under the paper and the foot,
+     inside the sheet's stacking context; wider than the sheet, so the side
+     shadows show past its edges. */
+  .c-sheet__lift {
+    position: absolute;
+    inset: 0 -8px;
+    z-index: -1;
+    background:
+      linear-gradient(
+        90deg,
+        rgb(0 0 0 / calc(40% * var(--fold-v))),
+        transparent 14%,
+        transparent 86%,
+        rgb(0 0 0 / calc(65% * var(--fold-v)))
+      ),
+      linear-gradient(transparent var(--fold-y), rgb(0 0 0 / calc(60% * var(--fold-h))));
+    -webkit-mask-image: linear-gradient(rgb(0 0 0 / 35%), #000 70%);
+    mask-image: linear-gradient(rgb(0 0 0 / 35%), #000 70%);
+    filter: blur(5px);
+    translate: 2px 7px;
+    pointer-events: none;
+
+    @include tools.below(md) {
+      inset: 0 -5px;
+      filter: blur(3px);
+      translate: 1px 4px;
+    }
+  }
+
+  /* Handled paper, over the print as on a real sheet: a fold across, down, both
+     or none (`--fold-h` and `--fold-v` switch them), shadowed on one side and
+     catching the light on the other (the halves of a vertical one, standing off
+     the wall, are turned to the light and away from it), a few soft crumples, a
+     tone that isn't even, corners rubbed darker and edges gone a little yellow.
+     `--fold-*` and `--crumple-*` come from the sheet's seed. */
+  .c-sheet__wear {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+    }
+
+    &::before {
+      background:
+        linear-gradient(
+          180deg,
+          transparent calc(var(--fold-y) - 10px),
+          rgb(0 0 0 / calc(11% * var(--fold-h, 1))) var(--fold-y),
+          transparent calc(var(--fold-y) + 1px)
+        ),
+        linear-gradient(
+          90deg,
+          rgb(0 0 0 / calc(4% * var(--fold-v, 1))),
+          rgb(0 0 0 / calc(12% * var(--fold-v, 1))) var(--fold-x),
+          transparent var(--fold-x)
+        ),
+        radial-gradient(28% 18% at var(--crumple-a), rgb(0 0 0 / 9%), transparent 70%),
+        radial-gradient(22% 30% at var(--crumple-b), rgb(0 0 0 / 7%), transparent 70%),
+        radial-gradient(30% 14% at var(--crumple-c), rgb(0 0 0 / 6%), transparent 70%),
+        radial-gradient(circle at 0 0, rgb(70 55 30 / 22%), transparent 26px),
+        radial-gradient(circle at 100% 0, rgb(70 55 30 / 20%), transparent 22px),
+        radial-gradient(circle at 0 100%, rgb(70 55 30 / 18%), transparent 24px),
+        radial-gradient(circle at 100% 100%, rgb(70 55 30 / 22%), transparent 28px),
+        radial-gradient(140% 120% at 50% 42%, transparent 55%, rgb(90 70 30 / 22%)),
+        tools.$paper-mottle;
+      mix-blend-mode: multiply;
+    }
+
+    &::after {
+      background:
+        linear-gradient(
+          180deg,
+          transparent calc(var(--fold-y) + 1px),
+          rgb(255 255 255 / calc(45% * var(--fold-h, 1))) calc(var(--fold-y) + 1.5px),
+          transparent calc(var(--fold-y) + 6px)
+        ),
+        linear-gradient(
+          90deg,
+          transparent var(--fold-x),
+          rgb(255 255 255 / calc(24% * var(--fold-v, 1))) calc(var(--fold-x) + 1px),
+          rgb(255 255 255 / calc(7% * var(--fold-v, 1))) calc(var(--fold-x) + 28px),
+          transparent
+        ),
+        radial-gradient(18% 12% at var(--crumple-b), rgb(255 255 255 / 14%), transparent 70%);
+      mix-blend-mode: screen;
+    }
   }
 }

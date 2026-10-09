@@ -57,6 +57,28 @@
     pointer-events: none;
   }
 
+  /* What a tab torn off before the page loaded leaves behind: a scrap along the
+     perforation, shown though the tab is hidden. Its ragged edge, `--scrap`,
+     comes from the component. Over the tab's own border, so the perforation
+     runs on across the gap. */
+  .c-tear-tabs__tab--gone {
+    position: relative;
+    overflow: visible;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      right: 0;
+      left: 0;
+      height: 16px;
+      border-top: 2px dashed color-mix(in srgb, currentColor 55%, transparent);
+      background: tools.$paper-grain, var(--sheet-stock, var(--color-paper));
+      clip-path: var(--scrap);
+      visibility: visible;
+    }
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     @keyframes tear-off {
       to {
@@ -65,6 +87,34 @@
         rotate: 16deg;
         visibility: hidden;
       }
+    }
+
+    /* A swing on the perforation that dies down, the way a strip of paper takes
+       a brush of the hand; `--sway-dir` turns it away from the hand. Over its
+       neighbors while it swings. Before the tear, which wins. */
+    @keyframes tab-sway {
+      18% {
+        rotate: calc(4.5deg * var(--sway-dir, 1));
+      }
+
+      42% {
+        rotate: calc(-2.6deg * var(--sway-dir, 1));
+      }
+
+      66% {
+        rotate: calc(1.2deg * var(--sway-dir, 1));
+      }
+
+      84% {
+        rotate: calc(-0.4deg * var(--sway-dir, 1));
+      }
+    }
+
+    .c-tear-tabs__tab--sway {
+      position: relative;
+      z-index: 1;
+      transform-origin: 50% 0;
+      animation: tab-sway 1.1s ease-in-out;
     }
 
     .c-tear-tabs__tab--torn {

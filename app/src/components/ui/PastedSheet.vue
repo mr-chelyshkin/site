@@ -7,6 +7,7 @@ type TapeAt = 'top-left' | 'top' | 'top-right'
 /** Clear office tape as a camera sees it, or tape as a pen draws it. */
 type TapeKind = 'real' | 'drawn'
 type Stock = 'paper' | 'white' | 'cyan' | 'ink' | 'grid'
+type Fold = 'none' | 'vertical' | 'horizontal' | 'both'
 
 /**
  * Paper pasted to the wall. The wrapper carries the tilt and the shadow; the
@@ -26,12 +27,29 @@ const props = withDefaults(
     tape?: readonly TapeAt[]
     /** Which tape holds it up; by default the seed picks, so sheets differ. */
     tapeKind?: TapeKind
+    /** Handled paper: folded, a little crumpled, its edges yellowed, its corners rubbed. */
+    worn?: boolean
+    /**
+     * Which way a worn sheet was folded, if at all. Taped at the top, the paper stands off
+     * the wall where the fold leaves it free: below a horizontal fold, at the
+     * sides of a vertical one.
+     */
+    fold?: Fold
     /** Rotation in degrees; small screens use less of it. */
     tilt?: number
     /** Place in the section's paste-in sequence. */
     order?: number
   }>(),
-  { as: 'div', stock: 'paper', torn: () => ['top'], tape: () => [], tilt: 0, order: 0 },
+  {
+    as: 'div',
+    stock: 'paper',
+    torn: () => ['top'],
+    tape: () => [],
+    tilt: 0,
+    order: 0,
+    worn: false,
+    fold: 'both',
+  },
 )
 defineSlots<{ default(): VNode[]; foot?(): VNode[]; over?(): VNode[] }>()
 
@@ -40,16 +58,43 @@ const kind = computed<TapeKind>(
   () => props.tapeKind ?? (seeded(`${props.seed}:tape-kind`)() < 0.5 ? 'real' : 'drawn'),
 )
 
-// A tape's cut ends: teeth from the dispenser, in percent of the tape so they
-// scale with it, each a little different.
-function serrated(rand: () => number) {
-  const teeth = 7
-  const end = (x: (depth: number) => number, from: number, to: number) =>
-    Array.from({ length: teeth * 2 + 1 }, (_, i) => {
-      const depth = i % 2 ? 1.6 + rand() * 2.2 : 0
-      return `${x(depth).toFixed(2)}% ${(from + ((to - from) * i) / (teeth * 2)).toFixed(2)}%`
+// A tape's outline, torn by hand: ragged ends a little askew, and long edges
+// that aren't quite straight. In percent of the tape, so it scales with it.
+function tornOutline(rand: () => number) {
+  const steps = 9
+  const jag = () => rand() * 2.6
+  const end = (base: number, dir: number, slant: number, from: number, to: number) =>
+    Array.from({ length: steps + 1 }, (_, i) => {
+      const t = i / steps
+      const x = base + dir * (slant * (t - 0.5) + jag())
+      return `${x.toFixed(2)}% ${(from + (to - from) * t).toFixed(2)}%`
     })
-  return `polygon(${[...end((d) => d, 0, 100), ...end((d) => 100 - d, 100, 0)].join(', ')})`
+  const edge = (y: number, dir: number, from: number, to: number) =>
+    [0.3, 0.55, 0.8].map(
+      (t) => `${(from + (to - from) * t).toFixed(2)}% ${(y + dir * rand() * 1.4).toFixed(2)}%`,
+    )
+  const left = end(1.5, 1, (rand() - 0.5) * 7, 0, 100)
+  const right = end(98.5, -1, (rand() - 0.5) * 7, 100, 0)
+  return `polygon(${[...left, ...edge(100, -1, 4, 96), ...right, ...edge(0, 1, 96, 4)].join(', ')})`
+}
+
+const at = (rand: () => number, x0: number, x1: number, y0: number, y1: number) =>
+  `${(x0 + rand() * (x1 - x0)).toFixed(1)}% ${(y0 + rand() * (y1 - y0)).toFixed(1)}%`
+
+// What makes a real piece of tape look handled: its own size, a crease, a couple of
+// air bubbles, dust under the glue, and frosting that isn't even.
+function wear(rand: () => number) {
+  return {
+    '--tape-sx': (0.88 + rand() * 0.26).toFixed(3),
+    '--tape-sy': (0.9 + rand() * 0.2).toFixed(3),
+    '--crease-x': `${(22 + rand() * 56).toFixed(1)}%`,
+    '--crease-angle': `${(70 + rand() * 40).toFixed(1)}deg`,
+    '--bubble-a': at(rand, 12, 88, 25, 75),
+    '--bubble-b': at(rand, 12, 88, 25, 75),
+    '--speck-a': at(rand, 8, 92, 15, 85),
+    '--speck-b': at(rand, 8, 92, 15, 85),
+    '--mottle': at(rand, 15, 85, 20, 80),
+  }
 }
 
 // The same outline as a pen draws it, in the 150 × 40 box of the drawing, with a
@@ -70,14 +115,30 @@ function drawnPath(rand: () => number) {
   ].join(' ')
 }
 
+// Where the sheet was folded and crumpled, the same on every load.
+const wearStyle = computed(() => {
+  const rand = seeded(`${props.seed}:wear`)
+  const spot = () => `${(15 + rand() * 70).toFixed(1)}% ${(15 + rand() * 70).toFixed(1)}%`
+  return {
+    '--fold-v': props.fold === 'vertical' || props.fold === 'both' ? 1 : 0,
+    '--fold-h': props.fold === 'horizontal' || props.fold === 'both' ? 1 : 0,
+    '--fold-x': `${(44 + rand() * 12).toFixed(1)}%`,
+    '--fold-y': `${(38 + rand() * 24).toFixed(1)}%`,
+    '--crumple-a': spot(),
+    '--crumple-b': spot(),
+    '--crumple-c': spot(),
+  }
+})
+
 const tapes = computed(() => {
   const rand = seeded(`${props.seed}:tape`)
   const base: Record<TapeAt, number> = { 'top-left': -36, top: -3, 'top-right': 32 }
   return props.tape.map((at) => ({
     at,
     angle: base[at] + (rand() - 0.5) * 8,
-    clip: serrated(rand),
+    clip: tornOutline(rand),
     path: drawnPath(rand),
+    wear: wear(rand),
   }))
 })
 </script>
@@ -89,8 +150,15 @@ const tapes = computed(() => {
     :class="`c-sheet--${stock}`"
     :style="{ '--tilt': `${tilt}deg`, '--paste-order': order }"
   >
+    <span
+      v-if="worn && fold !== 'none'"
+      class="c-sheet__lift"
+      :style="wearStyle"
+      aria-hidden="true"
+    />
     <div class="c-sheet__paper" :style="{ clipPath }">
       <slot />
+      <span v-if="worn" class="c-sheet__wear" :style="wearStyle" aria-hidden="true" />
     </div>
     <slot name="foot" />
     <span
@@ -98,7 +166,7 @@ const tapes = computed(() => {
       :key="i"
       class="c-sheet__tape"
       :class="[`c-sheet__tape--${t.at}`, `c-sheet__tape--${kind}`]"
-      :style="{ '--tape-angle': `${t.angle}deg`, '--tape-clip': t.clip }"
+      :style="{ '--tape-angle': `${t.angle}deg`, '--tape-clip': t.clip, ...t.wear }"
       aria-hidden="true"
     >
       <svg

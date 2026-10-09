@@ -1,5 +1,8 @@
 @layer components {
-  /* The photo one bit per pixel, scaled up without smoothing. */
+  /* The photo one bit per pixel. It is scaled smoothly: its dots are fine enough
+     to stay crisp, while unsmoothed scaling at a fractional ratio doubles a
+     different set of rows each time the page scrolls by part of a pixel, and the
+     finest dots shimmer. */
   .c-dither {
     position: relative;
     overflow: hidden;
@@ -10,7 +13,6 @@
     display: block;
     width: 100%;
     height: auto;
-    image-rendering: pixelated;
   }
 
   .c-dither__layer {
@@ -18,8 +20,13 @@
     left: 0;
     right: 0;
     background-repeat: no-repeat;
-    image-rendering: pixelated;
     pointer-events: none;
+  }
+
+  /* One row stretched down its band keeps hard streaks; scrolling can't make
+     it shimmer, since every row of it is the same. */
+  .c-dither__smear {
+    image-rendering: pixelated;
   }
 
   .c-dither__ghost {

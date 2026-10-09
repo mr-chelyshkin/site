@@ -52,6 +52,8 @@ const smear = { at: 74, height: 6, row: 1020, shift: -4.2 }
       stock="cyan"
       :tape="['top']"
       tape-kind="drawn"
+      worn
+      fold="none"
       :tilt="2.6"
     >
       <div class="hero__notice-body">
@@ -78,7 +80,7 @@ const smear = { at: 74, height: 6, row: 1020, shift: -4.2 }
         <p class="hero__note">{{ content.notice.note }}</p>
       </div>
       <template #foot>
-        <TearTabs :email="email" :count="8" :gone="[2, 5]" :copied="copied" />
+        <TearTabs :email="email" :count="8" :gone="[1, 2, 3, 5, 7]" :copied="copied" />
       </template>
     </PastedSheet>
 

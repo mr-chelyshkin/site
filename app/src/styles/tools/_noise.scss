@@ -14,3 +14,6 @@ $specks: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' wi
 
 // Mostly opaque with grainy holes, as a mask for sprayed paint.
 $spray-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 8 -1.9'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+
+// Large, soft blotches, for paper whose tone isn't even.
+$paper-mottle: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .4  0 0 0 0 .3  0 0 0 -1.2 .5'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");

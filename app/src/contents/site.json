@@ -37,7 +37,11 @@
         "kicker": ["Independent"],
         "headline": ["Software", "engineer"],
         "discipline": "Infrastructure",
-        "points": ["developer platforms", "runtime systems", "cloud · on-prem · bare metal"],
+        "points": [
+          "internal developer platforms",
+          "orchestration & control planes",
+          "hybrid cloud & bare metal"
+        ],
         "note": "Open for platform work."
       }
     },
@@ -58,17 +62,17 @@
       "layers": [
         {
           "key": "platforms",
-          "title": "Developer platforms",
+          "title": "Internal developer platforms",
           "description": "Self-service tools and APIs for building and running software."
         },
         {
           "key": "runtime",
-          "title": "Runtime systems",
+          "title": "Orchestration & control planes",
           "description": "Task execution, supervision and the services that connect them."
         },
         {
           "key": "infrastructure",
-          "title": "Infrastructure",
+          "title": "Hybrid cloud & bare metal",
           "description": "Cloud, on-premises and bare metal. Environments for development and production."
         }
       ],
