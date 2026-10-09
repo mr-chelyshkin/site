@@ -33,15 +33,13 @@
       "lastName": "Chelyshkin",
       "image": "hero-poster",
       "imageAlt": "Igor Chelyshkin standing in a crowded street, printed one bit per pixel",
-      "caption": "fig. 01 — cam.01, one bit per pixel",
       "notice": {
-        "kicker": ["Notice no. 01", "Independent"],
+        "kicker": ["Independent"],
         "headline": ["Software", "engineer"],
         "discipline": "Infrastructure",
         "points": ["developer platforms", "runtime systems", "cloud · on-prem · bare metal"],
         "note": "Open for platform work."
-      },
-      "labels": ["Rust", "Go"]
+      }
     },
     "practice": {
       "id": "build",

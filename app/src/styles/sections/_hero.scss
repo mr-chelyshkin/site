@@ -11,7 +11,7 @@
     grid-template-rows: auto auto auto 1fr;
     column-gap: var(--wall-gap);
     padding-top: clamp(56px, 5vw, 72px);
-    /* Its z-indexes stay inside: poster 1 < IGOR 2 < surname 3 < notice 5 < labels 6. */
+    /* Its z-indexes stay inside: poster 1 < IGOR 2 < surname 3 < notice 5. */
     isolation: isolate;
   }
 
@@ -20,18 +20,6 @@
     grid-row: 1 / 3;
     align-self: start;
     z-index: 1;
-  }
-
-  .hero__caption {
-    position: absolute;
-    left: 2.4%;
-    top: 2.8%;
-    padding: 5px 8px;
-    background: var(--color-paper);
-    color: var(--color-ink);
-    font-size: var(--text-size-xsm);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
   }
 
   /* Sizes here and on phones fit the 4-letter first name; re-tune them if
@@ -43,17 +31,6 @@
     margin-left: -0.1em;
     font-size: clamp(88px, 14.9vw, 214px);
     z-index: 2;
-  }
-
-  .hero__labels {
-    display: flex;
-    grid-column: 9 / 13;
-    grid-row: 1;
-    align-self: end;
-    justify-self: end;
-    gap: 16px;
-    translate: 0 45%;
-    z-index: 6;
   }
 
   /* The notice runs into the flexible fourth row, so its extra height never
@@ -71,6 +48,7 @@
   }
 
   .hero__kicker {
+    justify-content: center;
     padding-bottom: 10px;
     border-bottom: 2px solid currentColor;
   }
@@ -98,16 +76,45 @@
     hyphens: auto;
   }
 
+  /* A printed checklist: each point on its own dashed line, ticked in pen. */
   .hero__points {
-    margin-top: 16px;
-    font-size: var(--text-size-sm);
-    line-height: 1.75;
+    margin-top: 18px;
+    border-top: 1.5px dashed color-mix(in srgb, currentColor 45%, transparent);
+    font-size: var(--text-size-xsm);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
-  /* Drawn, not read. */
+  .hero__point {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1.5px dashed color-mix(in srgb, currentColor 45%, transparent);
+  }
+
+  /* The printed box, and the tick in it: drawn, not read. */
   .hero__point::before {
-    content: '→ ';
-    content: '→ ' / '';
+    content: '';
+    flex: none;
+    width: 13px;
+    height: 13px;
+    border: 1.5px solid currentColor;
+  }
+
+  .hero__point::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 3px;
+    width: 12px;
+    height: 6px;
+    border-bottom: 2.5px solid currentColor;
+    border-left: 2.5px solid currentColor;
+    rotate: -48deg;
+    translate: 0 -80%;
   }
 
   .hero__note {
@@ -159,21 +166,10 @@
       font-size: 30vw;
     }
 
-    .hero__labels {
-      grid-column: 1;
-      grid-row: 1;
-      gap: 10px;
-      translate: 0 0;
-    }
-
     .hero__poster {
       grid-column: 1;
       grid-row: 2;
       margin-top: 6px;
-    }
-
-    .hero__caption {
-      font-size: 9.5px;
     }
 
     .hero__last {

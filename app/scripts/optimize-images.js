@@ -19,16 +19,43 @@ const cyan = [95, 176, 191]
 // Crops are [left, top, width, height] as fractions of the source photo, so they
 // survive a re-export at another size. When the photograph changes, move them to
 // frame the new portrait and face. `width` is the output width; the height follows
-// the crop. `contrast` and `brightness` go to sharp's `linear(a, b)`, gray × a + b,
-// before dithering. `ghost` also writes `<name>-cyan.png`.
+// the crop. `clahe`, when set, evens out local contrast first, so a face keeps its
+// features through the dither. `contrast` and `brightness` go to sharp's
+// `linear(a, b)`, gray × a + b, before dithering. `ghost` also writes
+// `<name>-cyan.png`.
 const renders = [
   {
     name: 'hero-poster',
-    width: 470,
-    crop: [0.1875, 0.0444, 0.625, 0.9111],
-    contrast: 1.3,
-    brightness: -56,
+    width: 560,
+    crop: [0.268, 0.06, 0.48, 0.7],
+    clahe: { width: 40, height: 40, maxSlope: 3 },
+    contrast: 1.15,
+    brightness: -30,
     ghost: true,
+    // The person, dithered three times as fine and sharpened, over the street's
+    // coarser grain: at the poster's size on a 2x screen, about one dot per pixel.
+    // The fine grain covers the skin, and the dark hair and shirt up to their
+    // edges, so it stops at the person's outline while the lighter street around
+    // stays coarse. Ellipses are [cx, cy, rx, ry] as fractions of the render:
+    // `skin` (face, then neck and collar) always takes the fine grain; `dark`
+    // (head, then shoulders) only where the photo is darker than `darkBelow`.
+    subject: {
+      skin: [
+        [0.494, 0.4, 0.074, 0.13],
+        [0.494, 0.565, 0.075, 0.065],
+      ],
+      dark: [
+        [0.494, 0.36, 0.1, 0.17],
+        [0.5, 0.8, 0.32, 0.3],
+      ],
+      darkBelow: 70,
+      scale: 3,
+      sharpen: { sigma: 0.9, m2: 3 },
+      clahe: { width: 64, height: 64, maxSlope: 3 },
+      // Midtones stay where they are (1.25 × 128 − 32 = 128): sharper, not lighter.
+      contrast: 1.25,
+      brightness: -32,
+    },
   },
   {
     name: 'hero-face',
@@ -71,7 +98,7 @@ function checkQrCodes() {
   }
 }
 
-async function grayscale({ width, crop, contrast, brightness }) {
+async function grayscale({ width, crop, sharpen, clahe, contrast, brightness }) {
   const meta = await sharp(source).metadata()
   const [x, y, w, h] = crop
   const left = Math.round(x * meta.width)
@@ -83,10 +110,10 @@ async function grayscale({ width, crop, contrast, brightness }) {
     width: Math.min(Math.round(w * meta.width), meta.width - left),
     height: Math.min(Math.round(h * meta.height), meta.height - top),
   }
-  const { data, info } = await sharp(source)
-    .extract(region)
-    .resize(width)
-    .grayscale()
+  let image = sharp(source).extract(region).resize(width).grayscale()
+  if (sharpen) image = image.sharpen(sharpen)
+  if (clahe) image = image.clahe(clahe)
+  const { data, info } = await image
     .linear(contrast, brightness)
     .raw()
     .toBuffer({ resolveWithObject: true })
@@ -114,6 +141,58 @@ function dither({ data, width, height }) {
   return lit
 }
 
+// A 4×4 Bayer matrix as thresholds in (0, 1), so the fine person fades into the
+// coarse street dot by dot rather than along a seam.
+const bayer = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16)
+
+// One channel in, one channel out: sharp's blur otherwise hands back three.
+const blurred = (data, width, height, sigma) =>
+  sharp(data, { raw: { width, height, channels: 1 } })
+    .blur(sigma)
+    .extractChannel(0)
+    .raw()
+    .toBuffer()
+
+// How much of the fine render to show at each pixel, 0 to 1: the skin, and the dark
+// parts inside the subject's outline. Blurring the mask and cutting it again drops
+// stray specks, and a last blur gives an edge a pixel or two soft.
+async function silhouette({ data, width, height }, { skin, dark, darkBelow }) {
+  const within = (ellipses, u, v) =>
+    ellipses.some(([cx, cy, rx, ry]) => Math.hypot((u - cx) / rx, (v - cy) / ry) < 1)
+  const mask = Buffer.alloc(width * height)
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = y * width + x
+      const u = x / width
+      const v = y / height
+      const person = within(skin, u, v) || (within(dark, u, v) && data[i] < darkBelow)
+      mask[i] = person ? 255 : 0
+    }
+  }
+  const spread = await blurred(mask, width, height, 2)
+  const shape = Buffer.from(Uint8Array.from(spread, (v) => (v > 128 ? 255 : 0)))
+  const edge = await blurred(shape, width, height, 1.5)
+  return Float32Array.from(edge, (v) => v / 255)
+}
+
+// The fine render where the subject's silhouette covers it, the coarse one scaled
+// up to the fine render's size everywhere else.
+function blend(coarse, fine, weights) {
+  const lit = new Uint8Array(fine.width * fine.height)
+  const scale = fine.width / coarse.width
+  for (let y = 0; y < fine.height; y++) {
+    for (let x = 0; x < fine.width; x++) {
+      const i = y * fine.width + x
+      const weight = weights[i]
+      const cxy =
+        Math.min(coarse.height - 1, Math.floor(y / scale)) * coarse.width +
+        Math.min(coarse.width - 1, Math.floor(x / scale))
+      lit[i] = weight > bayer[(y & 3) * 4 + (x & 3)] ? fine.lit[i] : coarse.lit[cxy]
+    }
+  }
+  return lit
+}
+
 // RGB with both colors, or RGBA with only the lit bits when `off` is omitted.
 function paint(lit, on, off) {
   const channels = off ? 3 : 4
@@ -126,15 +205,21 @@ function paint(lit, on, off) {
   return { data, channels }
 }
 
-async function render({ name, ghost, ...options }) {
+async function render({ name, ghost, subject, ...options }) {
   const [x, y, w, h] = options.crop
   // The tolerance only absorbs floating point in a crop that ends at the edge.
   if (Math.min(x, y, w, h) < 0 || x + w > 1 + 1e-9 || y + h > 1 + 1e-9) {
     throw new Error(`Crop of ${name} runs outside the photo`)
   }
   try {
-    const image = await grayscale(options)
-    const lit = dither(image)
+    let image = await grayscale(options)
+    let lit = dither(image)
+    if (subject) {
+      const fine = await grayscale({ ...options, ...subject, width: image.width * subject.scale })
+      const weights = await silhouette(fine, subject)
+      lit = blend({ ...image, lit }, { ...fine, lit: dither(fine) }, weights)
+      image = fine
+    }
     // Two colors fit a 1-bit palette PNG.
     const save = ({ data, channels }, file) =>
       sharp(data, { raw: { width: image.width, height: image.height, channels } })
