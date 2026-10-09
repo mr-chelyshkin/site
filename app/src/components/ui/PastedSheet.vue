@@ -3,7 +3,8 @@ import { computed, type VNode } from 'vue'
 import { seeded } from '@/utils/seeded'
 import { tornClipPath, type Edge } from '@/utils/torn'
 
-type TapeAt = 'top-left' | 'top' | 'top-right'
+// Along the top, or at the bottom corners too where a big sheet needs holding down.
+type TapeAt = 'top-left' | 'top' | 'top-right' | 'bottom-left' | 'bottom-right'
 /** Clear office tape as a camera sees it, or tape as a pen draws it. */
 type TapeKind = 'real' | 'drawn'
 type Stock = 'paper' | 'white' | 'cyan' | 'ink' | 'grid'
@@ -39,6 +40,12 @@ const props = withDefaults(
     tilt?: number
     /** Place in the section's paste-in sequence. */
     order?: number
+    /**
+     * Its content moves, as an animated drawing does: the shadow is a layer of
+     * its own under the paper, so a repaint inside doesn't blur the whole sheet
+     * again, and real tape keeps its film without the backdrop blur.
+     */
+    live?: boolean
   }>(),
   {
     as: 'div',
@@ -49,6 +56,7 @@ const props = withDefaults(
     order: 0,
     worn: false,
     fold: 'both',
+    live: false,
   },
 )
 defineSlots<{ default(): VNode[]; foot?(): VNode[]; over?(): VNode[] }>()
@@ -132,7 +140,13 @@ const wearStyle = computed(() => {
 
 const tapes = computed(() => {
   const rand = seeded(`${props.seed}:tape`)
-  const base: Record<TapeAt, number> = { 'top-left': -36, top: -3, 'top-right': 32 }
+  const base: Record<TapeAt, number> = {
+    'top-left': -36,
+    top: -3,
+    'top-right': 32,
+    'bottom-left': 34,
+    'bottom-right': -30,
+  }
   return props.tape.map((at) => ({
     at,
     angle: base[at] + (rand() - 0.5) * 8,
@@ -147,7 +161,7 @@ const tapes = computed(() => {
   <component
     :is="as"
     class="c-sheet"
-    :class="`c-sheet--${stock}`"
+    :class="[`c-sheet--${stock}`, { 'c-sheet--live': live }]"
     :style="{ '--tilt': `${tilt}deg`, '--paste-order': order }"
   >
     <span
@@ -156,6 +170,9 @@ const tapes = computed(() => {
       :style="wearStyle"
       aria-hidden="true"
     />
+    <span v-if="live" class="c-sheet__shadow" aria-hidden="true">
+      <span :style="{ clipPath }" />
+    </span>
     <div class="c-sheet__paper" :style="{ clipPath }">
       <slot />
       <span v-if="worn" class="c-sheet__wear" :style="wearStyle" aria-hidden="true" />

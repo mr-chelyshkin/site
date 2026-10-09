@@ -1,4 +1,10 @@
 @layer sections {
+  /* A fault, wherever the drawing shows one: the struck-out node and its
+     server's light. */
+  .stack {
+    --stack-fault: #e5484d;
+  }
+
   /* The exploded drawing and its callouts. On the wide sheet the stack is the
      callout column of the sheet's grid, the drawing lies behind the whole
      sheet, and type is sized in the sheet's container units (`cqw`). */
@@ -24,11 +30,12 @@
     }
   }
 
+  /* The drawing: a layer for each plate and one for the leaders, stacked in
+     one box, which takes the view's proportions out of the wide sheet (set
+     inline). */
   .stack__drawing {
-    display: block;
+    position: relative;
     width: 100%;
-    height: auto;
-    overflow: visible;
 
     /* Out of the wide sheet the drawing stays within about three quarters of
        a landscape phone's height, so it shows whole, and within 30rem. */
@@ -46,6 +53,25 @@
       height: 100%;
       pointer-events: none;
     }
+  }
+
+  /* The drawing's own box at the view's proportions, unpainted: scroll
+     progress follows its middle. */
+  .stack__frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    pointer-events: none;
+  }
+
+  .stack__layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
 
     /* Lines keep their weight however far the drawing scales. */
     * {
@@ -53,13 +79,14 @@
     }
   }
 
-  .stack__plate {
-    pointer-events: auto;
+  /* A plate's layer slides into place on the compositor while the stack
+     explodes (its transform set inline), without a repaint. */
+  .stack__layer--plate {
+    will-change: transform;
   }
 
-  /* The drawing's frame, unpainted: scroll progress follows its middle. */
-  .stack__frame {
-    fill: none;
+  .stack__plate {
+    pointer-events: auto;
   }
 
   /* An opaque ground under the hatch, so a side face hides what is behind it. */
@@ -70,13 +97,6 @@
   .stack__hatch {
     stroke: var(--color-ink);
     stroke-width: 0.8;
-  }
-
-  .stack__axis {
-    fill: none;
-    stroke: var(--color-ink);
-    stroke-width: 0.8;
-    stroke-dasharray: 18 4 3 4;
   }
 
   .stack__face {
@@ -107,21 +127,559 @@
     }
   }
 
-  .stack__detail {
+  /* A photograph printed on a plate: dark dots only, in a thin border. */
+  .stack__print-edge {
     fill: none;
     stroke: var(--color-ink);
-    stroke-width: 0.9;
+    stroke-width: 0.8;
+  }
 
-    &--dashed {
-      stroke-dasharray: 3 3;
+  /* What stands on a plate: boxes drawn as the plates are, a little lighter. */
+  .stack__box-face {
+    stroke: var(--color-ink);
+    stroke-width: 1;
+    stroke-linejoin: round;
+
+    &--top {
+      fill: var(--color-paper-white);
+    }
+
+    &--front {
+      fill: color-mix(in srgb, var(--color-steel) 20%, var(--color-paper-white));
+    }
+
+    &--shade {
+      fill: color-mix(in srgb, var(--color-steel) 45%, var(--color-paper-white));
     }
   }
 
-  .stack__guide {
+  /* Work just placed on a node, lit until it settles. */
+  .stack__pod--fresh {
+    .stack__box-face--top {
+      fill: var(--color-cyan-pale);
+    }
+
+    .stack__box-face--front {
+      fill: color-mix(in srgb, var(--color-cyan) 55%, var(--color-paper-white));
+    }
+  }
+
+  .stack__wire {
     fill: none;
     stroke: var(--color-ink);
+    stroke-width: 0.8;
+
+    &--live {
+      stroke: var(--color-cyan-deep);
+      stroke-width: 1.8;
+    }
+  }
+
+  .stack__token {
+    fill: var(--color-cyan);
+    stroke: var(--color-ink);
+    stroke-width: 1;
+  }
+
+  .stack__fault {
+    fill: none;
+    stroke: var(--stack-fault);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+  }
+
+  .stack__label {
+    fill: var(--color-ink);
+    font: 700 7px var(--font-mono);
+    letter-spacing: 0.08em;
+  }
+
+  .stack__replica {
+    fill: var(--color-paper-white);
+    stroke: var(--color-ink);
+    stroke-width: 0.9;
+
+    &--leader {
+      fill: var(--color-cyan);
+    }
+  }
+
+  .stack__light {
+    fill: var(--color-ink);
+
+    &--off {
+      fill: var(--color-paper-white);
+      stroke: var(--color-ink);
+      stroke-width: 0.8;
+    }
+  }
+
+  /* The server chassis (StackMetal), tinted under the ink as a technical
+     illustration is: each part lit from above, its top lightest, its front
+     darker, its right side darkest. The tones follow the front photo's, dark
+     and a little warm, so the drawn steel and the photographed bezels read as
+     one machine. */
+  .stack__solid {
+    stroke: var(--color-ink);
+    stroke-width: 0.7;
+    stroke-linejoin: round;
+
+    /* The outer shell: the lid. */
+    &--shell {
+      --lit: #3f3a34;
+      --mid: #2a2622;
+      --shade: #1f1c19;
+    }
+
+    /* Inner sheet steel: the drive cage. */
+    &--steel {
+      --lit: #5b564e;
+      --mid: #48443d;
+      --shade: #3a3631;
+    }
+
+    &--alu {
+      --lit: #d3cfc7;
+      --mid: #b9b5ad;
+      --shade: #9d9991;
+    }
+
+    &--pcb {
+      --lit: #3f5e4b;
+      --mid: #355140;
+      --shade: #2c4436;
+    }
+
+    /* A memory stick: the edge on top, the board and its chips on the side. */
+    &--dimm {
+      --lit: #23201d;
+      --mid: #1e1c19;
+      --shade: #36503f;
+    }
+
+    &--plastic {
+      --lit: #34312d;
+      --mid: #282623;
+      --shade: #201e1b;
+    }
+
+    &--psu {
+      --lit: #aaa69e;
+      --mid: #918d86;
+      --shade: #78746d;
+    }
+
+    /* The laptop (StackLaptop): bead-blasted aluminium, smooth and pale. */
+    &--aluminum {
+      --lit: #e3e5e6;
+      --mid: #c9cdcf;
+      --shade: #aeb3b6;
+    }
+  }
+
+  .stack__plate--active .stack__solid--aluminum {
+    --lit: color-mix(in srgb, var(--color-cyan) 35%, #e3e5e6);
+    --mid: color-mix(in srgb, var(--color-cyan) 35%, #c9cdcf);
+    --shade: color-mix(in srgb, var(--color-cyan) 35%, #aeb3b6);
+
+    .stack__painted {
+      fill: var(--lit);
+    }
+  }
+
+  /* A face lit by a gradient, which its `fill` names; the outline is the part's. */
+  .stack__painted {
+    stroke-width: 0.7;
+  }
+
+  /* The polished cut along an aluminium edge. */
+  .stack__chamfer {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 0.9;
+    stroke-linecap: round;
+    opacity: 0.85;
+  }
+
+  .stack__port {
+    fill: #2a2c2f;
+    stroke: none;
+  }
+
+  /* The screen: black glass round a terminal, and the light across it. */
+  .stack__bezel {
+    fill: #0d0e10;
+  }
+
+  /* The desktop: a translucent menu bar with the camera's notch in it, and
+     the terminal's window, its shadow stacked from faint layers, which no
+     blur filter has to redo. */
+  .stack__menubar {
+    fill: rgb(16 18 22 / 62%);
+    stroke: none;
+  }
+
+  .stack__menu-text {
+    fill: #e8ecef;
+    stroke: none;
+    font: 500 3.6px var(--font-mono);
+
+    &--app {
+      font-weight: 700;
+    }
+
+    &--clock {
+      text-anchor: end;
+    }
+  }
+
+  .stack__notch {
+    fill: #050506;
+    stroke: none;
+  }
+
+  .stack__camera {
+    fill: #1f2a33;
+    stroke: none;
+  }
+
+  .stack__window-shadow {
+    fill: #000;
+    stroke: none;
+    opacity: 0.12;
+  }
+
+  .stack__window {
+    fill: rgb(14 19 25 / 94%);
+    stroke: rgb(255 255 255 / 12%);
+    stroke-width: 0.4;
+  }
+
+  .stack__titlebar {
+    fill: #1d242c;
+    stroke: none;
+  }
+
+  .stack__window-dot {
+    stroke: none;
+
+    &--close {
+      fill: #ff5f57;
+    }
+
+    &--minimise {
+      fill: #febc2e;
+    }
+
+    &--zoom {
+      fill: #28c840;
+    }
+  }
+
+  .stack__term {
+    fill: #c5ced6;
+    stroke: none;
+    font: 500 5.6px var(--font-mono);
+
+    &--title {
+      font-size: 4.4px;
+      text-anchor: middle;
+    }
+
+    &--dim {
+      fill: #6b7785;
+    }
+
+    &--ok {
+      fill: #4ccf6a;
+    }
+
+    &--fault {
+      fill: var(--stack-fault);
+    }
+
+    &--move {
+      fill: var(--color-cyan);
+    }
+
+    &--prompt {
+      fill: #e6c35c;
+    }
+  }
+
+  .stack__cursor {
+    fill: #c5ced6;
+    stroke: none;
+  }
+
+  .stack__glare {
+    fill: #fff;
+    stroke: none;
+    opacity: 0.05;
+  }
+
+  /* The platform's line down to the control plane. */
+  .stack__link {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 0.9;
+    stroke-dasharray: 3 3;
+
+    &--live {
+      stroke: var(--color-cyan-deep);
+      stroke-width: 1.8;
+      stroke-dasharray: none;
+    }
+  }
+
+  .stack__solid-top {
+    fill: var(--lit);
+  }
+
+  .stack__solid-front {
+    fill: var(--mid);
+  }
+
+  .stack__solid-right {
+    fill: var(--shade);
+  }
+
+  /* What's printed, stamped or fitted on a part's faces. */
+  .stack__mark {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 0.5;
+
+    &--fin {
+      stroke: #7f7b73;
+      stroke-width: 0.6;
+    }
+
+    &--trace {
+      stroke: #6f9581;
+      stroke-width: 0.6;
+    }
+
+    &--cap,
+    &--screw {
+      fill: #9c978f;
+      stroke-width: 0.4;
+    }
+
+    &--chip,
+    &--port,
+    &--opening {
+      fill: #0f0e0c;
+      stroke: none;
+    }
+
+    &--vent {
+      fill: #171512;
+      stroke: none;
+    }
+
+    &--label {
+      fill: #f3f3ef;
+      stroke-width: 0.4;
+    }
+
+    &--warning {
+      fill: #e5c547;
+      stroke-width: 0.4;
+    }
+
+    &--sign {
+      fill: #16191b;
+      stroke: none;
+    }
+
+    &--bar {
+      stroke: #1b1e20;
+      stroke-width: 0.8;
+    }
+
+    &--divider {
+      stroke-width: 0.7;
+    }
+  }
+
+  .stack__cable {
+    fill: none;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+
+    &--yellow {
+      stroke: #c9a63e;
+    }
+
+    &--red {
+      stroke: #a9453b;
+    }
+
+    &--black {
+      stroke: #141210;
+    }
+  }
+
+  .stack__blade {
+    fill: #5f5b55;
+    stroke: #141210;
+    stroke-width: 0.4;
+  }
+
+  .stack__hub {
+    fill: #45413c;
+    stroke: #141210;
+    stroke-width: 0.5;
+  }
+
+  /* Sheet steel: the open server's floor and walls, the side panels with
+     their slide rails, the rack ears and the walls' rim. */
+  .stack__mat {
+    stroke: var(--color-ink);
     stroke-width: 0.6;
-    stroke-dasharray: 4 4;
+
+    &--floor {
+      fill: #57524b;
+    }
+
+    &--wall {
+      fill: #403c36;
+    }
+
+    &--wall-side {
+      fill: #36322d;
+    }
+
+    /* Its fill is the lit-from-the-front gradient. */
+    &--side {
+      stroke-width: 0.8;
+    }
+
+    &--gap,
+    &--hole {
+      fill: #0c0b0a;
+      stroke: none;
+    }
+
+    &--rail {
+      fill: #4c4740;
+      stroke-width: 0.5;
+    }
+
+    &--ear {
+      fill: #39352f;
+      stroke-width: 0.5;
+    }
+
+    /* The walls' cut edge catches the light. */
+    &--rim {
+      fill: #6a645b;
+      fill-rule: evenodd;
+      stroke-width: 0.7;
+    }
+  }
+
+  .stack__stop {
+    &--far {
+      stop-color: #1d1a17;
+    }
+
+    &--near {
+      stop-color: #37332e;
+    }
+
+    &--lit {
+      stop-color: #4a453e;
+    }
+
+    &--alu {
+      stop-color: #cfd3d5;
+    }
+
+    &--alu-lit {
+      stop-color: #eef0f1;
+    }
+  }
+
+  /* The photo's grain over the drawn steel. */
+  .stack__grain {
+    stroke: none;
+    pointer-events: none;
+  }
+
+  /* Taken in hand, the chassis's steel takes the cyan too. */
+  .stack__plate--active {
+    .stack__mat--rim,
+    .stack__mat--ear,
+    .stack__mat--rail {
+      fill: color-mix(in srgb, var(--color-cyan) 45%, #39352f);
+    }
+  }
+
+  .stack__seam {
+    stroke: #0c0b0a;
+    stroke-width: 1.2;
+  }
+
+  /* A server's name on its sticker, as a label printer prints it. */
+  .stack__sticker {
+    fill: #161514;
+    font: 700 7px var(--font-mono);
+    letter-spacing: 0.06em;
+    text-anchor: middle;
+  }
+
+  .stack__metal-edge {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 1.2;
+  }
+
+  /* A server light over the photo's own: a core and a glow, green as the
+     photo's are, red for a fault, cyan as work lands. */
+  .stack__led {
+    --led: #62ff86;
+
+    &--fault {
+      --led: var(--stack-fault);
+    }
+
+    &--landing {
+      --led: var(--color-cyan);
+    }
+  }
+
+  .stack__led-core {
+    fill: var(--led);
+  }
+
+  .stack__led-glow {
+    fill: var(--led);
+    opacity: 0.3;
+
+    .stack__led--landing & {
+      opacity: 0.6;
+    }
+  }
+
+  /* Activity lights blink, each in its own time (set inline), but not for a
+     reader who asks for less motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes stack-blink {
+      50% {
+        opacity: 0.15;
+      }
+    }
+
+    .stack__light:not(.stack__light--off),
+    .stack__led--activity {
+      animation: stack-blink 1s steps(1, end) infinite;
+    }
+
+    .stack__cursor {
+      animation: stack-blink 1.1s steps(1, end) infinite;
+    }
   }
 
   .stack__leader {
@@ -188,12 +746,14 @@
     line-height: 1;
   }
 
+  /* Roomy enough for the figure's whole line, so it centres on its own; a
+     smaller circle let the line overflow and pushed the figure low. */
   .stack__number {
     display: inline-grid;
     flex: none;
     place-items: center;
-    width: 1.15em;
-    height: 1.15em;
+    width: 1.6em;
+    height: 1.6em;
     border: 1.5px solid currentColor;
     border-radius: 50%;
     font: 600 0.5em var(--font-mono);
@@ -209,10 +769,10 @@
     }
   }
 
-  /* Starts under the title text: the number circle is 0.575 of the title
-     (1.15em of its half-size font), plus the 0.45 gap. */
+  /* Starts under the title text: the number circle is 0.8 of the title (1.6em
+     of its half-size font), plus the 0.45 gap. */
   .stack__callout-text {
-    margin: 6px 0 0 calc(var(--callout-title) * 1.025);
+    margin: 6px 0 0 calc(var(--callout-title) * 1.25);
     color: var(--color-ink-soft);
     font-size: 12.5px;
     line-height: 1.6;

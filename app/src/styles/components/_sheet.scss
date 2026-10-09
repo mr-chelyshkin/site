@@ -15,6 +15,46 @@
     }
   }
 
+  /* A live sheet's shadow: the paper's outline in black, blurred and dropped
+     as the wrapper's drop-shadow would be, but on a layer that never changes,
+     so the content's repaints leave it be. The blur is the drop-shadow's
+     radius halved. */
+  .c-sheet--live {
+    filter: none;
+
+    @include tools.below(md) {
+      filter: none;
+    }
+  }
+
+  .c-sheet__shadow {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.55;
+    filter: blur(11px);
+    translate: 0 18px;
+    pointer-events: none;
+    will-change: transform;
+
+    > span {
+      position: absolute;
+      inset: 0;
+      background: #000;
+    }
+
+    @include tools.below(md) {
+      opacity: 0.5;
+      filter: blur(7px);
+      translate: 0 10px;
+    }
+  }
+
+  .c-sheet--live .c-sheet__tape--real::before {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
   /* `flow-root` keeps the content's margins on the paper; one that collapsed
      through would open a gap to the wall above the foot. */
   .c-sheet__paper {
@@ -91,6 +131,16 @@
     &--top-right {
       right: -36px;
       top: -2px;
+    }
+
+    &--bottom-left {
+      left: -36px;
+      bottom: -6px;
+    }
+
+    &--bottom-right {
+      right: -38px;
+      bottom: -10px;
     }
 
     @include tools.below(md) {

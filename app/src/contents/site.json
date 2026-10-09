@@ -49,7 +49,6 @@
       "id": "build",
       "index": "01",
       "label": "What I build",
-      "sheet": "Sheet 01 / 04",
       "statement": [
         { "text": "I’m Igor — an independent software engineer. I build the " },
         { "text": "platforms", "mark": "highlight" },
@@ -75,16 +74,7 @@
           "title": "Hybrid cloud & bare metal",
           "description": "Cloud, on-premises and bare metal. Environments for development and production."
         }
-      ],
-      "figure": "Fig. 1 — the stack, exploded. Scroll, and it comes apart.",
-      "titleBlock": [
-        { "term": "Title", "value": "What I build" },
-        { "term": "Drawn", "value": "I. Chelyshkin" },
-        { "term": "Sheet", "value": "01 / 04" },
-        { "term": "Note", "value": "Do not scale drawing" },
-        { "term": "Rev.", "value": "2026-10" }
-      ],
-      "labels": ["Supervision", "Bare metal"]
+      ]
     },
     "commerce": {
       "id": "work",

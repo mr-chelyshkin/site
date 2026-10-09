@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import DitherPhoto from '@/components/ui/DitherPhoto.vue'
 import PastedSheet from '@/components/ui/PastedSheet.vue'
 import SprayText from '@/components/ui/SprayText.vue'
 import TearTabs from '@/components/ui/TearTabs.vue'
+import { useScrollDrift } from '@/composables/useScrollDrift'
 import type { HomeContent } from '@/contents'
 
 defineProps<{
@@ -18,10 +20,14 @@ const bands = [
   { at: 64, height: 2.4, shift: 1.6 },
 ]
 const smear = { at: 74, height: 6, row: 1020, shift: -4.2 }
+
+// The notice rises a little faster than the page, nearer than the rest.
+const hero = ref<HTMLElement | null>(null)
+useScrollDrift(hero, 0.08)
 </script>
 
 <template>
-  <section class="hero o-wall" aria-labelledby="hero-title">
+  <section ref="hero" class="hero o-wall" aria-labelledby="hero-title">
     <h1 id="hero-title" class="u-visually-hidden">{{ content.title }}</h1>
 
     <PastedSheet

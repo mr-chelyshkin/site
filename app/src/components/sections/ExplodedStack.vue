@@ -1,8 +1,23 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, useId, watch, watchEffect } from 'vue'
+import { computed, onBeforeUnmount, onMounted, provide, ref, useId, watch, watchEffect } from 'vue'
+import StackLaptop from '@/components/sections/StackLaptop.vue'
+import StackMetal from '@/components/sections/StackMetal.vue'
+import StackRuntime from '@/components/sections/StackRuntime.vue'
+import { useClock } from '@/composables/useClock'
+import { useElementWidth } from '@/composables/useElementWidth'
+import { useInView } from '@/composables/useInView'
 import { useScrollProgress } from '@/composables/useScrollProgress'
 import type { StackLayer } from '@/contents'
-import { easeOutCubic, lerp, plateFaces, projector, svgPoints, type Point } from '@/utils/isometric'
+import {
+  clamp01,
+  easeOutCubic,
+  plateFaces,
+  projector,
+  svgPoints,
+  type Point,
+  type Vec3,
+} from '@/utils/isometric'
+import { CONTROL_PLANE, storyClock } from '@/utils/stack-story'
 
 const props = defineProps<{
   layers: readonly StackLayer[]
@@ -13,27 +28,28 @@ const active = defineModel<string | null>('active', { default: null })
 
 // Drawing units. The wide drawing covers the sheet at its 1184-unit width, so
 // leader lines can reach the callouts; a taller sheet leaves the drawing at
-// that scale and adds room below it. The narrow drawing is cropped to the stack.
+// that scale and adds room below it. Its height is the sheet's least, as
+// `.practice__drawing--wide` sets it. The narrow drawing is cropped to the stack.
 const VIEWS = {
-  wide: { x: 0, y: 0, width: 1184, height: 872 },
-  narrow: { x: 50, y: 110, width: 580, height: 700 },
+  wide: { x: 0, y: 0, width: 1184, height: 980 },
+  narrow: { x: 50, y: 90, width: 580, height: 790 },
 } as const
-const LEADER_END = 690
-// A leader's diagonal drops at most this far: enough for today's copy, and
-// clear of the plate below whenever the leaders show. A callout pushed further
-// down is reached by a lane right of every plate (none reaches past x 582);
-// the higher the callout, the nearer its lane, so leaders never cross.
-const DIAGONAL_DROP = 88
-const LANES = [670, 645, 620] as const
+// A leader runs from its plate's corner to a shelf level with the middle of
+// its callout's title, and the shelf runs on to the callout's number. The
+// shelves all start this far short of the numbers, so they line up.
+const SHELF = 40
 
 // From the top of the stack down: footprint, thickness and the height of the
-// top face assembled and exploded.
+// top face assembled and exploded. The top plate is a laptop's base, its lid
+// opening above it (StackLaptop); the bottom plate is a chassis of three
+// servers, as thick as its front photo is tall at the plate's width (StackMetal).
 const PLATES = [
-  { width: 212, depth: 146, thickness: 16, assembled: -106, exploded: 160 },
-  { width: 276, depth: 192, thickness: 20, assembled: -126, exploded: 6 },
-  { width: 340, depth: 240, thickness: 24, assembled: -150, exploded: -150 },
+  { width: 212, depth: 146, thickness: 12, assembled: -66, exploded: 160 },
+  { width: 276, depth: 192, thickness: 20, assembled: -86, exploded: 16 },
+  { width: 340, depth: 240, thickness: 105, assembled: -110, exploded: -110 },
 ] as const
-const [TOP, , BOTTOM] = PLATES
+const [TOP, MIDDLE, BOTTOM] = PLATES
+type Plate = (typeof PLATES)[number]
 
 // One plate per layer; a layer beyond the drawn plates is left out.
 const drawn = computed(() => props.layers.slice(0, PLATES.length))
@@ -46,91 +62,79 @@ if (import.meta.env.DEV) {
   })
 }
 
-const project = projector(330, 470)
+// Low enough on the sheet that the laptop's open lid keeps clear of its top,
+// with more room still under the chassis.
+const project = projector(330, 510)
 const hatchId = `hatch-${useId()}`
 const view = computed(() => (props.wide ? VIEWS.wide : VIEWS.narrow))
 const viewBox = computed(() => {
   const { x, y, width, height } = view.value
   return `${x} ${y} ${width} ${height}`
 })
+const aspect = computed(() => `${view.value.width} / ${view.value.height}`)
 // The plates sit around the middle of the drawing, so progress follows the
-// middle of its frame, which stays put when the plates move or the sheet grows
-// taller: they come apart while they are on screen, and the explode completes
-// when that middle reaches 30% of the viewport, so the exploded drawing is seen
-// whole. 0 assembled, 1 exploded.
-const drawing = ref<SVGSVGElement | null>(null)
-const frame = ref<SVGRectElement | null>(null)
+// middle of its frame, the drawing's own box, which stays put when the plates
+// move or the sheet grows taller: they come apart while they are on screen,
+// and the explode completes when that middle reaches 30% of the viewport, so
+// the exploded drawing is seen whole. 0 assembled, 1 exploded.
+const drawing = ref<HTMLElement | null>(null)
+const frame = ref<HTMLElement | null>(null)
 const progress = useScrollProgress(frame, { anchor: 0.5, span: 0.6 })
 const eased = computed(() => easeOutCubic(progress.value))
-// Guides, leaders and callouts arrive over the second half of the travel.
+// Leaders and callouts arrive over the second half of the travel.
 const reveal = computed(() => Math.max(0, (eased.value - 0.55) / 0.45))
+// What stands on a plate rises over the middle of the travel, flat while the
+// plates lie close.
+const rise = computed(() => clamp01((eased.value - 0.25) / 0.5))
+// The runtime's loop plays while the stack is apart and on screen, and the
+// plates that follow it read the same clock.
+const inView = useInView(drawing)
+const running = computed(() => inView.value && eased.value > 0.9)
+provide(storyClock, useClock(running))
 
-interface Path {
-  points: Point[]
-  dashed?: boolean
+// Each plate is drawn once, where the explode leaves it, on a layer of its own,
+// and slid there: while the stack comes apart the compositor moves the layers
+// and nothing is repainted. How far below that a plate still is, in units, and
+// the slide in pixels.
+const below = (plate: Plate) => (plate.exploded - plate.assembled) * (1 - eased.value)
+const width = useElementWidth(drawing)
+const slide = (index: number) => {
+  const pixels = (below(PLATES[index]) * width.value) / view.value.width
+  return { transform: `translateY(${pixels.toFixed(2)}px)` }
 }
 
+// Where the platform's deploys land, the top of the control plane's box, and
+// how much further down the laptop's layer finds it while the two slide apart.
+const controlPlane = computed<Vec3>(() => [
+  -MIDDLE.width / 2 + CONTROL_PLANE.u + CONTROL_PLANE.width / 2,
+  -MIDDLE.depth / 2 + CONTROL_PLANE.v + CONTROL_PLANE.depth / 2,
+  MIDDLE.exploded + CONTROL_PLANE.height * rise.value,
+])
+const controlShift = computed(() => below(MIDDLE) - below(TOP))
+
+// The plates as drawn, exploded.
 const plates = computed(() =>
   drawn.value.map((layer, index) => {
     const shape = PLATES[index]
-    const z = lerp(shape.assembled, shape.exploded, eased.value)
-    const x0 = -shape.width / 2
-    const y0 = -shape.depth / 2
-    const onTop = (x: number, y: number): Point => project(x0 + x, y0 + y, z)
-    const rect = (x: number, y: number, w: number, d: number) => [
-      onTop(x, y),
-      onTop(x + w, y),
-      onTop(x + w, y + d),
-      onTop(x, y + d),
-      onTop(x, y),
-    ]
-
-    const paths: Path[] = []
-    const nodes: Point[] = []
-    if (index === 0) {
-      // Platforms: panels of tools.
-      paths.push(
-        { points: rect(18, 16, 78, 46) },
-        { points: rect(106, 16, 88, 46) },
-        { points: rect(18, 76, 176, 52) },
-      )
-    } else if (index === 1) {
-      // Runtime: a grid of tasks and one route across it.
-      for (let i = 0; i < 4; i++)
-        for (let j = 0; j < 3; j++) nodes.push(onTop(40 + i * 65, 38 + j * 58))
-      paths.push({ points: [onTop(40, 38), onTop(235, 154)], dashed: true })
-    } else {
-      // Infrastructure: rows of rack units.
-      for (let k = 1; k < 8; k++)
-        paths.push({
-          points: [
-            onTop(14, (shape.depth / 8) * k),
-            onTop(shape.width - 14, (shape.depth / 8) * k),
-          ],
-        })
+    const origin: Vec3 = [-shape.width / 2, -shape.depth / 2, shape.exploded]
+    return {
+      key: layer.key,
+      index,
+      faces: plateFaces(project, { ...shape, z: shape.exploded }),
+      origin,
     }
-
-    return { key: layer.key, index, faces: plateFaces(project, { ...shape, z }), paths, nodes }
   }),
 )
 // Painted from the bottom plate up.
 const painted = computed(() => [...plates.value].reverse())
 
-const axis = svgPoints([project(0, 0, 330), project(0, 0, -210)])
-// From the top plate's two front corners down to the bottom plate's top face.
-const guides = computed(() => {
-  const z = lerp(TOP.assembled, TOP.exploded, eased.value)
-  return [-TOP.width / 2, TOP.width / 2].map((x) => [
-    project(x, TOP.depth / 2, z),
-    project(x, TOP.depth / 2, BOTTOM.exploded),
-  ])
-})
-
 // Leaders end level with the middle of each callout title, wherever the
-// sheet's flow puts it: measured in layout pixels and turned into drawing units.
+// sheet's flow puts it, at its number's left edge: measured in layout pixels
+// and turned into drawing units.
 const root = ref<HTMLElement | null>(null)
 const list = ref<HTMLOListElement | null>(null)
 const titleLevels = ref<number[]>([])
+const numberEdge = ref(0)
 const measureTitles = () => {
   const ol = list.value
   // Layout offsets ignore the sheet's tilt. The list's offset parent is also
@@ -138,17 +142,22 @@ const measureTitles = () => {
   const box = ol?.offsetParent
   if (!props.wide || !ol || !(box instanceof HTMLElement) || !box.clientWidth) return
   const scale = VIEWS.wide.width / box.clientWidth
+  const offset = (el: HTMLElement) => {
+    let x = 0
+    let y = 0
+    let node: Element | null = el
+    while (node instanceof HTMLElement && node !== box) {
+      x += node.offsetLeft
+      y += node.offsetTop
+      node = node.offsetParent
+    }
+    return [x * scale, y * scale] as const
+  }
   titleLevels.value = [...ol.querySelectorAll<HTMLElement>('.stack__callout-title')].map(
-    (title) => {
-      let y = title.offsetHeight / 2
-      let el: Element | null = title
-      while (el instanceof HTMLElement && el !== box) {
-        y += el.offsetTop
-        el = el.offsetParent
-      }
-      return y * scale
-    },
+    (title) => offset(title)[1] + (title.offsetHeight / 2) * scale,
   )
+  const number = ol.querySelector<HTMLElement>('.stack__number')
+  numberEdge.value = number ? offset(number)[0] : 0
 }
 let titleObserver: ResizeObserver | undefined
 // The list changes size as its copy or type does, the drawing as the sheet
@@ -161,18 +170,14 @@ onBeforeUnmount(() => titleObserver?.disconnect())
 watch(() => props.wide, measureTitles, { flush: 'post' })
 
 const leaders = computed(() =>
-  titleLevels.value.length < plates.value.length
+  titleLevels.value.length < plates.value.length || !numberEdge.value
     ? []
     : plates.value.map(({ key, index, faces: { anchor } }) => {
-        const [x, top] = anchor
+        const from: Point = [anchor[0], anchor[1] + below(PLATES[index])]
         const y = titleLevels.value[index]
-        const elbow = Math.min(y, top + DIAGONAL_DROP)
-        const lane = LANES[index]
-        const points: Point[] =
-          y > elbow
-            ? [anchor, [x + 34, elbow], [lane, elbow], [lane, y], [LEADER_END, y]]
-            : [anchor, [x + 34, y], [LEADER_END, y]]
-        return { key, points }
+        const end = numberEdge.value - 1
+        const points: Point[] = [from, [end - SHELF, y], [end, y]]
+        return { key, from, points }
       }),
 )
 const calloutStyle = computed(() => (props.wide ? { opacity: 0.25 + reveal.value * 0.75 } : {}))
@@ -189,78 +194,99 @@ const leave = (event: PointerEvent) => {
 
 <template>
   <div ref="root" class="stack" :class="{ 'stack--wide': wide }">
-    <svg
+    <!-- A layer for each plate, bottom up, and one for the leaders on top. -->
+    <div
       ref="drawing"
       class="stack__drawing"
-      :viewBox="viewBox"
-      preserveAspectRatio="xMinYMin meet"
+      :style="wide ? undefined : { aspectRatio: aspect }"
       aria-hidden="true"
-      focusable="false"
     >
-      <defs>
-        <pattern
-          :id="hatchId"
-          width="6"
-          height="6"
-          patternUnits="userSpaceOnUse"
-          patternTransform="rotate(45)"
-        >
-          <rect class="stack__hatch-ground" width="6" height="6" />
-          <line class="stack__hatch" x1="0" y1="0" x2="0" y2="6" />
-        </pattern>
-      </defs>
-
-      <rect ref="frame" class="stack__frame" v-bind="view" />
-      <polyline class="stack__axis" :points="axis" />
-
-      <g
+      <div ref="frame" class="stack__frame" :style="{ aspectRatio: aspect }" />
+      <svg
         v-for="plate in painted"
         :key="plate.key"
-        class="stack__plate"
-        :class="{ 'stack__plate--active': active === plate.key }"
-        @pointerenter="enter($event, plate.key)"
-        @pointerleave="leave"
+        class="stack__layer stack__layer--plate"
+        :style="slide(plate.index)"
+        :viewBox="viewBox"
+        preserveAspectRatio="xMinYMin meet"
+        focusable="false"
       >
-        <polygon
-          class="stack__face stack__face--side"
-          :points="svgPoints(plate.faces.right)"
-          :fill="`url(#${hatchId})`"
-        />
-        <polygon class="stack__face stack__face--front" :points="svgPoints(plate.faces.front)" />
-        <polygon class="stack__face stack__face--top" :points="svgPoints(plate.faces.top)" />
-        <polyline
-          v-for="(path, i) in plate.paths"
-          :key="`p${i}`"
-          class="stack__detail"
-          :class="{ 'stack__detail--dashed': path.dashed }"
-          :points="svgPoints(path.points)"
-        />
-        <ellipse
-          v-for="(node, i) in plate.nodes"
-          :key="`n${i}`"
-          class="stack__detail"
-          :cx="node[0]"
-          :cy="node[1]"
-          rx="11"
-          ry="6.5"
-        />
+        <defs v-if="plate.index === 1">
+          <pattern
+            :id="hatchId"
+            width="6"
+            height="6"
+            patternUnits="userSpaceOnUse"
+            patternTransform="rotate(45)"
+          >
+            <rect class="stack__hatch-ground" width="6" height="6" />
+            <line class="stack__hatch" x1="0" y1="0" x2="0" y2="6" />
+          </pattern>
+        </defs>
         <g
-          v-if="!wide"
-          class="stack__balloon"
-          :transform="`translate(${plate.faces.anchor[0] + 22} ${plate.faces.anchor[1] - 10})`"
+          class="stack__plate"
+          :class="{ 'stack__plate--active': active === plate.key }"
+          @pointerenter="enter($event, plate.key)"
+          @pointerleave="leave"
         >
-          <circle class="stack__balloon-ring" r="22" />
-          <text class="stack__balloon-number">{{ plate.index + 1 }}</text>
+          <!-- The laptop and the chassis draw all of themselves. -->
+          <template v-if="plate.index === 1">
+            <polygon
+              class="stack__face stack__face--side"
+              :points="svgPoints(plate.faces.right)"
+              :fill="`url(#${hatchId})`"
+            />
+            <polygon
+              class="stack__face stack__face--front"
+              :points="svgPoints(plate.faces.front)"
+            />
+            <polygon class="stack__face stack__face--top" :points="svgPoints(plate.faces.top)" />
+          </template>
+          <StackLaptop
+            v-if="plate.index === 0"
+            :project="project"
+            :origin="plate.origin"
+            :width="TOP.width"
+            :depth="TOP.depth"
+            :thickness="TOP.thickness"
+            :rise="rise"
+            :target="controlPlane"
+            :target-shift="controlShift"
+          />
+          <StackRuntime
+            v-if="plate.index === 1"
+            :project="project"
+            :origin="plate.origin"
+            :rise="rise"
+            :hatch="hatchId"
+          />
+          <StackMetal
+            v-if="plate.index === 2"
+            :project="project"
+            :origin="plate.origin"
+            :width="BOTTOM.width"
+            :depth="BOTTOM.depth"
+            :height="BOTTOM.thickness"
+            :rise="rise"
+          />
+          <g
+            v-if="!wide"
+            class="stack__balloon"
+            :transform="`translate(${plate.faces.anchor[0] + 22} ${plate.faces.anchor[1] - 10})`"
+          >
+            <circle class="stack__balloon-ring" r="22" />
+            <text class="stack__balloon-number">{{ plate.index + 1 }}</text>
+          </g>
         </g>
-      </g>
-
-      <g v-if="wide" :style="{ opacity: reveal }">
-        <polyline
-          v-for="(guide, i) in guides"
-          :key="`g${i}`"
-          class="stack__guide"
-          :points="svgPoints(guide)"
-        />
+      </svg>
+      <svg
+        v-if="wide"
+        class="stack__layer"
+        :style="{ opacity: reveal }"
+        :viewBox="viewBox"
+        preserveAspectRatio="xMinYMin meet"
+        focusable="false"
+      >
         <polyline
           v-for="leader in leaders"
           :key="`l-${leader.key}`"
@@ -269,15 +295,15 @@ const leave = (event: PointerEvent) => {
           :points="svgPoints(leader.points)"
         />
         <circle
-          v-for="plate in plates"
-          :key="`d-${plate.key}`"
+          v-for="leader in leaders"
+          :key="`d-${leader.key}`"
           class="stack__dot"
-          :cx="plate.faces.anchor[0]"
-          :cy="plate.faces.anchor[1]"
+          :cx="leader.from[0]"
+          :cy="leader.from[1]"
           r="2.6"
         />
-      </g>
-    </svg>
+      </svg>
+    </div>
 
     <!-- The role, because Safari drops list semantics under `list-style: none`. -->
     <ol ref="list" class="stack__callouts" role="list">

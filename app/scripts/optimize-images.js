@@ -5,7 +5,8 @@ import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
 
 const srcDir = fileURLToPath(new URL('../src/', import.meta.url))
-const source = path.join(srcDir, 'assets/images-source/hero.png')
+const sourceDir = path.join(srcDir, 'assets/images-source')
+const source = path.join(sourceDir, 'hero.png')
 const outputDir = path.join(srcDir, 'assets/images')
 const content = path.join(srcDir, 'contents/site.json')
 const qrDir = path.join(srcDir, 'assets/qr')
@@ -67,6 +68,41 @@ const renders = [
   },
 ]
 
+// Photographs the stack drawing uses whole and in color, as they were taken:
+// cropped and `width` drawing units wide at `scale` pixels a unit, `brightness`
+// times as bright. The drawing gives each the crop's proportions: the rack's
+// three servers, 946 × 292 pixels of the photo, front a chassis 340 wide and
+// 105 tall (StackMetal.vue, ExplodedStack.vue); a MacBook's deck, shot from
+// straight above and cropped below the hinge, is the laptop's 212 × 146 deck,
+// and the data centre aisle the wallpaper on its 200 × 128 screen, dimmed
+// under the terminal (StackLaptop.vue). The aisle's source is cropped clear of
+// the people in it. The deck is Polina Tankilevitch's, from Pexels (pexels.com/
+// photo/4523026), free to use under the Pexels license.
+const faces = [
+  {
+    name: 'stack-rack',
+    source: 'rack-front.jpg',
+    crop: [0.165625, 0.45, 0.7390625, 0.3041667],
+    width: 340,
+    scale: 2,
+  },
+  {
+    name: 'stack-deck',
+    source: 'macbook-deck.jpg',
+    crop: [0, 0, 1, 1],
+    width: 212,
+    scale: 2.5,
+  },
+  {
+    name: 'stack-wallpaper',
+    source: 'datacenter-aisle.jpg',
+    crop: [0, 0, 1, 1],
+    width: 200,
+    scale: 2.5,
+    brightness: 0.8,
+  },
+]
+
 // Neighbors, as [dx, dy], that each take 1/8 of a pixel's error. Only 6/8 is passed
 // on, deliberately: dropping the rest is what gives Atkinson its contrast.
 const atkinson = [
@@ -98,19 +134,29 @@ function checkQrCodes() {
   }
 }
 
-async function grayscale({ width, crop, sharpen, clahe, contrast, brightness }) {
-  const meta = await sharp(source).metadata()
-  const [x, y, w, h] = crop
-  const left = Math.round(x * meta.width)
-  const top = Math.round(y * meta.height)
-  // Clamped: a crop flush with an edge overshoots it when its offset and size both round up.
-  const region = {
+function checkCrop(name, [x, y, w, h]) {
+  // The tolerance only absorbs floating point in a crop that ends at the edge.
+  if (Math.min(x, y, w, h) < 0 || x + w > 1 + 1e-9 || y + h > 1 + 1e-9) {
+    throw new Error(`Crop of ${name} runs outside the photo`)
+  }
+}
+
+// A crop in pixels. Clamped: a crop flush with an edge overshoots it when its
+// offset and size both round up.
+function region({ width, height }, [x, y, w, h]) {
+  const left = Math.round(x * width)
+  const top = Math.round(y * height)
+  return {
     left,
     top,
-    width: Math.min(Math.round(w * meta.width), meta.width - left),
-    height: Math.min(Math.round(h * meta.height), meta.height - top),
+    width: Math.min(Math.round(w * width), width - left),
+    height: Math.min(Math.round(h * height), height - top),
   }
-  let image = sharp(source).extract(region).resize(width).grayscale()
+}
+
+async function grayscale({ width, crop, sharpen, clahe, contrast, brightness }) {
+  const meta = await sharp(source).metadata()
+  let image = sharp(source).extract(region(meta, crop)).resize(width).grayscale()
   if (sharpen) image = image.sharpen(sharpen)
   if (clahe) image = image.clahe(clahe)
   const { data, info } = await image
@@ -206,11 +252,7 @@ function paint(lit, on, off) {
 }
 
 async function render({ name, ghost, subject, ...options }) {
-  const [x, y, w, h] = options.crop
-  // The tolerance only absorbs floating point in a crop that ends at the edge.
-  if (Math.min(x, y, w, h) < 0 || x + w > 1 + 1e-9 || y + h > 1 + 1e-9) {
-    throw new Error(`Crop of ${name} runs outside the photo`)
-  }
+  checkCrop(name, options.crop)
   try {
     let image = await grayscale(options)
     let lit = dither(image)
@@ -236,12 +278,31 @@ async function render({ name, ghost, subject, ...options }) {
   }
 }
 
+async function face({ name, source: file, crop, width, scale, brightness = 1 }) {
+  checkCrop(name, crop)
+  const input = path.join(sourceDir, file)
+  if (!fs.existsSync(input)) throw new Error(`Source photo not found: ${input}`)
+  try {
+    const info = await sharp(input)
+      .extract(region(await sharp(input).metadata(), crop))
+      .resize(Math.round(width * scale))
+      .modulate({ brightness })
+      .webp({ quality: 82 })
+      .toFile(path.join(outputDir, `${name}.webp`))
+    console.log(` ${name}.webp (${info.width}×${info.height}), from ${file}`)
+  } catch (error) {
+    throw new Error(`Could not cut ${name}: ${error.message}`, { cause: error })
+  }
+}
+
 async function main() {
   checkQrCodes()
   if (!fs.existsSync(source)) throw new Error(`Source photo not found: ${source}`)
   fs.mkdirSync(outputDir, { recursive: true })
   console.log('\nrendering: hero.png')
   for (const options of renders) await render(options)
+  console.log('\ncutting: stack faces')
+  for (const options of faces) await face(options)
 }
 
 main().catch((error) => {
