@@ -21,6 +21,10 @@
       "label": "LinkedIn",
       "href": "https://www.linkedin.com/in/mr-chelyshkin/"
     },
+    "telegram": {
+      "label": "Telegram",
+      "href": "https://t.me/mr_igoss"
+    },
     "github": {
       "label": "GitHub",
       "href": "https://github.com/mr-chelyshkin"
@@ -212,7 +216,6 @@
     "contact": {
       "id": "contact",
       "label": "Write to me",
-      "notice": "Notice no. 04",
       "headline": ["Tell me what", "you’re building."],
       "description": "For independent project work or a platform engineering role, send me a short note about the product and where you need help.",
       "email": "mr.chelyshkin@icloud.com",

@@ -56,7 +56,7 @@ the mixins below. The textures in `tools/_noise.scss` are Sass values too.
 
 `themes/_site.scss` groups the tokens:
 
-- Type: `--font-display`, `--font-stencil`, `--font-mono` and `--font-serif`;
+- Type: `--font-display`, `--font-stencil`, `--font-mono` and `--font-hand`;
   `--text-size-md`, `--text-size-sm` and `--text-size-xsm`.
 - Motion: `--motion-fast` and `--motion-base`, both `0ms` under
   `prefers-reduced-motion: reduce`; `--ease-settle`, quick to move and slow to
@@ -111,14 +111,14 @@ Four typefaces, each with one job:
 - Big Shoulders Display (800, 900), `--font-display` — names and headlines;
   headings default to it, at 900 and uppercase.
 - Big Shoulders Stencil Display (900), `--font-stencil` — sprayed words and
-  numerals, the hero's discipline, the contact address and a marked word in the
+  numerals, the hero's discipline, the contact links and a marked word in the
   statement.
 - Chivo Mono (400, 600, 800), `--font-mono` — body copy, kickers, labels and
   facts.
-- Old Standard TT italic, `--font-serif` — the drawing's figure caption only.
+- Caveat (500), `--font-hand` — the note scrawled under the contact tabs only.
 
-All four load from Google Fonts with `display=swap`; `index.html` and
-`public/404.html` link the same stylesheet. The display stacks fall back to
+All four load from Google Fonts with `display=swap`; `public/404.html` links
+the same stylesheet less Caveat, which it doesn't use. The display stacks fall back to
 condensed system faces, but not width-matched ones, so a slow or blocked font
 reflows the sprayed names.
 

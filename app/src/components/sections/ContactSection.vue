@@ -1,20 +1,14 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import PastedSheet from '@/components/ui/PastedSheet.vue'
 import TearTabs from '@/components/ui/TearTabs.vue'
-import WallLabel from '@/components/ui/WallLabel.vue'
 import WallSection from '@/components/ui/WallSection.vue'
 import type { HomeContent, SocialProfiles } from '@/contents'
-import { foldAddress } from '@/utils/email'
 
-const props = defineProps<{
+defineProps<{
   content: HomeContent['contact']
   profiles: SocialProfiles
   copied: string
 }>()
-
-// A line that runs out folds the address after its "@" rather than inside a word.
-const address = computed(() => foldAddress(props.content.email))
 </script>
 
 <template>
@@ -23,8 +17,7 @@ const address = computed(() => foldAddress(props.content.email))
       <PastedSheet class="contact__sheet" seed="contact" stock="white" :tape="['top']" :tilt="-1">
         <div class="contact__body">
           <p class="c-kicker">
-            <span>{{ content.label }}</span
-            >{{ ' ' }}<span>{{ content.notice }}</span>
+            <span>{{ content.label }}</span>
           </p>
           <h2 :id="titleId" class="contact__title">
             <!-- The space keeps copied text and reader modes from running the lines together. -->
@@ -34,10 +27,20 @@ const address = computed(() => foldAddress(props.content.email))
             </template>
           </h2>
           <p class="contact__lead">{{ content.description }}</p>
-          <!-- Hidden, the break keeps the link's name whole: Chrome would add a space at it. -->
-          <a class="contact__email" :href="`mailto:${content.email}`"
-            >{{ address.first }}<wbr aria-hidden="true" />{{ address.rest }}</a
-          >
+          <!-- Where else to find me; the address is on the tabs. The role, because
+               Safari drops list semantics under `list-style: none`. -->
+          <ul class="contact__links" role="list">
+            <li v-for="(profile, platform) in profiles" :key="platform">
+              <a
+                class="contact__link"
+                :href="profile.href"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {{ profile.label }}
+              </a>
+            </li>
+          </ul>
         </div>
         <template #foot>
           <TearTabs
@@ -66,16 +69,6 @@ const address = computed(() => foldAddress(props.content.email))
           <span v-for="n in 4" :key="n" class="contact__frame" :class="`contact__frame--${n}`" />
         </div>
       </PastedSheet>
-
-      <div class="contact__labels">
-        <WallLabel
-          v-for="(profile, platform, i) in profiles"
-          :key="platform"
-          :text="profile.label"
-          :href="profile.href"
-          :tilt="i % 2 ? 3 : -4"
-        />
-      </div>
     </div>
   </WallSection>
 </template>

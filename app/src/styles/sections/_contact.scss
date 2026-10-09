@@ -40,15 +40,25 @@
     line-height: 1.65;
   }
 
-  /* The smallest size still sets the whole address on one line at 320px. A
-     longer address or a fallback face folds at the `<wbr>` after the "@";
-     `overflow-wrap` breaks inside a word only if one part alone can't fit. */
-  .contact__email {
-    display: inline-block;
+  /* The profiles in stencil, a row that wraps on a phone; each opens
+     elsewhere, so it carries an arrow. */
+  .contact__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px clamp(20px, 3vw, 40px);
     margin-top: 22px;
-    font: 900 clamp(21px, 4.3vw, 62px) / 1 var(--font-stencil);
+  }
+
+  .contact__link {
+    font: 900 clamp(26px, 3.8vw, 52px) / 1 var(--font-stencil);
     text-transform: uppercase;
-    overflow-wrap: anywhere;
+
+    &::after {
+      content: '↗';
+      margin-left: 0.12em;
+      font-size: 0.5em;
+      vertical-align: super;
+    }
 
     &:hover {
       text-decoration: underline;
@@ -61,17 +71,31 @@
     height: 150px;
   }
 
+  /* Scrawled on the wall under the tabs, a little crooked, with an arrow
+     drawn up at them; at every width the hint sits under the tabs. The whole
+     note is hidden from screen readers. */
   .contact__hint {
+    position: relative;
     grid-column: 5 / 9;
     grid-row: 2;
-    margin-top: 18px;
-    font-size: var(--text-size-sm);
+    margin-top: 22px;
+    padding-left: 44px;
+    font: 500 clamp(19px, 1.65vw, 24px) / 1.1 var(--font-hand);
+    rotate: -2deg;
   }
 
-  /* Drawn rather than written into the copy: at every width the hint sits
-     under the tabs, so it points up at them. Hidden from screen readers. */
   .contact__hint::before {
-    content: '↑ ';
+    content: '';
+    position: absolute;
+    bottom: 0.25em;
+    left: 0;
+    width: 36px;
+    height: 44px;
+    background: currentColor;
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 46' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M37 41.5C25 42 13.6 34 11.6 22 10.7 15.8 11 10.6 12 5.6'/><path d='M5.6 12.6C7.9 10.2 9.9 7.8 12.2 5.2 13.8 8 15.7 10.5 18.2 12.7'/></svg>")
+      center / contain no-repeat;
+    mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 46' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M37 41.5C25 42 13.6 34 11.6 22 10.7 15.8 11 10.6 12 5.6'/><path d='M5.6 12.6C7.9 10.2 9.9 7.8 12.2 5.2 13.8 8 15.7 10.5 18.2 12.7'/></svg>")
+      center / contain no-repeat;
   }
 
   .contact__booth {
@@ -115,16 +139,6 @@
     }
   }
 
-  .contact__labels {
-    display: flex;
-    flex-wrap: wrap;
-    grid-column: 9 / 13;
-    grid-row: 4;
-    justify-content: flex-end;
-    gap: 14px;
-    margin-top: 24px;
-  }
-
   @include tools.below(xl) {
     .contact__board {
       grid-template-rows: none;
@@ -136,12 +150,6 @@
 
     .contact__hint {
       grid-column: 1 / 7;
-    }
-
-    .contact__labels {
-      grid-column: 7 / 13;
-      grid-row: 2;
-      margin-top: 18px;
     }
 
     .contact__booth {
@@ -161,14 +169,8 @@
     }
 
     .contact__hint,
-    .contact__labels,
     .contact__booth {
       grid-column: 1;
-    }
-
-    .contact__labels {
-      grid-row: 3;
-      justify-content: flex-start;
     }
 
     .contact__booth {
