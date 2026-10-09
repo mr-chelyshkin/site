@@ -15,21 +15,41 @@
       var(--shadow-offset) 20px rgb(0 0 0 / 50%);
   }
 
-  /* Its tie point, the ring's top, is mirrored in pass-kinds.ts as the
-     laminate's `tie`. */
+  /* Drawn in the card's own pixels, over the eyelet. Its tie point, the
+     ring's top 3px above the card, is mirrored in pass-kinds.ts as the
+     laminate's `tie`, from the pivot in the eyelet. */
   .pass-laminated__ring {
     position: absolute;
-    top: -4px;
+    top: -8px;
     left: 50%;
     z-index: 6;
     width: 24px;
-    height: 24px;
+    height: 30px;
     margin-left: -12px;
     overflow: visible;
-    filter: drop-shadow(0 1px 1px rgb(0 0 0 / 60%));
+    filter: drop-shadow(0.5px 1px 0.8px rgb(0 0 0 / 60%));
+  }
+
+  .pass-laminated__ring-front,
+  .pass-laminated__ring-back {
+    fill: none;
+    stroke-linecap: round;
+  }
+
+  /* Behind the card, out of the light. */
+  .pass-laminated__ring-back {
+    stroke: #5b6569;
+    stroke-width: 2;
+  }
+
+  /* The dark line between the ring's two turns. */
+  .pass-laminated__ring-seam {
+    stroke: rgb(30 36 39 / 70%);
+    stroke-width: 2;
   }
 
   .pass-laminated__paper {
+    position: relative;
     display: grid;
     grid-template-columns: 72px minmax(0, 1fr);
     align-content: start;
@@ -56,21 +76,23 @@
     text-transform: uppercase;
   }
 
-  .pass-laminated__face {
-    display: block;
-    width: 72px;
-    height: 96px;
-    image-rendering: pixelated;
-    filter: contrast(0.92) brightness(1.04);
+  /* The mark across the top, under the head; the facts in two columns under it. */
+  .pass-laminated__mark {
+    --mark-at: left center;
+
+    grid-column: 1 / -1;
+    width: 150px;
+    height: 34px;
+    margin: 6px 0 4px;
+    color: #1a1a19;
     mix-blend-mode: multiply;
   }
 
-  /* First in the source, shown in the third row: under the head and the photo. */
-  .pass-laminated__name {
+  .pass-laminated__paper .pass__facts {
+    display: grid;
     grid-column: 1 / -1;
-    grid-row: 3;
-    font-size: 30px;
-    line-height: 0.86;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 10px;
   }
 
   .pass-laminated__note {

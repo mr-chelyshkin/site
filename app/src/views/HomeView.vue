@@ -12,7 +12,7 @@ const { brand, home, socialProfiles, tearTabs } = siteContent
 <template>
   <HeroSection :content="home.hero" :email="home.contact.email" :copied="tearTabs.copied" />
   <PracticeSection :content="home.practice" />
-  <CommerceSection :content="home.commerce" :holder="brand.shortName" />
+  <CommerceSection :content="home.commerce" :holder="brand.shortName" :email="home.contact.email" />
   <OpenSourceSection :content="home.openSource" />
   <ContactSection :content="home.contact" :profiles="socialProfiles" :copied="tearTabs.copied" />
 </template>

@@ -20,6 +20,69 @@
     line-height: 1.7;
   }
 
+  /* The cable, and what the wall says once every pass is torn off. */
+  .commerce__board {
+    position: relative;
+  }
+
+  /* The easter egg's end, sprayed where the passes hung, over the empty
+     hooks: the words take no pointer, the link and the button do. */
+  .commerce__revoked {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 18px;
+    padding: 24px;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .commerce__revoked-title {
+    font-size: clamp(56px, 7.5vw, 112px);
+  }
+
+  .commerce__revoked-note {
+    max-width: 52ch;
+    font-size: var(--text-size-sm);
+    line-height: 1.7;
+
+    a {
+      pointer-events: auto;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  }
+
+  /* A strip of dark tape to hang them back by. */
+  .commerce__rehang {
+    padding: 9px 14px;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font: 600 var(--text-size-xsm) / 1 var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    rotate: -2deg;
+    box-shadow: 0 3px 8px rgb(0 0 0 / 45%);
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes revoked-in {
+      from {
+        opacity: 0;
+        scale: 1.06;
+      }
+    }
+
+    .commerce__revoked {
+      animation: revoked-in 700ms var(--ease-settle) both;
+    }
+  }
+
   /* Passes hang from a cable. Each cell draws its stretch of cable and a hook,
      so the cable follows the grid at any number of columns. */
   .commerce__cable {
@@ -62,6 +125,64 @@
       background: color-mix(in srgb, var(--color-steel) 65%, var(--color-paper));
       box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-ink) 75%, var(--color-steel));
       z-index: 3;
+    }
+  }
+
+  /* Where a row of cable ends, it's nailed to the concrete: a nail head
+     photographed from above (`--nail-start` and `--nail-end`, from the
+     component), the cable wound twice round the nail and its cut end hanging,
+     the head's shadow on the wall. Centred on the cable's end, 1px down its
+     2px, where the live cable ends too, so the nail holds it there. Hidden
+     here; the rules after the cable's breakpoints show a row's two ends. */
+  .commerce__nail {
+    position: absolute;
+    top: -9.5px;
+    z-index: 2;
+    display: none;
+    width: 26px;
+    height: 30px;
+    pointer-events: none;
+
+    &--start {
+      left: calc(var(--cable-gap) / -2 - 13.5px);
+    }
+
+    &--end {
+      right: calc(var(--cable-gap) / -2 - 13.5px);
+    }
+
+    /* The turns round the shank under the head, which peek out below it as
+       they sag, and the hanging end; dark under light, so the steel reads on
+       the wall. */
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='26' height='30' viewBox='0 0 26 30'><g fill='none' stroke-linecap='round'><g stroke='%2321262a' stroke-width='2.6'><ellipse cx='13' cy='12.2' rx='7.6' ry='6.8'/><ellipse cx='12.6' cy='12.9' rx='7.1' ry='6.2' transform='rotate(-12 13 13)'/><path d='M13.6 18.9c.6 3-1.6 6-1 9.4'/></g><g stroke='%23a3abaf' stroke-width='1.4'><ellipse cx='13' cy='12.2' rx='7.6' ry='6.8'/><ellipse cx='12.6' cy='12.9' rx='7.1' ry='6.2' transform='rotate(-12 13 13)'/><path d='M13.6 18.9c.6 3-1.6 6-1 9.4'/></g></g></svg>")
+        no-repeat;
+      filter: drop-shadow(1px 2px 1px rgb(0 0 0 / 55%));
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 3.5px;
+      left: 6px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: center / cover no-repeat;
+      box-shadow:
+        1px 3px 4px rgb(0 0 0 / 60%),
+        inset 0 0 0 0.5px rgb(0 0 0 / 40%);
+    }
+
+    &--start::after {
+      background-image: var(--nail-start);
+    }
+
+    &--end::after {
+      background-image: var(--nail-end);
     }
   }
 
@@ -233,7 +354,8 @@
       grid-auto-columns: min(68vw, 240px);
       grid-auto-flow: column;
       margin-inline: calc(var(--wall-gutter) * -1);
-      padding: 8px var(--wall-gutter) 24px;
+      /* Room above for the nails at the cable's ends. */
+      padding: 12px var(--wall-gutter) 24px;
       overflow-x: auto;
       /* A swinging pass never scrolls the cable up and down. */
       overflow-y: hidden;
@@ -261,6 +383,27 @@
        would follow the swing. Its end edge gives a snap that stays put. */
     .commerce__hook:last-child {
       scroll-snap-align: end;
+    }
+  }
+
+  /* The nails at a row's two ends: six to a row from xxl, three to a row
+     below it, and a phone's one long cable, which ends only at its ends. */
+  .commerce__hook:first-child .commerce__nail--start,
+  .commerce__hook:last-child .commerce__nail--end {
+    display: block;
+  }
+
+  @include tools.below(xxl) {
+    .commerce__hook:nth-child(3n + 1) .commerce__nail--start,
+    .commerce__hook:nth-child(3n) .commerce__nail--end {
+      display: block;
+    }
+  }
+
+  @include tools.below(md) {
+    .commerce__hook:not(:first-child) .commerce__nail--start,
+    .commerce__hook:not(:last-child) .commerce__nail--end {
+      display: none;
     }
   }
 }

@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import face from '@/assets/images/hero-face.png'
+import PassMark from '@/components/sections/passes/PassMark.vue'
 import type { Company } from '@/contents'
+import { validity } from '@/utils/format'
 
 /**
  * A clear contactless smart card, its antenna and chip showing, on a vinyl
- * strap with a snap.
+ * strap with a snap: the company's mark printed on, the facts in a row
+ * under it.
  */
 defineProps<{ company: Company; number: string; holder: string; nameId: string }>()
 </script>
@@ -44,44 +46,34 @@ defineProps<{ company: Company; number: string; holder: string; nameId: string }
       </g>
     </svg>
     <span class="pass-smartcard__slot" aria-hidden="true" />
-    <!-- First, so a screen reader meets the company before its facts; the band
-         and the photo's row still show above it. -->
-    <h3 :id="nameId" class="pass-smartcard__name">{{ company.name }}</h3>
+    <!-- Read, not shown: the mark says it. -->
+    <h3 :id="nameId" class="u-visually-hidden">{{ company.name }}</h3>
     <p class="pass-smartcard__band" aria-hidden="true">
       <span>Access</span>{{ ' ' }}<span>{{ number }}</span>
     </p>
-    <div class="pass-smartcard__row">
-      <div class="pass-smartcard__photo">
-        <!-- Not draggable, so pulling a pass by its photo pulls the pass. -->
-        <img
-          class="pass-smartcard__face"
-          :src="face"
-          alt=""
-          width="42"
-          height="56"
-          draggable="false"
-        />
+    <PassMark class="pass-smartcard__mark" :name="company.name" />
+    <dl class="pass__facts pass-smartcard__facts">
+      <!-- The same holder on every pass: printed, not read out six times. -->
+      <div class="pass__fact" aria-hidden="true">
+        <dt class="pass__term">Name</dt>
+        <dd class="pass__value">{{ holder }}</dd>
       </div>
-      <dl class="pass__facts">
-        <!-- The same holder on every pass: printed, not read out six times. -->
-        <div class="pass__fact" aria-hidden="true">
-          <dt class="pass__term">Name</dt>
-          <dd class="pass__value">{{ holder }}</dd>
-        </div>
-        <div class="pass__fact">
-          <dt class="pass__term">Unit</dt>
-          <dd class="pass__value">{{ company.unit }}</dd>
-        </div>
-        <div class="pass__fact">
-          <dt class="pass__term">Role</dt>
-          <dd class="pass__value">{{ company.role }}</dd>
-        </div>
-      </dl>
-    </div>
+      <div class="pass__fact">
+        <dt class="pass__term">Unit</dt>
+        <dd class="pass__value">{{ company.unit }}</dd>
+      </div>
+      <div class="pass__fact">
+        <dt class="pass__term">Role</dt>
+        <dd class="pass__value">{{ company.role }}</dd>
+      </div>
+      <div class="pass__fact">
+        <dt class="pass__term">Valid</dt>
+        <dd class="pass__value">{{ validity(company.from, company.to) }}</dd>
+      </div>
+    </dl>
     <p class="pass-smartcard__note">{{ company.note }}</p>
     <p class="pass-smartcard__foot" aria-hidden="true">
-      <span>IC-{{ number }}</span
-      >{{ ' ' }}<span>13.56 MHz</span>
+      <span>13.56 MHz</span>
     </p>
     <span class="pass__gloss" aria-hidden="true" />
     <span class="pass__shade" aria-hidden="true" />

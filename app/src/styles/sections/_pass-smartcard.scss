@@ -1,13 +1,14 @@
 @layer sections {
   /* A clear polycarbonate smart card on a vinyl strap through its slot. The
      copper antenna and the chip show through, and so does the wall behind,
-     blurred. The card grows with its text. */
+     blurred. The print keeps inside the antenna's innermost turn, about 25px
+     in. The card grows with its text. */
   .pass-smartcard {
     display: flex;
     flex-direction: column;
     gap: 7px;
-    min-height: 316px;
-    padding: 30px 14px 14px;
+    min-height: 330px;
+    padding: 34px 30px 30px;
     border-radius: 11px;
     color: rgb(244 251 253 / 94%);
     background: linear-gradient(160deg, rgb(190 228 236 / 30%), rgb(105 160 174 / 17%));
@@ -92,18 +93,12 @@
 
   /* The print, over the antenna. */
   .pass-smartcard__band,
-  .pass-smartcard__row,
-  .pass-smartcard__name,
+  .pass-smartcard__mark,
+  .pass-smartcard__facts,
   .pass-smartcard__note,
   .pass-smartcard__foot {
     position: relative;
     z-index: 1;
-  }
-
-  /* After the name in the source, shown above it. */
-  .pass-smartcard__band,
-  .pass-smartcard__row {
-    order: -1;
   }
 
   .pass-smartcard__band {
@@ -114,33 +109,32 @@
     text-transform: uppercase;
   }
 
-  .pass-smartcard__row {
-    display: flex;
-    gap: 10px;
+  /* The mark across the top, then the facts under it. */
+  .pass-smartcard__mark {
+    --mark-at: left center;
+
+    width: 128px;
+    height: 34px;
+    margin: 4px 0 6px;
+    color: rgb(246 250 251 / 92%);
   }
 
-  .pass-smartcard__photo {
-    flex: none;
-    width: 66px;
-    height: 88px;
-    padding: 3px;
-    border-radius: 3px;
-    background: rgb(246 250 251 / 92%);
-  }
+  /* The name and the unit side by side, each as wide as its words need and
+     wrapping only between them; the role and the dates a line each. */
+  .pass-smartcard__facts {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    justify-content: space-between;
+    gap: 0 8px;
+    font-size: 8px;
 
-  .pass-smartcard__face {
-    display: block;
-    width: 100%;
-    height: 100%;
-    image-rendering: pixelated;
-    mix-blend-mode: multiply;
-  }
+    .pass__value {
+      overflow-wrap: normal;
+    }
 
-  .pass-smartcard__name {
-    font-size: 29px;
-    font-weight: 800;
-    line-height: 0.86;
-    letter-spacing: 0.01em;
+    .pass__fact:nth-child(n + 3) {
+      grid-column: 1 / -1;
+    }
   }
 
   .pass-smartcard__note {
@@ -149,9 +143,10 @@
     opacity: 0.85;
   }
 
+  /* The frequency printed in the corner. */
   .pass-smartcard__foot {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     margin-top: auto;
     font-size: 8px;
     letter-spacing: 0.16em;

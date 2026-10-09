@@ -112,21 +112,26 @@
     text-transform: uppercase;
   }
 
-  .pass-holder__photo {
+  /* The mark, and the name under it, as the bank's own lockup has it. */
+  .pass-holder__brand {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .pass-holder__emblem {
     position: relative;
     width: 76px;
-    height: 101px;
+    height: 64px;
   }
 
-  .pass-holder__face {
-    display: block;
+  .pass-holder__mark {
     width: 100%;
     height: 100%;
-    image-rendering: pixelated;
-    filter: contrast(1.05);
+    color: #1d2022;
   }
 
-  /* A security hologram on the photo: a foil seal whose colors shift as the
+  /* A security hologram on the mark: a foil seal whose colors shift as the
      pass turns. Live, script turns `--holo`; at rest it is 0. */
   .pass-holder__holo {
     position: absolute;
@@ -162,12 +167,9 @@
       0 0 0 0.5px rgb(0 0 0 / 25%);
   }
 
-  /* First in the source, shown in the third row: under the band and the photo. */
   .pass-holder__name {
-    grid-column: 1 / -1;
-    grid-row: 3;
-    font-size: 27px;
-    line-height: 0.88;
+    font-size: 15px;
+    line-height: 0.92;
   }
 
   .pass-holder__note {
@@ -175,14 +177,6 @@
     color: var(--color-ink-soft);
     font-size: 9px;
     line-height: 1.45;
-  }
-
-  .pass-holder__id {
-    grid-column: 1 / -1;
-    justify-self: end;
-    color: var(--color-ink-soft);
-    font-size: 8px;
-    letter-spacing: 0.14em;
   }
 
   .pass-holder__barcode {

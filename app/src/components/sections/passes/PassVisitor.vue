@@ -1,50 +1,14 @@
 <script setup lang="ts">
 import { computed, useId } from 'vue'
-import face from '@/assets/images/hero-face.png'
+import PassMark from '@/components/sections/passes/PassMark.vue'
 import type { Company } from '@/contents'
-import { seeded } from '@/utils/seeded'
+import { validity } from '@/utils/format'
 
-/** A thermal-printed visitor's label in a soft vinyl sleeve, on a bulldog clip. */
+/**
+ * A thermal-printed visitor's label in a soft vinyl sleeve, on a bulldog clip,
+ * the company's mark printed on.
+ */
 const props = defineProps<{ company: Company; number: string; holder: string; nameId: string }>()
-
-const QR_SIZE = 21
-// The corners where a QR code keeps its three finder squares.
-const FINDERS = [
-  [0, 0],
-  [QR_SIZE - 7, 0],
-  [0, QR_SIZE - 7],
-] as const
-
-// Whether a QR cell belongs to a finder square: 1 printed, 0 blank (the square's
-// white ring and the quiet ring round it), -1 a data cell.
-function finderCell(x: number, y: number) {
-  for (const [fx, fy] of FINDERS) {
-    const dx = x - fx
-    const dy = y - fy
-    if (dx >= -1 && dx <= 7 && dy >= -1 && dy <= 7) {
-      if (dx < 0 || dx > 6 || dy < 0 || dy > 6) return 0
-      const ring = dx === 0 || dx === 6 || dy === 0 || dy === 6
-      const core = dx >= 2 && dx <= 4 && dy >= 2 && dy <= 4
-      return ring || core ? 1 : 0
-    }
-  }
-  return -1
-}
-
-// Something that looks like a QR code, the same on every visit: the finder
-// squares, and seeded data cells. One path, as one shape paints faster than
-// hundreds of cells.
-const qr = computed(() => {
-  const rand = seeded(`${props.company.name}:qr`)
-  let d = ''
-  for (let y = 0; y < QR_SIZE; y++) {
-    for (let x = 0; x < QR_SIZE; x++) {
-      const cell = finderCell(x, y)
-      if (cell === 1 || (cell === -1 && rand() > 0.52)) d += `M${x} ${y}h1v1h-1z`
-    }
-  }
-  return d
-})
 
 const purpose = computed(() => props.company.note.replace(/\.$/, ''))
 // Printed on one line: every space in the name becomes a non-breaking one.
@@ -69,20 +33,10 @@ const soft = `${useId()}-soft`
         <span class="pass-visitor__kicker">{{ company.kicker }}</span
         >{{ ' ' }}<small class="pass-visitor__access">Access {{ number }}</small>
       </p>
-      <!-- Not draggable, so pulling a pass by its photo pulls the pass. -->
-      <img class="pass-visitor__face" :src="face" alt="" width="42" height="56" draggable="false" />
-      <svg
-        class="pass-visitor__qr"
-        :viewBox="`0 0 ${QR_SIZE} ${QR_SIZE}`"
-        shape-rendering="crispEdges"
-        aria-hidden="true"
-        focusable="false"
-      >
-        <path :d="qr" />
-      </svg>
+      <PassMark class="pass-visitor__mark" :name="company.name" />
       <p class="pass-visitor__foot">
         <span>{{ company.role }}</span
-        >{{ ' ' }}<span aria-hidden="true">Valid today</span>
+        >{{ ' ' }}<span>Valid {{ validity(company.from, company.to) }}</span>
       </p>
     </div>
     <!-- Soft creases in the vinyl, catching the light. -->

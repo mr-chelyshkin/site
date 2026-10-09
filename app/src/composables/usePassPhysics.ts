@@ -11,6 +11,7 @@ import {
   moveHand,
   poke,
   refit,
+  rehang,
   settle,
   step,
   swipe,
@@ -37,6 +38,9 @@ interface Hung extends Parts {
   cablePoints: string
   cordPath: string
   seamPath: string
+  /** Torn off, and gone from sight, as last drawn. */
+  torn: boolean
+  gone: boolean
 }
 
 /** Where a pointer was last, when, and how fast it went: px, ms, px/s. */
@@ -66,10 +70,14 @@ interface Press {
   y: number
   time: number
   moved: boolean
+  /** A finger that held still long enough to take hold, as a hand does. */
+  holding: boolean
 }
 
-// A press shorter than this that wanders less than its slop pokes the pass.
+// A press shorter than this that wanders less than its slop pokes the pass. A
+// finger held still past HOLD_MS takes hold of the pass instead.
 const POKE_MS = 350
+const HOLD_MS = 380
 const SLOP = { hand: 4, finger: 10 }
 
 // One decimal place, never "-0.0": a value settling to zero from below would
@@ -84,15 +92,22 @@ const tenths = (n: number) => (Math.round(n * 10) / 10 || 0).toFixed(1)
  * draws them; the returned `live` turns on the styles that hand the drawing over
  * to script. A pen pulls a pass as a mouse does, but on a touchscreen it pans
  * like a finger, so its pull ends when scrolling takes over.
+ *
+ * A hand that pulls a pass hard enough tears it off its cord (see
+ * `pass-physics`); `revoked` turns true once every pass has fallen away, and
+ * `restore` hangs them all back. A gone pass leaves the tab order but stays in
+ * the document, so a screen reader still reads it.
  */
 export function usePassPhysics(cable: Ref<HTMLElement | null>) {
   const live = ref(false)
+  const revoked = ref(false)
   let items: Hung[] = []
   let passes: Pass[] = []
   let frame = 0
   let last = 0
   let pending = 0
   let press: Press | null = null
+  let holdTimer = 0
   const tracks = new Map<number, Track>()
   let listening: AbortController | undefined
   let resize: ResizeObserver | undefined
@@ -186,13 +201,36 @@ export function usePassPhysics(cable: Ref<HTMLElement | null>) {
       item.seamPath = d.cord
       seam.setAttribute('d', d.cord)
     }
+    if (d.torn) el.style.opacity = d.opacity.toFixed(3)
+    if (item.torn !== d.torn) {
+      item.torn = d.torn
+      el.toggleAttribute('data-torn', d.torn)
+      if (!d.torn) el.style.removeProperty('opacity')
+    }
+    if (item.gone !== d.gone) {
+      item.gone = d.gone
+      el.toggleAttribute('data-gone', d.gone)
+      el.tabIndex = d.gone ? -1 : 0
+    }
   }
 
   function clear({ hook, el, twist, body, line, cord, seam }: Hung) {
-    for (const name of ['transform', '--shadow-x', '--shadow-y', '--glint', '--holo']) {
+    for (const name of [
+      'transform',
+      '--shadow-x',
+      '--shadow-y',
+      '--glint',
+      '--holo',
+      'opacity',
+      'animation-delay',
+    ]) {
       el.style.removeProperty(name)
     }
     delete el.dataset.held
+    delete el.dataset.torn
+    delete el.dataset.gone
+    delete el.dataset.rehang
+    el.tabIndex = 0
     twist.style.removeProperty('transform')
     body.style.removeProperty('--shade')
     body.style.removeProperty('--shade-side')
@@ -229,7 +267,21 @@ export function usePassPhysics(cable: Ref<HTMLElement | null>) {
     const moving = passes.some(isMoving)
     if (!moving) passes.forEach(settle)
     items.forEach(draw)
+    revoked.value = passes.length > 0 && passes.every((pass) => pass.gone)
     if (moving) frame = requestAnimationFrame(tick)
+  }
+
+  // Every pass back on its cord, settling onto the wall one after another as
+  // they did when they were first put up.
+  function restore() {
+    items.forEach((item, i) => {
+      rehang(item.pass)
+      item.el.style.animationDelay = `${i * 90}ms`
+      item.el.dataset.rehang = ''
+      item.el.addEventListener('animationend', () => delete item.el.dataset.rehang, { once: true })
+    })
+    revoked.value = false
+    items.forEach(draw)
   }
 
   function track(e: PointerEvent) {
@@ -275,6 +327,7 @@ export function usePassPhysics(cable: Ref<HTMLElement | null>) {
     if (!press) return
     const { item, hand, u, v, x0, y0, t0, x, y, time, moved } = press
     press = null
+    clearTimeout(holdTimer)
     if (hand) {
       release(item)
       // Chrome drops the capture once it sees the button up; a browser that
@@ -307,6 +360,7 @@ export function usePassPhysics(cable: Ref<HTMLElement | null>) {
       press.time = e.timeStamp
       press.moved ||=
         Math.hypot(press.x - press.x0, press.y - press.y0) > SLOP[press.hand ? 'hand' : 'finger']
+      if (press.moved && !press.hand) clearTimeout(holdTimer)
       return
     }
     // A finger never hovers: only a mouse or a pen brushes, so only they are tracked.
@@ -342,9 +396,14 @@ export function usePassPhysics(cable: Ref<HTMLElement | null>) {
       y: e.clientY,
       time: e.timeStamp,
       moved: false,
+      holding: false,
     }
-    // A finger keeps scrolling the page and the cable: no capture, nothing prevented.
-    if (!hand) return
+    // A finger keeps scrolling the page and the cable: no capture, nothing
+    // prevented, unless it holds still long enough to take hold.
+    if (!hand) {
+      holdTimer = window.setTimeout(takeHold, HOLD_MS)
+      return
+    }
     // A hand takes hold: no text selection or image drag, and the pass follows
     // the pointer off its edge.
     e.preventDefault()
@@ -357,6 +416,25 @@ export function usePassPhysics(cable: Ref<HTMLElement | null>) {
     grab(item.pass, at.x, at.y)
     item.el.dataset.held = ''
     wake()
+  }
+
+  // A finger that held still takes hold of the pass, with a tick where the
+  // phone can give one, and the page stops scrolling under it (`blockScroll`)
+  // until it lets go.
+  function takeHold() {
+    holdTimer = 0
+    if (!press || press.hand || press.moved) return
+    press.hand = true
+    press.holding = true
+    const at = local(press.item, press.x, press.y)
+    grab(press.item.pass, at.x, at.y)
+    press.item.el.dataset.held = ''
+    navigator.vibrate?.(8)
+    wake()
+  }
+
+  function blockScroll(e: TouchEvent) {
+    if (press?.holding) e.preventDefault()
   }
 
   function onPointerEnd(e: PointerEvent) {
@@ -404,6 +482,8 @@ export function usePassPhysics(cable: Ref<HTMLElement | null>) {
         cablePoints: '',
         cordPath: '',
         seamPath: '',
+        torn: false,
+        gone: false,
       })
     }
     passes = items.map((item) => item.pass)
@@ -426,6 +506,8 @@ export function usePassPhysics(cable: Ref<HTMLElement | null>) {
     root.addEventListener('pointerup', onPointerEnd, { signal })
     root.addEventListener('pointercancel', onPointerEnd, { signal })
     root.addEventListener('lostpointercapture', onLostCapture, { signal })
+    // Not passive, so a finger holding a pass can keep the page from scrolling.
+    root.addEventListener('touchmove', blockScroll, { passive: false, signal })
     root.addEventListener('focusin', takeFocusedInHand, { signal })
     root.addEventListener('keydown', takeFocusedInHand, { signal })
     root.addEventListener('focusout', onFocusOut, { signal })
@@ -450,12 +532,14 @@ export function usePassPhysics(cable: Ref<HTMLElement | null>) {
     cancelAnimationFrame(resizeFrame)
     frame = 0
     resizeFrame = 0
+    clearTimeout(holdTimer)
     press = null
     tracks.clear()
     items.forEach(clear)
     items = []
     passes = []
     live.value = false
+    revoked.value = false
   }
 
   const onMotionChange = () => (motion?.matches ? stop() : start())
@@ -471,5 +555,5 @@ export function usePassPhysics(cable: Ref<HTMLElement | null>) {
     stop()
   })
 
-  return live
+  return { live, revoked, restore }
 }

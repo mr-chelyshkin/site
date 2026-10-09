@@ -147,6 +147,16 @@
       z-index: 4;
     }
 
+    /* Torn off, a pass rides over everything on the cable; fallen away, it
+       takes no pointer. Script sets how much of it still shows. */
+    &[data-torn] {
+      z-index: 5;
+    }
+
+    &[data-gone] {
+      pointer-events: none;
+    }
+
     @media (hover: hover) and (pointer: fine) {
       cursor: grab;
 
@@ -215,6 +225,22 @@
     pointer-events: none;
   }
 
+  /* The company's mark where a photo would be: its shape masks the ink, so
+     each kind colors it as it prints, etches or screens. */
+  .pass__mark {
+    position: relative;
+    display: block;
+    flex: none;
+  }
+
+  .pass__mark-ink {
+    position: absolute;
+    inset: 0;
+    background: currentColor;
+    -webkit-mask: var(--logo) var(--mark-at, center) / contain no-repeat;
+    mask: var(--logo) var(--mark-at, center) / contain no-repeat;
+  }
+
   /* The printed facts, on light stock or dark; the terms are fainter. */
   .pass__facts {
     font-size: 8.5px;
@@ -234,5 +260,21 @@
     font-weight: 600;
     letter-spacing: 0.05em;
     overflow-wrap: anywhere;
+  }
+
+  /* Hung back, each pass settles onto the wall as when it was first put up,
+     one after another (script staggers the delay). */
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes pass-rehang {
+      from {
+        opacity: 0;
+        translate: 0 -18px;
+        scale: 1.04;
+      }
+    }
+
+    .pass[data-rehang] {
+      animation: pass-rehang 520ms var(--ease-settle) backwards;
+    }
   }
 }

@@ -58,14 +58,6 @@ const renders = [
       brightness: -32,
     },
   },
-  {
-    name: 'hero-face',
-    width: 42,
-    crop: [0.4375, 0.2, 0.1388, 0.3289],
-    contrast: 1.5,
-    brightness: -40,
-    ghost: false,
-  },
 ]
 
 // Photographs the stack drawing uses whole and in color, as they were taken:
@@ -77,7 +69,10 @@ const renders = [
 // and the data centre aisle the wallpaper on its 200 × 128 screen, dimmed
 // under the terminal (StackLaptop.vue). The aisle's source is cropped clear of
 // the people in it. The deck is Polina Tankilevitch's, from Pexels (pexels.com/
-// photo/4523026), free to use under the Pexels license.
+// photo/4523026), free to use under the Pexels license. Two rusty nail heads,
+// cut round from Miguel Á. Padriñán's photo on Pexels (pexels.com/photo/19681),
+// nail the access passes' cable to the wall, 16 units to a head at 4 pixels a
+// unit (CommerceSection.vue).
 const faces = [
   {
     name: 'stack-rack',
@@ -93,6 +88,13 @@ const faces = [
     width: 212,
     scale: 2.5,
   },
+  ...['a', 'b'].map((head) => ({
+    name: `cable-nail-${head}`,
+    source: `cable-nail-${head}.png`,
+    crop: [0, 0, 1, 1],
+    width: 16,
+    scale: 4,
+  })),
   {
     name: 'stack-wallpaper',
     source: 'datacenter-aisle.jpg',
@@ -102,6 +104,23 @@ const faces = [
     brightness: 0.8,
   },
 ]
+
+// The companies' logos for the access passes, from their own sites: Raiffeisen's
+// mark from raiffeisen.ru, VK's from its brand pack (vk.ru/brand), Ozon's from
+// the image ozon.ru shares links with, Aqua's from aquasec.com, Banank's from
+// banank.eu and ForkJoin's from forkjoin.io. Each becomes one shape: whatever
+// color the logo is drawn in turns to ink and its ground to nothing, so a pass
+// prints, etches or screens the shape in its own ink (PassMark.vue). `crop`
+// is as for the renders; every logo fits LOGO_BOX pixels each way.
+const logos = [
+  { name: 'raiffeisen-bank', source: 'raiffeisen.svg' },
+  { name: 'vk', source: 'vk.svg' },
+  { name: 'ozon-tech', source: 'ozon.png', crop: [0.225, 0.375, 0.55, 0.245] },
+  { name: 'aqua-security', source: 'aqua.svg' },
+  { name: 'banank', source: 'banank.svg' },
+  { name: 'forkjoin', source: 'forkjoin.svg' },
+]
+const LOGO_BOX = 240
 
 // Neighbors, as [dx, dy], that each take 1/8 of a pixel's error. Only 6/8 is passed
 // on, deliberately: dropping the rest is what gives Atkinson its contrast.
@@ -295,6 +314,40 @@ async function face({ name, source: file, crop, width, scale, brightness = 1 }) 
   }
 }
 
+async function logo({ name, source: file, crop }) {
+  const input = path.join(sourceDir, 'logos', file)
+  if (!fs.existsSync(input)) throw new Error(`Logo not found: ${input}`)
+  if (crop) checkCrop(name, crop)
+  try {
+    // A vector drawn large enough that scaling down keeps its edges smooth.
+    let image = sharp(input, { density: 600 })
+    if (crop) image = image.extract(region(await sharp(input, { density: 600 }).metadata(), crop))
+    const { data, info } = await image
+      .resize(LOGO_BOX, LOGO_BOX, { fit: 'inside' })
+      .flatten({ background: '#ffffff' })
+      .raw()
+      .toBuffer({ resolveWithObject: true })
+    // Ink is how far a pixel is from the white ground by its darkest channel,
+    // so a blue logo counts as fully as a black one; the logo's own color
+    // becomes full ink, and its edges stay soft.
+    const { width, height, channels } = info
+    const ink = Uint8Array.from({ length: width * height }, (_, i) => {
+      const p = i * channels
+      return 255 - Math.min(data[p], data[p + 1], data[p + 2])
+    })
+    const strongest = Math.max(1, ...ink)
+    const shape = Buffer.alloc(width * height * 2)
+    ink.forEach((value, i) => (shape[i * 2 + 1] = Math.round((value * 255) / strongest)))
+    fs.mkdirSync(path.join(outputDir, 'logos'), { recursive: true })
+    await sharp(shape, { raw: { width, height, channels: 2 } })
+      .png()
+      .toFile(path.join(outputDir, 'logos', `${name}.png`))
+    console.log(` logos/${name}.png (${width}×${height}), from ${file}`)
+  } catch (error) {
+    throw new Error(`Could not shape logo ${name}: ${error.message}`, { cause: error })
+  }
+}
+
 async function main() {
   checkQrCodes()
   if (!fs.existsSync(source)) throw new Error(`Source photo not found: ${source}`)
@@ -303,6 +356,8 @@ async function main() {
   for (const options of renders) await render(options)
   console.log('\ncutting: stack faces')
   for (const options of faces) await face(options)
+  console.log('\nshaping: logos')
+  for (const options of logos) await logo(options)
 }
 
 main().catch((error) => {

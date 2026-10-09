@@ -62,17 +62,17 @@
         {
           "key": "platforms",
           "title": "Internal developer platforms",
-          "description": "Self-service tools and APIs for building and running software."
+          "description": "Ship on a Friday afternoon, go home, enjoy the weekend. That’s the whole spec."
         },
         {
           "key": "runtime",
           "title": "Orchestration & control planes",
-          "description": "Task execution, supervision and the services that connect them."
+          "description": "Somewhere a server just died. Its work has already moved in next door, and nobody had to wake up."
         },
         {
           "key": "infrastructure",
           "title": "Hybrid cloud & bare metal",
-          "description": "Cloud, on-premises and bare metal. Environments for development and production."
+          "description": "Someone else’s computer or your own, humming in a rack. I’m at home with both."
         }
       ]
     },
@@ -81,55 +81,73 @@
       "index": "02",
       "label": "Commercial work",
       "headline": ["Access", "granted"],
-      "description": "Platforms and tooling built inside product teams — banking, consumer products and cloud security. Six doors, one job: keep the platform boring.",
+      "description": "Two banks, a social network, a marketplace, a cloud-security company and a consultancy — each gave me a badge and a problem. I kept the badges.",
+      "revoked": {
+        "headline": ["Access", "revoked"],
+        "note": "Fine — keep the badges.",
+        "cta": "Send me the problems.",
+        "restore": "Hang them back"
+      },
       "companies": [
         {
           "name": "Raiffeisen Bank",
           "unit": "Banking",
           "role": "Senior Quality Assurance Engineer",
-          "note": "Internal banking systems and test automation.",
+          "note": "Rolled out Siebel CRM and Avaya in a bank, where every bug comes with its own compliance officer.",
           "pass": "holder",
+          "from": "2014-10",
+          "to": "2016-09",
           "kicker": ""
         },
         {
           "name": "VK",
-          "unit": "Consumer products",
-          "role": "Senior Platform Engineer / DevOps Team Lead",
-          "note": "Self-service cloud tools and platforms for running services.",
+          "unit": "Search",
+          "role": "DevOps Team Lead",
+          "note": "Moved services onto Kubernetes, ML models onto bare-metal GPUs, and a voice assistant onto a release schedule.",
           "pass": "reel",
+          "from": "2016-09",
+          "to": "2022-02",
           "kicker": ""
         },
         {
           "name": "Ozon Tech",
           "unit": "Commerce",
           "role": "Lead DevOps Engineer",
-          "note": "A platform for building, testing and releasing mobile apps.",
+          "note": "Built the platform behind the marketplace’s mobile apps: Mac Studios, emulators, and releases nobody had to babysit.",
           "pass": "laminated",
+          "from": "2022-02",
+          "to": "2023-06",
           "kicker": ""
         },
         {
           "name": "Aqua Security",
           "unit": "Cloud security",
-          "role": "Senior SRE / Infrastructure Developer",
-          "note": "Cloud services, infrastructure APIs and database automation.",
+          "role": "Senior SRE (Core)",
+          "note": "Moved customer databases to Aurora Serverless, and nobody noticed. In SRE, that’s the compliment.",
           "pass": "smartcard",
+          "from": "2023-09",
+          "to": "2025-11",
           "kicker": ""
-        },
-        {
-          "name": "Banank",
-          "unit": "Digital banking",
-          "role": "Staff Engineer",
-          "note": "Digital banking infrastructure, all on Google Cloud.",
-          "pass": "metal",
-          "kicker": "Staff"
         },
         {
           "name": "ForkJoin",
           "unit": "Consultancy",
           "role": "Collaboration",
-          "note": "Software engineering consultancy.",
+          "note": "AWS and CI/CD, minus the whitepapers.",
           "pass": "visitor",
+          "from": "2026-01",
+          "to": "2026-04",
           "kicker": "Visitor"
+        },
+        {
+          "name": "Banank",
+          "unit": "Digital banking",
+          "role": "Staff Engineer",
+          "note": "Building a bank’s infra from scratch on Google Cloud. No legacy yet — give it time.",
+          "pass": "metal",
+          "from": "2025-12",
+          "to": null,
+          "kicker": "Staff"
         }
       ]
     },

@@ -11,6 +11,10 @@
  * point where the cord leaves the hook (`pass-kinds.ts`): a reel's line leaves
  * from the reel's mouth, below the ring, and a metal card hangs by a hole on a
  * ball chain. At rest a pass hangs at its own tilt, as the stylesheet draws it.
+ *
+ * Pulled hard enough, a cord snaps: the pass comes away free, hangs from the
+ * hand that holds it, and falls and fades once let go; the cord's stub swings
+ * on the ring. `rehang` puts it back.
  */
 
 /**
@@ -83,6 +87,21 @@ const CABLE_DAMPING = 0.2
 const CABLE_COUPLING = 0.35
 // How far a card's shadow falls, px: the `box-shadow` offset of each kind's body (`_pass-*.scss`).
 const SHADOW = 16
+// Tearing a pass off: a hand that keeps ahead of its pass by more than
+// TEAR_REACH px for TEAR_HOLD s in all snaps the cord; the strain bleeds off
+// three times as fast as it builds. Let go, a torn pass fades out over FADE.over
+// px of fall, from FADE.after px below where it was let go.
+const TEAR_REACH = 150
+const TEAR_HOLD = 0.1
+const FADE = { after: 60, over: 420 }
+// The stub of a snapped cord swings on the ring: Hz and damping ratio.
+const STUB_HZ = 2.2
+const STUB_DAMPING = 0.12
+// The air on a torn pass, per second: on its speed in a hand and falling, a
+// card's flat face catching enough to keep its fall in view, and on its spin.
+const AIR = 0.6
+const FALL_AIR = 9
+const SPIN_AIR = 1.2
 
 // Gravity, px/s².
 const G = (TAU * TUNING.swingHz) ** 2 * PENDULUM
@@ -92,13 +111,15 @@ const CABLE_OMEGA = TAU * CABLE_HZ
 
 /**
  * A cord's feel: its bounce, Hz; how far past rest it stretches before it
- * stiffens, px; and whether it narrows when stretched. Read-only, since passes
- * of one kind share their cord.
+ * stiffens, px; whether it narrows when stretched; and how much of it stays on
+ * the ring when it snaps, px, none for a reel's line, which winds back in.
+ * Read-only, since passes of one kind share their cord.
  */
 export interface PassCord {
   readonly hz: number
   readonly stretch: number
   readonly thins: boolean
+  readonly stub: number
 }
 
 /**
@@ -175,6 +196,23 @@ export interface Pass extends PassFit {
   /** The neighbors on the same cable. */
   left: Pass | null
   right: Pass | null
+  /** Torn off its cord, and fallen away out of sight. */
+  torn: boolean
+  gone: boolean
+  /** How long a hand has pulled past `TEAR_REACH`, s. */
+  strain: number
+  /** A torn pass: its card's middle and how fast it moves, its angle and spin. */
+  cx: number
+  cy: number
+  vx: number
+  vy: number
+  angle: number
+  spin: number
+  /** Where a torn pass was let go, or null while a hand holds it. */
+  dropY: number | null
+  /** The snapped cord's stub on the ring: its swing and how fast it swings. */
+  stub: number
+  vstub: number
 }
 
 /** How to draw a pass: CSS for its element, SVG for its cord and its stretch of cable. */
@@ -205,6 +243,10 @@ export interface PassDrawing {
   /** The ring's dip, and the hook's stretch of cable as SVG polyline points. */
   dip: number
   cable: string
+  /** How much of a torn pass still shows as it falls, and whether it's gone. */
+  opacity: number
+  torn: boolean
+  gone: boolean
 }
 
 interface Frame {
@@ -242,6 +284,18 @@ export function createPass(fit: PassFit): Pass {
     inHand: false,
     left: null,
     right: null,
+    torn: false,
+    gone: false,
+    strain: 0,
+    cx: 0,
+    cy: 0,
+    vx: 0,
+    vy: 0,
+    angle: 0,
+    spin: 0,
+    dropY: null,
+    stub: 0,
+    vstub: 0,
   }
 }
 
@@ -430,6 +484,9 @@ function advance(p: Pass) {
     swingAccel += (j.theta[0] * fx + j.theta[1] * fy) / inertia
     stretchAccel += j.r[0] * fx + j.r[1] * fy
     turnAccel += (j.phi[0] * fx + j.phi[1] * fy) / cardInertia(p)
+    p.strain = distance > TEAR_REACH ? p.strain + STEP : Math.max(0, p.strain - 3 * STEP)
+  } else {
+    p.strain = 0
   }
 
   p.swingAccel = swingAccel
@@ -455,15 +512,113 @@ function advance(p: Pass) {
   const line = cordOf(p, frameOf(p))
   if (line.length >= line.natural) p.slackSide = 0
   else if (!p.slackSide) p.slackSide = p.omega < 0 ? -1 : 1
+
+  if (p.strain > TEAR_HOLD) tear(p)
+}
+
+// From a torn pass's middle to its slot, in the card: the middle sits this far below.
+const middleOf = (p: Pass) => p.height / 2 - p.slot
+
+// The cord snaps: the pass carries on from where it is, as fast as it was
+// going, and the stub on the ring flicks back the other way.
+function tear(p: Pass) {
+  const f = frameOf(p)
+  const d = middleOf(p)
+  const at = pointAt(f, 0, d)
+  const velocity = velocityAt(p, jacobian(p, f, 0, d))
+  Object.assign(p, {
+    torn: true,
+    strain: 0,
+    tension: 0,
+    cx: at.x,
+    cy: at.y,
+    vx: velocity.x,
+    vy: velocity.y,
+    angle: f.angle,
+    spin: p.omega + p.vphi,
+    psi: 0,
+    vpsi: 0,
+    stub: 0,
+    vstub: Math.max(-9, Math.min(9, velocity.x / 80)),
+  })
+  if (p.grip) {
+    // The hand keeps its hold, now on the free card.
+    const { u, v } = toCard(p, p.grip.x, p.grip.y)
+    p.grip.u = u
+    p.grip.v = v
+  }
+}
+
+// A torn pass: in a hand it hangs from the point held, let go it falls and
+// tumbles, and the air slows both. The stub on the ring swings and settles.
+function advanceFree(p: Pass) {
+  const stubOmega = TAU * STUB_HZ
+  p.vstub += (-(stubOmega ** 2) * Math.sin(p.stub) - 2 * STUB_DAMPING * stubOmega * p.vstub) * STEP
+  p.stub += p.vstub * STEP
+  if (p.gone) return
+
+  const air = p.grip ? AIR : FALL_AIR
+  let ax = -air * p.vx
+  let ay = G - air * p.vy
+  let spinAccel = -SPIN_AIR * p.spin
+  if (p.grip) {
+    const sa = Math.sin(p.angle)
+    const ca = Math.cos(p.angle)
+    // The point held, from the card's middle.
+    const u = p.grip.u
+    const v = p.grip.v - middleOf(p)
+    const rx = u * ca - v * sa
+    const ry = u * sa + v * ca
+    let dx = p.grip.x - (p.cx + rx)
+    let dy = p.grip.y - (p.cy + ry)
+    const distance = Math.hypot(dx, dy)
+    if (distance > GRIP_REACH) {
+      dx *= GRIP_REACH / distance
+      dy *= GRIP_REACH / distance
+    }
+    const fx = GRIP * dx - GRIP_DAMPING * (p.vx - p.spin * ry)
+    const fy = GRIP * dy - GRIP_DAMPING * (p.vy + p.spin * rx)
+    ax += fx
+    ay += fy
+    spinAccel += (rx * fy - ry * fx) / ((p.height ** 2 + p.width ** 2) / 12)
+    p.dropY = null
+  } else if (p.dropY === null) {
+    p.dropY = p.cy
+  }
+  p.vx += ax * STEP
+  p.vy += ay * STEP
+  p.cx += p.vx * STEP
+  p.cy += p.vy * STEP
+  p.spin += spinAccel * STEP
+  p.angle += p.spin * STEP
+  if (p.dropY !== null && p.cy - p.dropY > FADE.after + FADE.over) p.gone = true
+}
+
+/** Hangs a torn pass back on its cord, at rest. */
+export function rehang(p: Pass) {
+  Object.assign(p, {
+    torn: false,
+    gone: false,
+    strain: 0,
+    dropY: null,
+    stub: 0,
+    vstub: 0,
+    grip: null,
+  })
+  settle(p)
 }
 
 /** Moves every pass on the wall on by one `STEP`. */
 export function step(passes: readonly Pass[]) {
-  for (const p of passes) advance(p)
-  // The cable gives under a pull beyond a card's weight and rises a little
-  // when the weight comes off; each ring drags its neighbors along.
   for (const p of passes) {
-    const load = (p.tension - G) * Math.cos(p.theta)
+    if (p.torn) advanceFree(p)
+    else advance(p)
+  }
+  // The cable gives under a pull beyond a card's weight and rises a little
+  // when the weight comes off; each ring drags its neighbors along. A torn
+  // pass's ring rests where it did, so the cable settles.
+  for (const p of passes) {
+    const load = p.torn ? 0 : (p.tension - G) * Math.cos(p.theta)
     // It takes a pull of about 2.5 cards' weight past the card's own to bend
     // the cable most of the way to `cableDip`.
     const target = TUNING.cableDip * Math.tanh(load / (2.5 * G))
@@ -481,6 +636,15 @@ export function step(passes: readonly Pass[]) {
 /** Whether the pass still moves, or a hand holds it; a still pass can `settle`. */
 export function isMoving(p: Pass) {
   if (p.grip) return true
+  if (p.torn) {
+    return (
+      !p.gone ||
+      Math.abs(p.stub) > 1e-3 ||
+      Math.abs(p.vstub) > 1e-2 ||
+      Math.abs(p.dip) > 0.03 ||
+      Math.abs(p.vdip) > 0.1
+    )
+  }
   const rest = restOf(p)
   // The twist dies out slowest and shows least: snapping from 5e-3 rad moves the
   // card's edge by about 0.06px.
@@ -498,8 +662,12 @@ export function isMoving(p: Pass) {
   )
 }
 
-/** Puts the pass exactly at rest. */
+/** Puts the pass exactly at rest; a torn one only stills its stub and ring. */
 export function settle(p: Pass) {
+  if (p.torn) {
+    Object.assign(p, { stub: 0, vstub: 0, dip: 0, vdip: 0, dipAccel: 0 })
+    return
+  }
   const rest = restOf(p)
   Object.assign(p, {
     theta: rest.theta,
@@ -519,9 +687,17 @@ export function settle(p: Pass) {
   })
 }
 
+// A torn pass's slot and angle, as `frameOf` gives them for a hung one.
+function freeFrame(p: Pass) {
+  const sa = Math.sin(p.angle)
+  const ca = Math.cos(p.angle)
+  const d = middleOf(p)
+  return { x: p.cx + d * sa, y: p.cy - d * ca, angle: p.angle, sa, ca }
+}
+
 /** The point (x, y) in the card's frame: `u` across and `v` down from the slot. */
 export function toCard(p: Pass, x: number, y: number) {
-  const f = frameOf(p)
+  const f = p.torn ? freeFrame(p) : frameOf(p)
   const dx = x - f.x
   const dy = y - f.y
   const u = dx * f.ca + dy * f.sa
@@ -565,6 +741,7 @@ function kick(p: Pass, j: Jacobian, dx: number, dy: number) {
  * difference between their velocities, as a `kick`.
  */
 export function brush(p: Pass, x: number, y: number, vx: number, vy: number, travel: number) {
+  if (p.torn) return
   const { u, v } = toCard(p, x, y)
   const j = jacobian(p, frameOf(p), u, v)
   const velocity = velocityAt(p, j)
@@ -574,6 +751,7 @@ export function brush(p: Pass, x: number, y: number, vx: number, vy: number, tra
 
 /** A finger swiping off the card point (u, v) at (vx, vy) px/s. */
 export function swipe(p: Pass, u: number, v: number, vx: number, vy: number) {
+  if (p.torn) return
   const gain = TUNING.push * SWIPE_GAIN
   kick(p, jacobian(p, frameOf(p), u, v), vx * gain, vy * gain * SWIPE_VERTICAL)
 }
@@ -581,7 +759,7 @@ export function swipe(p: Pass, u: number, v: number, vx: number, vy: number) {
 /** A poke `u` px off the card's middle turns the pass round its cord. */
 export function poke(p: Pass, u: number) {
   // A pass measured before layout has no width, so no middle to poke off.
-  if (!p.width) return
+  if (!p.width || p.torn) return
   // `poke` was a 0-to-1 knob in the sketch; the 5 makes it rad/s, so a poke at
   // the edge adds 2.5 rad/s to the twist.
   p.vpsi += TUNING.poke * 5 * Math.max(-1, Math.min(1, u / (p.width / 2)))
@@ -591,6 +769,7 @@ const px = (n: number) => n.toFixed(2)
 
 /** The pass as it is now, in CSS and SVG values. A pass at rest draws as the stylesheet does. */
 export function drawingOf(p: Pass): PassDrawing {
+  if (p.torn) return tornDrawingOf(p)
   const f = frameOf(p)
   const line = cordOf(p, f)
   // The cord's middle lags a swing's speed-up, and a slack cord bows out as far
@@ -603,10 +782,6 @@ export function drawingOf(p: Pass): PassDrawing {
   const mx = (line.x0 + line.x1) / 2 - ((line.y1 - line.y0) / line.length) * bow
   const my = (line.y0 + line.y1) / 2 + ((line.x1 - line.x0) / line.length) * bow
   const twisted = Math.abs(p.psi) > 1e-4
-  // Straight to the midpoints between rings, so neighbors' stretches meet.
-  const overhang = p.gap / 2 + 0.5
-  const leftY = p.left ? (p.left.dip + p.dip) / 2 : 0
-  const rightY = p.right ? (p.right.dip + p.dip) / 2 : 0
   // The shadow turns back by the angle away from rest, so it falls as it does at rest.
   const fromRest = f.angle - p.tilt
   return {
@@ -631,6 +806,48 @@ export function drawingOf(p: Pass): PassDrawing {
     glint: 30 + 95 * Math.sin(p.psi) + 150 * fromRest,
     holo: fromRest * 420 + p.psi * 300,
     dip: p.dip,
-    cable: `${px(-overhang)},${px(1 + leftY)} ${px(p.ringX)},${px(1 + p.dip)} ${px(p.hookWidth + overhang)},${px(1 + rightY)}`,
+    cable: cableOf(p),
+    opacity: 1,
+    torn: false,
+    gone: false,
+  }
+}
+
+// The hook's stretch of cable: straight to the midpoints between rings, so
+// neighbors' stretches meet.
+function cableOf(p: Pass) {
+  const overhang = p.gap / 2 + 0.5
+  const leftY = p.left ? (p.left.dip + p.dip) / 2 : 0
+  const rightY = p.right ? (p.right.dip + p.dip) / 2 : 0
+  return `${px(-overhang)},${px(1 + leftY)} ${px(p.ringX)},${px(1 + p.dip)} ${px(p.hookWidth + overhang)},${px(1 + rightY)}`
+}
+
+// A torn pass, free of its cord, and the stub left on the ring.
+function tornDrawingOf(p: Pass): PassDrawing {
+  const f = freeFrame(p)
+  const fromRest = f.angle - p.tilt
+  const x0 = p.ringX
+  const y0 = p.dip + p.hookY + 1.5
+  const stub = p.cord.stub
+  const fade =
+    p.dropY === null ? 0 : Math.min(1, Math.max(0, (p.cy - p.dropY - FADE.after) / FADE.over))
+  return {
+    transform: `translate(${px(f.x - p.ringX)}px, ${px(f.y - p.slotY)}px) rotate(${f.angle.toFixed(5)}rad)`,
+    shadowX: SHADOW * Math.sin(fromRest),
+    shadowY: SHADOW * Math.cos(fromRest),
+    twist: '',
+    shade: 0,
+    shadeSide: 1,
+    cord: stub
+      ? `M${px(x0)} ${px(y0)}L${px(x0 - stub * Math.sin(p.stub))} ${px(y0 + stub * Math.cos(p.stub))}`
+      : '',
+    cordScale: 1,
+    glint: 30 + 150 * fromRest,
+    holo: fromRest * 420,
+    dip: p.dip,
+    cable: cableOf(p),
+    opacity: p.gone ? 0 : 1 - fade,
+    torn: true,
+    gone: p.gone,
   }
 }
