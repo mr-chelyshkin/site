@@ -14,5 +14,11 @@ const { brand, home, socialProfiles, tearTabs } = siteContent
   <PracticeSection :content="home.practice" />
   <CommerceSection :content="home.commerce" :holder="brand.shortName" :email="home.contact.email" />
   <OpenSourceSection :content="home.openSource" />
-  <ContactSection :content="home.contact" :profiles="socialProfiles" :copied="tearTabs.copied" />
+  <ContactSection
+    :content="home.contact"
+    :profiles="socialProfiles"
+    :copied="tearTabs.copied"
+    :holder="brand.fullName"
+    :companies="home.commerce.companies"
+  />
 </template>

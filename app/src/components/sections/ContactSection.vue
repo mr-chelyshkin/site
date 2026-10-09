@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CvPrinter from '@/components/sections/CvPrinter.vue'
 import PastedSheet from '@/components/ui/PastedSheet.vue'
 import TearTabs from '@/components/ui/TearTabs.vue'
 import WallSection from '@/components/ui/WallSection.vue'
@@ -8,6 +9,9 @@ defineProps<{
   content: HomeContent['contact']
   profiles: SocialProfiles
   copied: string
+  /** Who the CV printer prints, and where they worked. */
+  holder: string
+  companies: HomeContent['commerce']['companies']
 }>()
 </script>
 
@@ -55,20 +59,12 @@ defineProps<{
 
       <p class="contact__hint" aria-hidden="true">{{ content.hint }}</p>
 
-      <PastedSheet
-        class="contact__booth"
-        seed="booth"
-        stock="white"
-        :torn="['bottom']"
-        :tape="['top']"
-        :tilt="2.8"
-        :order="1"
-        aria-hidden="true"
-      >
-        <div class="contact__frames">
-          <span v-for="n in 4" :key="n" class="contact__frame" :class="`contact__frame--${n}`" />
-        </div>
-      </PastedSheet>
+      <CvPrinter
+        class="contact__printer"
+        :name="holder"
+        :email="content.email"
+        :companies="companies"
+      />
     </div>
   </WallSection>
 </template>

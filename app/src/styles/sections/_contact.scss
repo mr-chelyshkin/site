@@ -1,10 +1,10 @@
 @use '../tools';
 
 @layer sections {
-  /* The last notice: the address in stencil and tear-off tabs, with a photo
-     booth strip beside it. From xl up the booth also spans a flexible third
-     row, which takes whatever height it has beyond the sheet and the hint, so
-     the hint stays close under the tabs. */
+  /* The last notice: the profiles in stencil and tear-off tabs, with a CV
+     printer beside it. From xl up the printer also spans a flexible third row,
+     which takes whatever height it has beyond the sheet and the hint, so the
+     hint stays close under the tabs. */
   .contact__board {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -98,45 +98,10 @@
       center / contain no-repeat;
   }
 
-  .contact__booth {
-    grid-column: 10 / 12;
+  .contact__printer {
+    grid-column: 9 / 13;
     grid-row: 1 / 4;
-    margin-top: -10px;
-  }
-
-  .contact__frames {
-    display: grid;
-    gap: 10px;
-    padding: 12px;
-  }
-
-  .contact__frame {
-    aspect-ratio: 156 / 150;
-    background: url('../../assets/images/hero-poster.png') no-repeat;
-    image-rendering: pixelated;
-
-    &--1 {
-      background-size: 320% auto;
-      background-position: 50% 22%;
-    }
-
-    /* A negative. Inverting alone turns the grays warm; the half turn of hue
-       cools them again, as the wall keeps no warm colors. */
-    &--2 {
-      background-size: 320% auto;
-      background-position: 48% 21%;
-      filter: invert(1) hue-rotate(180deg);
-    }
-
-    &--3 {
-      background-size: 240% auto;
-      background-position: 50% 30%;
-    }
-
-    &--4 {
-      background-size: 320% auto;
-      background-position: 52% 26%;
-    }
+    margin-top: 24px;
   }
 
   @include tools.below(xl) {
@@ -152,14 +117,10 @@
       grid-column: 1 / 7;
     }
 
-    .contact__booth {
-      grid-column: 1 / -1;
-      grid-row: 3;
-      margin-top: 32px;
-    }
-
-    .contact__frames {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+    .contact__printer {
+      grid-column: 7 / 13;
+      grid-row: 2 / 4;
+      margin-top: 40px;
     }
   }
 
@@ -169,12 +130,13 @@
     }
 
     .contact__hint,
-    .contact__booth {
+    .contact__printer {
       grid-column: 1;
     }
 
-    .contact__booth {
-      grid-row: 4;
+    .contact__printer {
+      grid-row: 3;
+      margin-top: 48px;
     }
 
     /* Eleven tabs across a phone: smaller type keeps both lines of the address
