@@ -19,12 +19,11 @@ logs/
 *.pid.lock
 
 # Local environment files
-!/app/.env.development
-!/app/.env.production
-
 .env
 .env.*
 !.env.example
+!/app/.env.development
+!/app/.env.production
 
 # Site
 /.cache/
