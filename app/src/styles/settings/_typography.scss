@@ -1,5 +1,3 @@
-// `public/404.html` keeps a written-out copy of the font stacks; mirror changes
-// there.
 $text-size-md: 1rem;
 $text-size-sm: 0.8125rem;
 $text-size-xsm: 0.6875rem;
@@ -10,5 +8,4 @@ $font-stencil:
   'Big Shoulders Stencil Display', 'Big Shoulders Display', 'Avenir Next Condensed',
   'DIN Condensed', 'Arial Narrow', sans-serif-condensed, Impact, sans-serif;
 $font-mono: 'Chivo Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
-// Handwriting, for notes scrawled on the wall.
 $font-hand: 'Caveat', 'Bradley Hand', 'Segoe Print', cursive;

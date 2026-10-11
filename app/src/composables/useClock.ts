@@ -1,14 +1,9 @@
 import { onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue'
+import { useReducedMotion } from '@/composables/useReducedMotion'
 
-/**
- * Seconds of animation time, ticking once a frame while `running` holds and
- * standing still while it doesn't, so an animation picks up where it paused.
- * A long gap between frames, as after a hidden tab, counts as one short frame.
- * Readers who prefer reduced motion get a clock that never starts.
- */
-export function useClock(running: Ref<boolean>) {
+export function useClock(running: Readonly<Ref<boolean>>) {
   const time = ref(0)
-  let still = true
+  const reduced = useReducedMotion()
   let frame = 0
   let last: number | undefined
 
@@ -23,18 +18,15 @@ export function useClock(running: Ref<boolean>) {
     last = undefined
   }
   const sync = () => {
-    if (running.value && !still) {
+    if (running.value && !reduced.value) {
       if (!frame) frame = requestAnimationFrame(tick)
     } else if (frame) {
       stop()
     }
   }
 
-  watch(running, sync)
-  onMounted(() => {
-    still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    sync()
-  })
+  watch([running, reduced], sync)
+  onMounted(sync)
   onBeforeUnmount(stop)
 
   return time

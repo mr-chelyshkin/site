@@ -1,7 +1,4 @@
 @layer sections {
-  /* A brushed aluminum staff card, laser-etched, on a ball chain through a
-     drilled hole. The brushed highlight follows the light with `--glint`. The
-     card grows with its text. */
   .pass-metal {
     display: flex;
     flex-direction: column;
@@ -31,15 +28,11 @@
       inset -1px 0 0 rgb(0 0 0 / 20%),
       0 0 0 0.5px rgb(0 0 0 / 55%),
       var(--shadow-offset) 16px rgb(0 0 0 / 55%);
-    /* Laser etching: dark, with a faint frosted rim. */
     text-shadow: 0 0.6px 0 rgb(255 255 255 / 45%);
   }
 
-  /* The wall shows through it. */
   .pass-metal__hole {
     position: absolute;
-    /* Mirrored in pass-kinds.ts: its middle is the metal card's `slot`, and the
-       chain ties on just above it, at its `tie`. */
     top: 9px;
     left: 50%;
     width: 13px;
@@ -55,7 +48,6 @@
     );
   }
 
-  /* After the name in the source, shown above it. */
   .pass-metal__kicker {
     order: -1;
     font-size: 9px;
@@ -65,7 +57,6 @@
     text-transform: uppercase;
   }
 
-  /* The mark, etched large where a name would be. */
   .pass-metal__mark {
     align-self: center;
     width: 132px;
@@ -75,7 +66,6 @@
     mix-blend-mode: multiply;
   }
 
-  /* Etched centered, under the mark. */
   .pass-metal__who {
     text-align: center;
   }

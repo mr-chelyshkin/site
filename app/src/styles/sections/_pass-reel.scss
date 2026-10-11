@@ -1,10 +1,6 @@
 @use '../tools';
 
 @layer sections {
-  /* A matte soft-touch badge, charcoal with light specks, on a reel's clear
-     strap snapped through its slot. Matte plastic has no gloss, only a broad sheen
-     from above that follows the light (`--glint`). The badge grows with its
-     text. */
   .pass-reel {
     display: flex;
     flex-direction: column;
@@ -25,7 +21,6 @@
 
   .pass-reel__slot {
     position: absolute;
-    /* The pivot is in it, mirrored in pass-kinds.ts as the reel's `slot`. */
     top: 9px;
     left: 50%;
     width: 30px;
@@ -38,9 +33,6 @@
       0 1px 0 rgb(255 255 255 / 12%);
   }
 
-  /* The strap, over the card, drawn in the card's own pixels. Its tie point,
-     the crimp where the line ends, 17px above the card, is mirrored in
-     pass-kinds.ts as the reel's `tie`, from the pivot in the slot. */
   .pass-reel__clasp {
     position: absolute;
     top: -21px;
@@ -53,15 +45,12 @@
     filter: drop-shadow(0 1.5px 1.5px rgb(0 0 0 / 50%));
   }
 
-  /* Clear vinyl, faintly blue, its edges catching the light; doubled where
-     its two layers meet above the card. */
   .pass-reel__strap {
     fill: rgb(214 234 240 / 16%);
     stroke: rgb(255 255 255 / 42%);
     stroke-width: 0.55;
   }
 
-  /* Where the strap turns round behind the card in the slot. */
   .pass-reel__fold {
     fill: none;
     stroke: rgb(255 255 255 / 60%);
@@ -75,10 +64,9 @@
     stroke-width: 0.4;
   }
 
-  /* The reel's line, as `.commerce__hook--nylon` draws it. */
   .pass-reel__loop {
     fill: none;
-    stroke: #c8cfd2;
+    stroke: var(--cord);
     stroke-width: 0.9;
   }
 
@@ -99,7 +87,6 @@
     stroke-width: 0.5;
   }
 
-  /* The role set large, the mark beside it. */
   .pass-reel__top {
     display: flex;
     align-items: flex-start;
@@ -107,7 +94,6 @@
     gap: 10px;
   }
 
-  /* The mark, screened light on dark. */
   .pass-reel__mark {
     width: 62px;
     height: 62px;

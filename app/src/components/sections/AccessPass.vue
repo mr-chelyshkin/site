@@ -30,19 +30,13 @@ const KINDS: Record<PassKind, Component> = {
 const nameId = `pass-${useId()}`
 const number = computed(() => padIndex(props.index))
 const kind = computed(() => kindOf(props.company.pass))
-// Each pass hangs at its own angle and drop, the same on every visit;
-// neighbors lean opposite ways, but little enough that six in a row never
-// cover each other's text. A reel hangs lower, under its reel. The kind's
-// shape goes to the stylesheet and to usePassPhysics.
+
 const hang = computed(() => {
   const rand = seeded(`${props.company.name}:hang`)
   const lean = props.index % 2 ? 1 : -1
   const shape = SHAPES[kind.value]
   return {
     '--tilt': `${(lean * (1 + rand() * 1.25)).toFixed(2)}deg`,
-    // pass-physics needs each pivot at least 16px past `hookY + tie`, room for
-    // the hardware under the hook even lifted in hand. The reel clears that by
-    // only 3px at the shortest drop: 48 + 32 + 13 = 93 against 90.
     '--drop': `${48 + Math.round(rand() * 34) + shape.dropExtra}px`,
     '--w': `${shape.width}px`,
     '--slot': `${shape.slot}px`,
@@ -53,8 +47,6 @@ const hang = computed(() => {
 </script>
 
 <template>
-  <!-- Focusable, so a keyboard can take a pass in hand, and reach every pass
-       on a phone's scrolling cable. -->
   <article
     class="pass"
     :class="`pass--${kind}`"
@@ -63,7 +55,6 @@ const hang = computed(() => {
     tabindex="0"
     :aria-labelledby="nameId"
   >
-    <!-- Turns round the cord when the pass is poked; see usePassPhysics. -->
     <div class="pass__twist">
       <component
         :is="KINDS[kind]"

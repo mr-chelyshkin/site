@@ -18,7 +18,7 @@ const { brand, home, socialProfiles, tearTabs } = siteContent
     :content="home.contact"
     :profiles="socialProfiles"
     :copied="tearTabs.copied"
-    :holder="brand.fullName"
+    :name="brand.fullName"
     :companies="home.commerce.companies"
   />
 </template>

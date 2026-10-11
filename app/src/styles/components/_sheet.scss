@@ -1,9 +1,6 @@
 @use '../tools';
 
 @layer components {
-  /* Paper pasted to the wall. The wrapper casts the shadow, so it follows the
-     torn outline of the paper it wraps. A block whatever its tag, as an inline
-     box would not rotate. */
   .c-sheet {
     display: block;
     position: relative;
@@ -15,16 +12,8 @@
     }
   }
 
-  /* A live sheet's shadow: the paper's outline in black, blurred and dropped
-     as the wrapper's drop-shadow would be, but on a layer that never changes,
-     so the content's repaints leave it be. The blur is the drop-shadow's
-     radius halved. */
   .c-sheet--live {
     filter: none;
-
-    @include tools.below(md) {
-      filter: none;
-    }
   }
 
   .c-sheet__shadow {
@@ -37,16 +26,46 @@
     pointer-events: none;
     will-change: transform;
 
-    > span {
-      position: absolute;
-      inset: 0;
-      background: #000;
-    }
-
     @include tools.below(md) {
       opacity: 0.5;
       filter: blur(7px);
       translate: 0 10px;
+    }
+  }
+
+  .c-sheet__shadow-shape {
+    position: absolute;
+    inset: 0;
+    background: #000;
+  }
+
+  .c-sheet--near {
+    transform: translateY(var(--drift, 0px)) perspective(1400px) rotateX(4deg);
+    transform-origin: 50% 0;
+    filter: drop-shadow(0 1px 2px rgb(0 0 0 / 35%)) drop-shadow(0 16px 20px rgb(0 0 0 / 30%))
+      drop-shadow(0 42px 54px rgb(0 0 0 / 32%));
+
+    @include tools.below(md) {
+      filter: drop-shadow(0 1px 2px rgb(0 0 0 / 35%)) drop-shadow(0 10px 14px rgb(0 0 0 / 30%))
+        drop-shadow(0 26px 34px rgb(0 0 0 / 30%));
+    }
+
+    .c-sheet__paper::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgb(255 255 255 / 8%),
+        transparent 35%,
+        transparent 55%,
+        rgb(0 0 0 / 10%)
+      );
+      pointer-events: none;
+    }
+
+    .c-tear-tabs__tab {
+      box-shadow: inset 0 0 0 100vmax rgb(0 0 0 / 10%);
     }
   }
 
@@ -55,8 +74,6 @@
     backdrop-filter: none;
   }
 
-  /* `flow-root` keeps the content's margins on the paper; one that collapsed
-     through would open a gap to the wall above the foot. */
   .c-sheet__paper {
     display: flow-root;
     position: relative;
@@ -90,7 +107,6 @@
     }
   }
 
-  /* Millimeter paper for drawings. */
   .c-sheet--grid .c-sheet__paper {
     $fine: color-mix(in srgb, var(--color-ink) 4.5%, transparent);
     $bold: color-mix(in srgb, var(--color-ink) 8%, transparent);
@@ -108,8 +124,6 @@
       auto;
   }
 
-  /* Each piece is cut to its own length; `--tape-sx` and `--tape-sy` come from
-     the sheet's seed. */
   .c-sheet__tape {
     position: absolute;
     width: calc(150px * var(--tape-sx, 1));
@@ -153,10 +167,6 @@
     }
   }
 
-  /* Clear matte office tape, as handled: torn by hand, frosted unevenly, with a
-     crease, air under it in places and dust stuck to the glue. What's under it
-     shows through softer and lighter. The film and the wear are pseudo-elements
-     clipped to the torn outline, so the shadow survives the clip. */
   .c-sheet__tape--real {
     filter: drop-shadow(0 1px 1px rgb(0 0 0 / 28%));
 
@@ -179,7 +189,7 @@
           rgb(255 255 255 / 10%)
         ),
         linear-gradient(100deg, transparent 20%, rgb(255 255 255 / 14%) 48%, transparent 72%),
-        tools.$paper-grain, rgb(236 241 239 / 65%);
+        tools.$paper-grain, var(--color-tape);
       box-shadow:
         inset 0 1px 0 rgb(255 255 255 / 34%),
         inset 0 -1px 0 rgb(0 0 0 / 10%);
@@ -220,8 +230,6 @@
     }
   }
 
-  /* Tape as a pen draws it: a flat strip in an ink outline that wobbles, toothed
-     ends, a shine stroke and a little hatching. */
   .c-sheet__tape--drawn {
     filter: drop-shadow(1.5px 2px 0 rgb(0 0 0 / 35%));
   }
@@ -255,14 +263,6 @@
     opacity: 0.55;
   }
 
-  /* Only the top is taped, so a fold leaves the paper standing off the wall
-     where nothing holds it: the part below a horizontal fold, further the lower
-     it hangs, or the sides of a vertical one, the right more, as the light comes
-     from the upper left. Their shadows on the wall grow toward the bottom, a
-     foot's tabs and all. The horizontal fold's share of the sheet includes the
-     foot, close enough for a shadow that fades in. Under the paper and the foot,
-     inside the sheet's stacking context; wider than the sheet, so the side
-     shadows show past its edges. */
   .c-sheet__lift {
     position: absolute;
     inset: 0 -8px;
@@ -289,12 +289,6 @@
     }
   }
 
-  /* Handled paper, over the print as on a real sheet: a fold across, down, both
-     or none (`--fold-h` and `--fold-v` switch them), shadowed on one side and
-     catching the light on the other (the halves of a vertical one, standing off
-     the wall, are turned to the light and away from it), a few soft crumples, a
-     tone that isn't even, corners rubbed darker and edges gone a little yellow.
-     `--fold-*` and `--crumple-*` come from the sheet's seed. */
   .c-sheet__wear {
     position: absolute;
     inset: 0;

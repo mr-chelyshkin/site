@@ -17,7 +17,6 @@
     line-height: 1.7;
   }
 
-  /* Three flyers of different sizes, at different heights. */
   .open-source__board {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -27,8 +26,6 @@
     margin-top: clamp(40px, 5vw, 72px);
   }
 
-  /* A flyer past the third takes a third of the board; the first three are
-     placed one by one below. */
   .open-source__flyer {
     grid-column: span 4;
   }
@@ -40,7 +37,6 @@
   .open-source__flyer:nth-child(2) {
     grid-column: 6 / 9;
     margin-top: 60px;
-    /* Above both neighbors: their corners and shadows go under it. */
     z-index: 2;
   }
 
@@ -49,7 +45,6 @@
     margin-top: -30px;
   }
 
-  /* More labels wrap within the room right of where the row starts. */
   .open-source__labels {
     display: flex;
     flex-wrap: wrap;
@@ -90,8 +85,6 @@
       row-gap: 36px;
     }
 
-    /* `:nth-child(n)` matches every flyer and weighs as much as the
-       placements above, so this later rule overrides all of them. */
     .open-source__flyer:nth-child(n) {
       grid-column: 1;
       margin-top: 0;

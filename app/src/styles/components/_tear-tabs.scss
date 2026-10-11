@@ -1,9 +1,6 @@
 @use '../tools';
 
 @layer components {
-  /* The address on tabs hanging below a notice. The strip has no paper of its
-     own, so a missing tab leaves a gap to the wall. The type is set here, where
-     a placement class can shrink it. */
   .c-tear-tabs {
     display: flex;
     height: 124px;
@@ -12,8 +9,6 @@
     line-height: 1.3;
   }
 
-  /* A scrap of the sheet's stock: the tabs hang outside the clipped paper, so
-     each one carries its own. */
   .c-tear-tabs__tab {
     display: flex;
     flex: 1;
@@ -25,10 +20,8 @@
     border-right: 1px dashed color-mix(in srgb, currentColor 50%, transparent);
     background: tools.$paper-grain, var(--sheet-stock, var(--color-paper));
     color: var(--sheet-ink, var(--color-ink));
-    /* Browsers reset letter-spacing on buttons; the strip sets it. */
     letter-spacing: inherit;
 
-    /* Not `last-child`: the live region after the tabs is the last child. */
     &:last-of-type {
       border-right: 0;
     }
@@ -37,30 +30,22 @@
       background-color: color-mix(in srgb, currentColor 8%, var(--sheet-stock, var(--color-paper)));
     }
 
-    /* Inside the edge: outside it, the paper above, the next tab and the dark
-       wall would hide the shared ring. */
     &:focus-visible {
       outline-offset: -4px;
     }
   }
 
-  /* Vertical inside a horizontal button, so the tabs still sit side by side. */
   .c-tear-tabs__text {
     writing-mode: vertical-rl;
     rotate: 180deg;
   }
 
-  /* A falling tab takes no clicks and no focus on its way down. */
   .c-tear-tabs__tab--gone,
   .c-tear-tabs__tab--torn {
     visibility: hidden;
     pointer-events: none;
   }
 
-  /* What a tab torn off before the page loaded leaves behind: a scrap along the
-     perforation, shown though the tab is hidden. Its ragged edge, `--scrap`,
-     comes from the component. Over the tab's own border, so the perforation
-     runs on across the gap. */
   .c-tear-tabs__tab--gone {
     position: relative;
     overflow: visible;
@@ -89,9 +74,6 @@
       }
     }
 
-    /* A swing on the perforation that dies down, the way a strip of paper takes
-       a brush of the hand; `--sway-dir` turns it away from the hand. Over its
-       neighbors while it swings. Before the tear, which wins. */
     @keyframes tab-sway {
       18% {
         rotate: calc(4.5deg * var(--sway-dir, 1));

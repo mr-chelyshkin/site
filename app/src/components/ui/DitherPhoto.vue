@@ -2,29 +2,19 @@
 import { computed, type CSSProperties } from 'vue'
 
 interface Band {
-  /** Top of the band, in percent of the photo's height. */
   at: number
-  /** In percent of the photo's height. */
   height: number
-  /** Sideways slip, in percent of the photo's width. */
   shift: number
 }
 
-/**
- * A 1-bit render from `scripts/optimize-images.js`, scaled up without
- * smoothing, with bands where the cyan channel slips and one smeared row.
- */
 const props = withDefaults(
   defineProps<{
     image: string
     alt: string
-    /** The render's own size in pixels. */
     width: number
     height: number
     bands?: readonly Band[]
-    /** A band filled with one row of the render; `row` counts its rows from 0 at the top. */
     smear?: Band & { row: number }
-    /** Above the fold: loaded at once and first. */
     priority?: boolean
   }>(),
   { bands: () => [], priority: false },
@@ -42,8 +32,6 @@ const url = (name: string) => {
 }
 const base = computed(() => url(props.image))
 const ghost = computed(() => (props.bands.length ? url(`${props.image}-cyan`) : ''))
-// The render stretched to `height` bands tall, so each of its rows fills the band,
-// and positioned so that the band shows row `row`.
 const smearStyle = computed<CSSProperties>(() => {
   const smear = props.smear
   if (!smear) return {}
@@ -60,7 +48,6 @@ const smearStyle = computed<CSSProperties>(() => {
 
 <template>
   <div class="c-dither">
-    <!-- `loading` precedes `src` so the first request already knows when to load. -->
     <img
       class="c-dither__base"
       :loading="priority ? 'eager' : 'lazy'"

@@ -1,5 +1,3 @@
-// Taken in hand: the pass straightens and lifts, and its cord drops by as much
-// so it stays on the hook.
 @mixin in-hand {
   rotate: 0deg;
   translate: 0 calc(var(--lift) * -1);
@@ -10,23 +8,13 @@
 }
 
 @layer sections {
-  /* A pass on a cord, one of six kinds; each kind's partial (`_pass-*.scss`)
-     draws its body and hardware. The tilt pivots where the cord leaves the
-     hook, at the ring or at a reel's mouth; hovering takes the pass in hand.
-     Live passes leave all of that to script; see the block after the cords.
-     `--tilt` and `--drop` come from the component, and so does the kind's
-     shape from pass-kinds.ts: `--w`, `--slot`, `--tie` and `--hook-y`. Small
-     screens keep less of the tilt. */
   .pass {
-    /* Mirrored in pass-physics.ts as `LIFT`, for live passes. */
     --lift: 8px;
 
     position: relative;
-    /* As tall as its card, not the row, so the focus ring hugs the card. */
     align-self: start;
     width: min(100%, var(--w, 210px));
     margin-top: var(--drop);
-    /* Rounds the focus ring. */
     border-radius: 12px;
     rotate: calc(var(--tilt) * var(--tilt-scale));
     transform-origin: 50% calc((var(--drop) - var(--hook-y, 0px)) * -1);
@@ -34,10 +22,6 @@
       rotate var(--motion-base) var(--ease-settle),
       translate var(--motion-base) var(--ease-settle);
 
-    /* The cord, from the hook down to where it ties on, behind the pass's
-       hardware. Its 3px is mirrored in `.commerce__cord` (`_commerce.scss`),
-       the live cord, as `calc(3px * var(--cord-scale, 1))`; pass-physics.ts
-       keeps only the floor a stretched cord thins to, 1.6px of the 3. */
     &::before {
       content: '';
       position: absolute;
@@ -56,8 +40,6 @@
       z-index: 2;
     }
 
-    /* Only for a reader who doesn't ask for less motion; hover only where a
-       pointer hovers, so a tap leaves no pass lifted. */
     @media (prefers-reduced-motion: no-preference) {
       &:focus-visible {
         @include in-hand;
@@ -68,9 +50,6 @@
           @include in-hand;
         }
 
-        /* A strip behind the card keeps a pointer near its edge on the pass
-           as it lifts away, so it doesn't drop and lift again. Behind, so the
-           card's text stays selectable. */
         &:hover::after {
           content: '';
           position: absolute;
@@ -81,28 +60,27 @@
     }
   }
 
-  /* The other kinds of cord, as `_commerce.scss` draws them live. A reel's
-     nylon line is drawn ten times as wide and scaled down: a box 1.3px wide
-     would be painted to whole pixels, heavier than the live line. */
   .pass--reel::before {
     width: 13px;
     margin-left: -6.5px;
     border-radius: 0;
-    background: #c8cfd2;
+    background: var(--cord);
     scale: 0.1 1;
   }
 
-  /* A ribbon's stitches and a chain's beads, each bead lit up and to the left,
-     repeat from 1.5px under the hook, where the live cord starts, so the two
-     agree at rest. */
   .pass--visitor::before {
     width: 9px;
     margin-left: -4.5px;
     border-radius: 0;
     background:
-      linear-gradient(90deg, #24343b calc(50% - 0.7px), transparent 0 calc(50% + 0.7px), #24343b 0),
-      linear-gradient(rgb(95 176 191 / 70%) 5px, transparent 0) 0 1.5px / 100% 8px,
-      #24343b;
+      linear-gradient(
+        90deg,
+        var(--cord) calc(50% - 0.7px),
+        transparent 0 calc(50% + 0.7px),
+        var(--cord) 0
+      ),
+      linear-gradient(var(--cord-stitch) 5px, transparent 0) 0 1.5px / 100% 8px,
+      var(--cord);
   }
 
   .pass--metal::before {
@@ -116,15 +94,12 @@
           transparent 0.95px
         )
         0 -1.6px / 4.6px 6.2px repeat-y,
-      radial-gradient(circle, #a9b2b5 2.1px, transparent 2.4px) 0 -1.6px / 4.6px 6.2px repeat-y;
+      radial-gradient(circle, var(--cord) 2.1px, transparent 2.4px) 0 -1.6px / 4.6px 6.2px repeat-y;
   }
 
-  /* Live, script moves the pass and draws its cord (usePassPhysics), so the
-     tilt, the hover lift and the cord above stand down. The pivot is the slot
-     or hole the hardware goes through, `slot` in pass-kinds.ts. A press is a
-     pull, so the pass's text doesn't select. */
   .commerce__cable--live .pass {
     z-index: 2;
+    will-change: transform;
     rotate: none;
     translate: none;
     transform-origin: 50% var(--slot);
@@ -147,8 +122,6 @@
       z-index: 4;
     }
 
-    /* Torn off, a pass rides over everything on the cable; fallen away, it
-       takes no pointer. Script sets how much of it still shows. */
     &[data-torn] {
       z-index: 5;
     }
@@ -166,30 +139,17 @@
     }
   }
 
-  /* Turns round the cord when the pass is poked. Positioned, so the hardware
-     keeps the same containing block whether a twist transforms it or not. The
-     origin is the perspective's vanishing point, near the card's middle. */
   .pass__twist {
     position: relative;
     transform-origin: 50% 40%;
   }
 
-  /* Each kind's body: the card, the holder or the sleeve, with its light and
-     shade on top. Its layers, from the bottom: a smart card's antenna 0 and
-     its print 1, a laminate's bubbles 2, a sleeve's wrinkles and the gloss 3,
-     the shade 4 and a laminate's eyelet 5; the hardware, over the body, is 6. */
   .pass__body {
-    /* Each kind's shadow falls this far. Live passes counter-turn the offset
-       as they swing, so the shadow keeps falling the way it does at rest. The
-       16px is mirrored in pass-physics.ts as `SHADOW`. */
     --shadow-offset: var(--shadow-x, 0) var(--shadow-y, 16px);
 
     position: relative;
   }
 
-  /* A glossy surface: a band of light where the light catches it, and a fainter
-     one after it. Live, script slides `--glint` across as the pass swings and
-     twists; at rest it sits 30% across. */
   .pass__gloss {
     position: absolute;
     inset: 0;
@@ -213,7 +173,6 @@
     pointer-events: none;
   }
 
-  /* Darkens the edge a twist turns away from the light, gloss and all. */
   .pass__shade {
     position: absolute;
     inset: 0;
@@ -225,8 +184,6 @@
     pointer-events: none;
   }
 
-  /* The company's mark where a photo would be: its shape masks the ink, so
-     each kind colors it as it prints, etches or screens. */
   .pass__mark {
     position: relative;
     display: block;
@@ -241,7 +198,6 @@
     mask: var(--logo) var(--mark-at, center) / contain no-repeat;
   }
 
-  /* The printed facts, on light stock or dark; the terms are fainter. */
   .pass__facts {
     font-size: 8.5px;
     line-height: 1.35;
@@ -253,8 +209,6 @@
     opacity: 0.7;
   }
 
-  /* The owner may edit the copy: a word too long for the column breaks
-     rather than running off the card. */
   .pass__value {
     margin-bottom: 5px;
     font-weight: 600;
@@ -262,8 +216,6 @@
     overflow-wrap: anywhere;
   }
 
-  /* Hung back, each pass settles onto the wall as when it was first put up,
-     one after another (script staggers the delay). */
   @media (prefers-reduced-motion: no-preference) {
     @keyframes pass-rehang {
       from {

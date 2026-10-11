@@ -2,10 +2,13 @@
 import { computed, inject, ref } from 'vue'
 import { blinkStyle } from '@/utils/blink'
 import {
+  X,
+  Y,
   boxFaces,
+  onFront,
+  onTop,
   planeTransform,
   svgPoints,
-  type Box,
   type Point,
   type Projector,
   type Vec3,
@@ -13,41 +16,30 @@ import {
 import {
   CONTROL_PLANE,
   DOWN,
+  FAIL,
   FINISH,
   LANDINGS,
   LOOP,
   SPARE,
   downness,
   inFlight,
+  nodeName,
   phase,
   smooth,
   storyClock,
 } from '@/utils/stack-story'
 
-/**
- * What the runtime plate stands for, on its top: a control plane wired to six
- * nodes running containers, playing the story's loop (stack-story.ts): a node
- * goes down and its container with it, the control plane sends the work to
- * another node, the node comes back, the moved work finishes, and new work is
- * sent to the node that came back, so the loop ends as it began.
- */
 const props = defineProps<{
   project: Projector
-  /** The back corner of the plate's top, in world units. */
   origin: Vec3
-  /** 0 flat on the plate, 1 at full height: the parts stand up as the stack comes apart. */
   rise: number
-  /** The drawing's hatch pattern, for the sides and a node that is down. */
   hatch: string
 }>()
 
-// In plate units from the back corner: u runs to the lower right, v to the
-// lower left.
 const CONTROL = CONTROL_PLANE
 const NODE = { width: 46, depth: 50, height: 14 }
 const COLUMNS = [104, 158, 212] as const
 const ROWS = [26, 116] as const
-// The wire the nodes hang off, along the gap between the rows.
 const SPINE = 96
 const POD = { size: 12, height: 9 }
 const SLOTS = [
@@ -56,17 +48,11 @@ const SLOTS = [
   [7, 29],
   [26, 29],
 ] as const
-// Containers on each node at rest, row by row from the back left; the node
-// that goes down has one, which goes with it.
 const PODS = [2, 1, 2, 1, 2, 1] as const
-// The nodes' names, in the same order: the front row is srv1 to srv3, the
-// servers the chassis below shows, the back row the rest of the rack.
-const NAMES = ['SRV4', 'SRV5', 'SRV6', 'SRV1', 'SRV2', 'SRV3'] as const
 
 const [TO_SPARE, TO_DOWN] = LANDINGS
 
 const center = (node: number) => COLUMNS[node % 3] + NODE.width / 2
-// From the control plane along the spine, then up or down to the node.
 const route = (node: number): Point[] => [
   [CONTROL.u + CONTROL.width, SPINE],
   [center(node), SPINE],
@@ -94,24 +80,11 @@ const along = (points: Point[], t: number): Point => {
 const time = inject(storyClock, ref(0))
 const t = computed(() => time.value % LOOP)
 
-// A box standing on the plate, its foot `base` above the plate's top.
 const standing = (u: number, v: number, width: number, depth: number, height: number, base = 0) => {
   const [x, y, z] = props.origin
   return { x: x + u, y: y + v, z: z + base, width, depth, height }
 }
-// Flat drawing on a box's top, or on its front, in that face's own units; the
-// front's y runs down from its top edge.
-const onTop = (box: Box) =>
-  planeTransform(props.project, [box.x, box.y, box.z + box.height], [1, 0, 0], [0, 1, 0])
-const onFront = (box: Box) =>
-  planeTransform(
-    props.project,
-    [box.x, box.y + box.depth, box.z + box.height],
-    [1, 0, 0],
-    [0, 0, -1],
-  )
-
-const surface = computed(() => planeTransform(props.project, props.origin, [1, 0, 0], [0, 1, 0]))
+const surface = computed(() => planeTransform(props.project, props.origin, X, Y))
 
 const sending = computed(() =>
   inFlight(t.value).map(({ node, at }) => ({
@@ -129,17 +102,20 @@ const control = computed(() => {
     CONTROL.depth,
     CONTROL.height * props.rise,
   )
-  return { faces: boxFaces(props.project, box), top: onTop(box), front: onFront(box) }
+  return {
+    faces: boxFaces(props.project, box),
+    top: onTop(props.project, box),
+    front: onFront(props.project, box),
+  }
 })
 
-// Each node's containers, sized 0 to 1 as they come and go.
 const podsOn = (node: number) => {
   const now = t.value
   const pods = Array.from({ length: PODS[node] }, (_, slot) => ({ slot, size: 1, fresh: false }))
   if (node === DOWN)
     pods[0] = {
       slot: 0,
-      size: 1 - smooth(phase(now, 1, 0.4)) + smooth(phase(now, TO_DOWN.at, 0.3)),
+      size: 1 - smooth(phase(now, FAIL, 0.4)) + smooth(phase(now, TO_DOWN.at, 0.3)),
       fresh: now >= TO_DOWN.at && now < TO_DOWN.at + 1.5,
     }
   if (node === SPARE)
@@ -151,7 +127,6 @@ const podsOn = (node: number) => {
   return pods.filter(({ size }) => size > 0.02)
 }
 
-// Back to front, so a nearer node paints over a further one.
 const nodes = computed(() => {
   const down = downness(t.value)
   return Array.from({ length: 6 }, (_, node) => {
@@ -175,8 +150,8 @@ const nodes = computed(() => {
       node,
       depth: u + v,
       faces: boxFaces(props.project, box),
-      top: onTop(box),
-      front: onFront(box),
+      top: onTop(props.project, box),
+      front: onFront(props.project, box),
       down: node === DOWN ? down : 0,
       pods,
     }
@@ -186,7 +161,6 @@ const nodes = computed(() => {
 
 <template>
   <g class="stack__runtime">
-    <!-- On the plate: the wires, and work in flight along its route. -->
     <g :transform="surface">
       <polyline v-for="(wire, i) in WIRES" :key="i" class="stack__wire" :points="svgPoints(wire)" />
       <g v-for="send in sending" :key="send.node">
@@ -216,7 +190,6 @@ const nodes = computed(() => {
         class="stack__box-face stack__box-face--top"
         :points="svgPoints(control.faces.top)"
       />
-      <!-- Its name, and the replicas of its state, the leader lit. -->
       <g :transform="control.top">
         <text class="stack__label" x="7" y="14">CONTROL</text>
         <text class="stack__label" x="7" y="23">PLANE</text>
@@ -251,7 +224,6 @@ const nodes = computed(() => {
       />
       <polygon class="stack__box-face stack__box-face--front" :points="svgPoints(n.faces.front)" />
       <polygon class="stack__box-face stack__box-face--top" :points="svgPoints(n.faces.top)" />
-      <!-- Down: struck out under hatching. -->
       <g v-if="n.down" :opacity="n.down">
         <polygon
           class="stack__box-face"
@@ -281,7 +253,7 @@ const nodes = computed(() => {
         x="5"
         :y="(NODE.height * rise) / 2 + 2.5"
       >
-        {{ NAMES[n.node] }}
+        {{ nodeName(n.node).toUpperCase() }}
       </text>
       <g
         v-for="pod in n.pods"

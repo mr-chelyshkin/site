@@ -19,6 +19,9 @@ logs/
 *.pid.lock
 
 # Local environment files
+!/app/.env.development
+!/app/.env.production
+
 .env
 .env.*
 !.env.example
@@ -42,6 +45,7 @@ logs/
 # Terraform
 /tf/**/terraform.tfstate.d/
 /tf/**/.terraform/
+/tf/**/.build/
 
 /tf/**/tfplan
 /tf/**/*.tfplan

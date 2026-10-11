@@ -54,7 +54,7 @@
       "index": "01",
       "label": "What I build",
       "statement": [
-        { "text": "I’m Igor — an independent software engineer. I build the " },
+        { "text": "I'm Igor — an independent software engineer. I build the " },
         { "text": "platforms", "mark": "highlight" },
         { "text": " teams ship on, the " },
         { "text": "runtimes", "mark": "stencil" },
@@ -94,6 +94,7 @@
       },
       "companies": [
         {
+          "id": "raiffeisen-bank",
           "name": "Raiffeisen Bank",
           "unit": "Banking",
           "role": "Senior Quality Assurance Engineer",
@@ -104,6 +105,7 @@
           "kicker": ""
         },
         {
+          "id": "vk",
           "name": "VK",
           "unit": "Search",
           "role": "DevOps Team Lead",
@@ -114,6 +116,7 @@
           "kicker": ""
         },
         {
+          "id": "ozon-tech",
           "name": "Ozon Tech",
           "unit": "Commerce",
           "role": "Lead DevOps Engineer",
@@ -124,6 +127,7 @@
           "kicker": ""
         },
         {
+          "id": "aqua-security",
           "name": "Aqua Security",
           "unit": "Cloud security",
           "role": "Senior SRE (Core)",
@@ -134,6 +138,7 @@
           "kicker": ""
         },
         {
+          "id": "forkjoin",
           "name": "ForkJoin",
           "unit": "Consultancy",
           "role": "Collaboration",
@@ -144,6 +149,7 @@
           "kicker": "Visitor"
         },
         {
+          "id": "banank",
           "name": "Banank",
           "unit": "Digital banking",
           "role": "Staff Engineer",
@@ -219,7 +225,39 @@
       "headline": ["Tell me what", "you’re building."],
       "description": "For independent project work or a platform engineering role, send me a short note about the product and where you need help.",
       "email": "mr.chelyshkin@icloud.com",
-      "hint": "tear one off: it copies the address"
+      "hint": "tear one off: it copies the address",
+      "printer": {
+        "templates": [
+          { "id": "one-page", "label": "One page" },
+          { "id": "classic", "label": "Classic" }
+        ],
+        "roles": [
+          {
+            "id": "platform",
+            "label": "Platform",
+            "line": "Platforms teams ship on",
+            "leads": ["banank", "vk", "ozon-tech"]
+          },
+          {
+            "id": "sre",
+            "label": "SRE",
+            "line": "Keeps the work running",
+            "leads": ["aqua-security", "vk", "banank"]
+          },
+          {
+            "id": "devops",
+            "label": "DevOps",
+            "line": "Releases nobody babysits",
+            "leads": ["ozon-tech", "vk", "forkjoin"]
+          }
+        ],
+        "hint": "tear it off",
+        "note": "it's in your downloads",
+        "jam": {
+          "title": "Paper jam",
+          "line": "The CV got stuck on its way here. Press print again."
+        }
+      }
     }
   }
 }

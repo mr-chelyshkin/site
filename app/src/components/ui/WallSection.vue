@@ -3,11 +3,6 @@ import { useId, type VNode } from 'vue'
 import SprayText from '@/components/ui/SprayText.vue'
 import { useReveal } from '@/composables/useReveal'
 
-/**
- * A stretch of the wall: the anchor, the stenciled section number and the
- * paste-in of its sheets the first time it comes into view. The default slot
- * receives `titleId` for the heading that names the section.
- */
 withDefaults(
   defineProps<{
     id: string

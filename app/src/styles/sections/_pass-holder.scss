@@ -1,9 +1,6 @@
 @use '../tools';
 
 @layer sections {
-  /* A photo ID in a rigid holder of clear, glossy plastic, with a slot for
-     the clip at the top and a thumb notch at the bottom. The holder grows
-     with its card. */
   .pass-holder {
     display: flex;
     flex-direction: column;
@@ -23,9 +20,6 @@
       var(--shadow-offset) 22px rgb(0 0 0 / 55%);
   }
 
-  /* A steel strap clip, down into the slot. Its place is mirrored in
-     pass-kinds.ts, where the holder's `tie` ties the live cord on just under
-     the clip's top, hidden behind it. */
   .pass-holder__clip {
     position: absolute;
     top: -18px;
@@ -40,7 +34,6 @@
       inset 0 1px 0 rgb(255 255 255 / 60%),
       0 2px 3px rgb(0 0 0 / 55%);
 
-    /* The clip's slot. */
     &::after {
       content: '';
       position: absolute;
@@ -55,7 +48,6 @@
 
   .pass-holder__slot {
     position: absolute;
-    /* Its middle is the pivot, mirrored in pass-kinds.ts as the holder's `slot`. */
     top: 9px;
     left: 50%;
     width: 46px;
@@ -81,7 +73,6 @@
       inset 0 3px 3px rgb(0 0 0 / 18%);
   }
 
-  /* The printed card in the holder, its ink band bled to the edges. */
   .pass-holder__card {
     position: relative;
     display: grid;
@@ -112,7 +103,6 @@
     text-transform: uppercase;
   }
 
-  /* The mark, and the name under it, as the bank's own lockup has it. */
   .pass-holder__brand {
     display: flex;
     flex-direction: column;
@@ -131,8 +121,6 @@
     color: #1d2022;
   }
 
-  /* A security hologram on the mark: a foil seal whose colors shift as the
-     pass turns. Live, script turns `--holo`; at rest it is 0. */
   .pass-holder__holo {
     position: absolute;
     right: -5px;

@@ -2,7 +2,6 @@
 import { computed } from 'vue'
 
 const props = defineProps<{
-  /** File name in `assets/qr/`, from `scripts/qr.swift`. */
   code: string
   href: string
   label: string
@@ -21,8 +20,6 @@ const src = computed(() => {
 </script>
 
 <template>
-  <!-- A scan target for a phone. Keyboards and screen readers use the links
-       printed on the flyer, so the sticker stays out of their way. -->
   <a
     class="c-qr"
     :href="href"

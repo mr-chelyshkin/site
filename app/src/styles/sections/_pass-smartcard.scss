@@ -1,8 +1,4 @@
 @layer sections {
-  /* A clear polycarbonate smart card on a vinyl strap through its slot. The
-     copper antenna and the chip show through, and so does the wall behind,
-     blurred. The print keeps inside the antenna's innermost turn, about 25px
-     in. The card grows with its text. */
   .pass-smartcard {
     display: flex;
     flex-direction: column;
@@ -21,8 +17,6 @@
       var(--shadow-offset) 18px rgb(0 0 0 / 38%);
   }
 
-  /* A clear vinyl strap with a snap, and the ring the cord ties to at its top,
-     mirrored in pass-kinds.ts as the smart card's `tie`. */
   .pass-smartcard__strap {
     position: absolute;
     top: -27px;
@@ -42,7 +36,6 @@
       inset 0 0 0 1px rgb(255 255 255 / 35%),
       0 1px 2px rgb(0 0 0 / 35%);
 
-    /* The snap. */
     &::before {
       content: '';
       position: absolute;
@@ -55,7 +48,6 @@
       box-shadow: 0 1px 1px rgb(0 0 0 / 50%);
     }
 
-    /* The ring. */
     &::after {
       content: '';
       position: absolute;
@@ -80,7 +72,6 @@
 
   .pass-smartcard__slot {
     position: absolute;
-    /* The pivot is in it, mirrored in pass-kinds.ts as the smart card's `slot`. */
     top: 9px;
     left: 50%;
     width: 30px;
@@ -91,7 +82,6 @@
     box-shadow: inset 0 0 0 1px rgb(255 255 255 / 30%);
   }
 
-  /* The print, over the antenna. */
   .pass-smartcard__band,
   .pass-smartcard__mark,
   .pass-smartcard__facts,
@@ -109,7 +99,6 @@
     text-transform: uppercase;
   }
 
-  /* The mark across the top, then the facts under it. */
   .pass-smartcard__mark {
     --mark-at: left center;
 
@@ -119,8 +108,6 @@
     color: rgb(246 250 251 / 92%);
   }
 
-  /* The name and the unit side by side, each as wide as its words need and
-     wrapping only between them; the role and the dates a line each. */
   .pass-smartcard__facts {
     display: grid;
     grid-template-columns: repeat(2, auto);
@@ -143,7 +130,6 @@
     opacity: 0.85;
   }
 
-  /* The frequency printed in the corner. */
   .pass-smartcard__foot {
     display: flex;
     justify-content: flex-end;

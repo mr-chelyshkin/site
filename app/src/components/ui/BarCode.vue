@@ -2,10 +2,6 @@
 import { computed } from 'vue'
 import { seeded } from '@/utils/seeded'
 
-/**
- * Decorative bars, the same for the same seed. The wrapper takes whatever box
- * the caller gives it and the bars stretch to fill it.
- */
 const props = withDefaults(defineProps<{ seed: string; vertical?: boolean }>(), { vertical: false })
 
 const LENGTH = 120

@@ -1,8 +1,6 @@
 @use '../tools';
 
 @layer sections {
-  /* A visitor's label, thermal-printed, in a soft vinyl sleeve on a bulldog
-     clip. The sleeve grows with its label. */
   .pass-visitor {
     display: flex;
     min-height: 178px;
@@ -14,7 +12,6 @@
       inset 0 1px 0 rgb(255 255 255 / 40%),
       var(--shadow-offset) 18px rgb(0 0 0 / 45%);
 
-    /* The sleeve's welded lip. */
     &::before {
       content: '';
       position: absolute;
@@ -27,8 +24,6 @@
     }
   }
 
-  /* A plastic bulldog clip with a wire loop for the ribbon; the loop is where
-     the ribbon ties on, mirrored in pass-kinds.ts as the visitor's `tie`. */
   .pass-visitor__clip {
     position: absolute;
     top: -13px;
@@ -43,7 +38,6 @@
       inset 0 1px 0 rgb(255 255 255 / 20%),
       0 2px 3px rgb(0 0 0 / 55%);
 
-    /* The wire loop. */
     &::before {
       content: '';
       position: absolute;
@@ -56,8 +50,6 @@
       border-radius: 6px 6px 0 0;
     }
 
-    /* A ridge across the jaws, where they grip: the pivot, 6px into the
-       sleeve, mirrored in pass-kinds.ts as the visitor's `slot`. */
     &::after {
       content: '';
       position: absolute;
@@ -70,8 +62,6 @@
     }
   }
 
-  /* The label: the title across the top, then the mark and the lines, then
-     the footer. */
   .pass-visitor__label {
     position: relative;
     display: grid;
@@ -84,7 +74,6 @@
     background: tools.$paper-grain, linear-gradient(#f5f4f0, #ebe9e2);
     color: #2c2824;
     box-shadow: 0 0.5px 1px rgb(0 0 0 / 30%);
-    /* Thermal print: warm, slightly faded black. */
     text-shadow: 0 0 0.4px currentColor;
   }
 
@@ -119,7 +108,6 @@
     opacity: 0.85;
   }
 
-  /* First in the source, shown under the title, beside the mark. */
   .pass-visitor__lines {
     display: flex;
     flex-direction: column;
@@ -143,7 +131,6 @@
     overflow-wrap: anywhere;
   }
 
-  /* After the name in the source, shown over it. */
   .pass-visitor__host {
     order: -1;
   }

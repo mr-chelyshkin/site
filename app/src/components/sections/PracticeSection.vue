@@ -8,8 +8,6 @@ import type { HomeContent } from '@/contents'
 
 defineProps<{ content: HomeContent['practice'] }>()
 
-// From this sheet width the drawing is laid out as on paper, callouts beside
-// it; below it everything flows in one column.
 const WIDE_SHEET = 880
 
 const drawing = ref<HTMLElement | null>(null)

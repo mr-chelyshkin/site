@@ -3,49 +3,25 @@ import { computed, type VNode } from 'vue'
 import { seeded } from '@/utils/seeded'
 import { tornClipPath, type Edge } from '@/utils/torn'
 
-// Along the top, or at the bottom corners too where a big sheet needs holding down.
 type TapeAt = 'top-left' | 'top' | 'top-right' | 'bottom-left' | 'bottom-right'
-/** Clear office tape as a camera sees it, or tape as a pen draws it. */
 type TapeKind = 'real' | 'drawn'
 type Stock = 'paper' | 'white' | 'cyan' | 'ink' | 'grid'
 type Fold = 'none' | 'vertical' | 'horizontal' | 'both'
 
-/**
- * Paper pasted to the wall. The wrapper carries the tilt and the shadow; the
- * paper inside is clipped to its torn outline; tape sits over the edges. The
- * `over` slot holds things stuck on top, such as a sticker, outside the clip.
- * The `foot` slot hangs from the bottom edge, outside the clip too, so tear-off
- * tabs that are gone leave a gap to the wall and a torn one falls past the edge;
- * don't tear the bottom edge of a sheet that has a foot.
- */
 const props = withDefaults(
   defineProps<{
-    /** Keeps the outline and the tape the same on every load. */
     seed: string
     as?: string
     stock?: Stock
     torn?: readonly Edge[]
     tape?: readonly TapeAt[]
-    /** Which tape holds it up; by default the seed picks, so sheets differ. */
     tapeKind?: TapeKind
-    /** Handled paper: folded, a little crumpled, its edges yellowed, its corners rubbed. */
     worn?: boolean
-    /**
-     * Which way a worn sheet was folded, if at all. Taped at the top, the paper stands off
-     * the wall where the fold leaves it free: below a horizontal fold, at the
-     * sides of a vertical one.
-     */
     fold?: Fold
-    /** Rotation in degrees; small screens use less of it. */
     tilt?: number
-    /** Place in the section's paste-in sequence. */
     order?: number
-    /**
-     * Its content moves, as an animated drawing does: the shadow is a layer of
-     * its own under the paper, so a repaint inside doesn't blur the whole sheet
-     * again, and real tape keeps its film without the backdrop blur.
-     */
     live?: boolean
+    near?: boolean
   }>(),
   {
     as: 'div',
@@ -57,6 +33,7 @@ const props = withDefaults(
     worn: false,
     fold: 'both',
     live: false,
+    near: false,
   },
 )
 defineSlots<{ default(): VNode[]; foot?(): VNode[]; over?(): VNode[] }>()
@@ -66,8 +43,6 @@ const kind = computed<TapeKind>(
   () => props.tapeKind ?? (seeded(`${props.seed}:tape-kind`)() < 0.5 ? 'real' : 'drawn'),
 )
 
-// A tape's outline, torn by hand: ragged ends a little askew, and long edges
-// that aren't quite straight. In percent of the tape, so it scales with it.
 function tornOutline(rand: () => number) {
   const steps = 9
   const jag = () => rand() * 2.6
@@ -89,8 +64,6 @@ function tornOutline(rand: () => number) {
 const at = (rand: () => number, x0: number, x1: number, y0: number, y1: number) =>
   `${(x0 + rand() * (x1 - x0)).toFixed(1)}% ${(y0 + rand() * (y1 - y0)).toFixed(1)}%`
 
-// What makes a real piece of tape look handled: its own size, a crease, a couple of
-// air bubbles, dust under the glue, and frosting that isn't even.
 function wear(rand: () => number) {
   return {
     '--tape-sx': (0.88 + rand() * 0.26).toFixed(3),
@@ -105,8 +78,6 @@ function wear(rand: () => number) {
   }
 }
 
-// The same outline as a pen draws it, in the 150 × 40 box of the drawing, with a
-// wobble on every point.
 function drawnPath(rand: () => number) {
   const j = (n: number) => (n + (rand() - 0.5) * 2.4).toFixed(1)
   const teeth = (x: number, out: number, ys: number[]) =>
@@ -123,7 +94,6 @@ function drawnPath(rand: () => number) {
   ].join(' ')
 }
 
-// Where the sheet was folded and crumpled, the same on every load.
 const wearStyle = computed(() => {
   const rand = seeded(`${props.seed}:wear`)
   const spot = () => `${(15 + rand() * 70).toFixed(1)}% ${(15 + rand() * 70).toFixed(1)}%`
@@ -161,7 +131,7 @@ const tapes = computed(() => {
   <component
     :is="as"
     class="c-sheet"
-    :class="[`c-sheet--${stock}`, { 'c-sheet--live': live }]"
+    :class="[`c-sheet--${stock}`, { 'c-sheet--live': live, 'c-sheet--near': near }]"
     :style="{ '--tilt': `${tilt}deg`, '--paste-order': order }"
   >
     <span
@@ -171,7 +141,7 @@ const tapes = computed(() => {
       aria-hidden="true"
     />
     <span v-if="live" class="c-sheet__shadow" aria-hidden="true">
-      <span :style="{ clipPath }" />
+      <span class="c-sheet__shadow-shape" :style="{ clipPath }" />
     </span>
     <div class="c-sheet__paper" :style="{ clipPath }">
       <slot />

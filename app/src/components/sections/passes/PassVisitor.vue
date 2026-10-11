@@ -4,16 +4,10 @@ import PassMark from '@/components/sections/passes/PassMark.vue'
 import type { Company } from '@/contents'
 import { validity } from '@/utils/format'
 
-/**
- * A thermal-printed visitor's label in a soft vinyl sleeve, on a bulldog clip,
- * the company's mark printed on.
- */
 const props = defineProps<{ company: Company; number: string; holder: string; nameId: string }>()
 
 const purpose = computed(() => props.company.note.replace(/\.$/, ''))
-// Printed on one line: every space in the name becomes a non-breaking one.
 const guest = computed(() => props.holder.replace(/ /g, '\u00a0'))
-// Six passes share the page, so a filter's id is the pass's own.
 const soft = `${useId()}-soft`
 </script>
 
@@ -21,8 +15,6 @@ const soft = `${useId()}-soft`
   <span class="pass-visitor__clip" aria-hidden="true" />
   <div class="pass__body pass-visitor">
     <div class="pass-visitor__label">
-      <!-- First, so a screen reader meets the company before the rest; the grid
-           still shows the title above it, and "Host" over it. -->
       <div class="pass-visitor__lines">
         <h3 :id="nameId" class="pass-visitor__name">{{ company.name }}</h3>
         <p class="pass-visitor__line pass-visitor__host" aria-hidden="true">Host</p>
@@ -33,13 +25,12 @@ const soft = `${useId()}-soft`
         <span class="pass-visitor__kicker">{{ company.kicker }}</span
         >{{ ' ' }}<small class="pass-visitor__access">Access {{ number }}</small>
       </p>
-      <PassMark class="pass-visitor__mark" :name="company.name" />
+      <PassMark class="pass-visitor__mark" :logo="company.id" />
       <p class="pass-visitor__foot">
         <span>{{ company.role }}</span
         >{{ ' ' }}<span>Valid {{ validity(company.from, company.to) }}</span>
       </p>
     </div>
-    <!-- Soft creases in the vinyl, catching the light. -->
     <svg
       class="pass-visitor__wrinkles"
       viewBox="0 0 206 178"

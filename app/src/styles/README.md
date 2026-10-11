@@ -50,9 +50,9 @@ classes rather than tag names: a variant is a modifier.
 
 `settings/` holds Sass values: the palette and type, which `themes/_site.scss`
 turns into custom properties, and the breakpoints. Components and sections read
-the custom properties, never the settings. Breakpoints are the exception: media
-queries cannot read custom properties, so they stay Sass values, used through
-the mixins below. The textures in `tools/_noise.scss` are Sass values too.
+the custom properties, never the settings. Breakpoints are the exception: they
+stay Sass values, used through the mixins below, because media queries cannot
+read custom properties. The textures in `tools/_noise.scss` are Sass values too.
 
 `themes/_site.scss` groups the tokens:
 
@@ -67,15 +67,15 @@ the mixins below. The textures in `tools/_noise.scss` are Sass values too.
   collage grids; and `--section-space` above each section.
 - `--tilt-scale`: the share of its tilt an object keeps, 1 by default and 0.45
   below `md`. The tilts of sheets, labels, passes and the footer tape are
-  multiplied by it, so a phone shows the same collage, straighter, rather than
+  multiplied by it: a phone shows the same collage, straighter, rather than
   objects moved around.
 
 `tools/_mixins.scss` holds:
 
-- `below($name)` — wraps a block in a `max-width` query just under a breakpoint,
-  so the breakpoint's own width gets the wider layout: 768px is a tablet.
+- `below($name)` — wraps a block in a `max-width` query just under a breakpoint.
+  The breakpoint's own width gets the wider layout: 768px is a tablet.
 - `qr-shown` — where a QR sticker shows: a pointer that hovers, from `md` up. The
-  sticker and the room a flyer keeps for it both use it, so they can't disagree.
+  sticker and the room a flyer keeps for it can't disagree: both use it.
 - `focus-ring` — the shared outline, applied to every `:focus-visible` element
   by the reset.
 - `spray-mask` — paint through a stencil: masks an element with `$spray-mask`.
@@ -87,14 +87,15 @@ desktop; `xxl` only decides where six passes fit on one cable.
 ## Palette and type
 
 The wall is near-black concrete; everything on it is paper, ink or cold cyan.
-There are no warm colors and no brand colors.
+There are no brand colors, and warm ones only in small drawn details: the
+stack's fault light, the printer's amber light, a brass eyelet, yellowed paper.
 
 | Token                 | Use                                                  |
 | --------------------- | ---------------------------------------------------- |
 | `--color-wall`        | the wall                                             |
 | `--color-wall-text`   | text printed on the wall                             |
 | `--color-paper`       | paper stock, sprayed paint, light text on ink        |
-| `--color-paper-white` | white and grid stock, passes, the QR sticker         |
+| `--color-paper-white` | white and grid stock, the QR sticker                 |
 | `--color-ink`         | text on paper, ink stock, labels and the footer tape |
 | `--color-ink-soft`    | secondary text on paper                              |
 | `--color-stock-cyan`  | cyan stock, the statement's marker highlight         |
@@ -115,33 +116,37 @@ Four typefaces, each with one job:
   statement.
 - Chivo Mono (400, 600, 800), `--font-mono` — body copy, kickers, labels and
   facts.
-- Caveat (500), `--font-hand` — the note scrawled under the contact tabs only.
+- Caveat (500), `--font-hand` — the notes scrawled on the contact wall only:
+  under the tabs and beside the CV printer.
 
 All four load from Google Fonts with `display=swap`; `public/404.html` links
-the same stylesheet less Caveat, which it doesn't use. The display stacks fall back to
-condensed system faces, but not width-matched ones, so a slow or blocked font
-reflows the sprayed names.
+the same stylesheet less Caveat, which it doesn't use. The display stacks fall
+back to condensed system faces, but not width-matched ones: a slow or blocked
+font reflows the sprayed names.
 
 ## Textures
 
-`tools/_noise.scss` holds three textures, SVG noise written into `data:` URIs
+`tools/_noise.scss` holds five textures, SVG noise written into `data:` URIs
 (inside them `%` is `%25` and `#` is `%23`):
 
 - `$wall-grain` — gray specks at half opacity, for the concrete. The body
   overlays it (`background-blend-mode: overlay`) on a few patches of light and
-  shade, so it adds texture without lifting the wall's tone. The patches are
-  sized in `vw`, so they stay patches on a tall, narrow page.
+  shade, to add texture without lifting the wall's tone. Sized in `vw`, the
+  patches stay patches on a tall, narrow page.
 - `$paper-grain` — sparse dark specks over a sheet's stock; tear-off tabs and
   passes carry it too.
 - `$spray-mask` — mostly opaque with grainy holes, the mask `spray-mask` puts on
   sprayed paint.
+- `$specks` — light specks, for dark matte plastic and powder-coated steel: a
+  reel's badge and the CV printer's case.
+- `$paper-mottle` — large, soft blotches, for the uneven tone of a worn sheet.
 
-The site's CSP in `tf/cloudfront.tf` has `img-src 'self' data:`, and the `data:`
+The site's CSP in `tf/locals.tf` has `img-src 'self' data:`, and the `data:`
 is load-bearing. Every grain, the spray mask and the statement's hand-drawn
-underline are `data:` URIs, and Vite inlines the smallest images (the pass photo
-and the QR codes) the same way. Without it the textures go, the pass photos and
-QR stickers break, and the sprayed numerals and names vanish: a mask image that
-fails to load hides everything it masks.
+underline are `data:` URIs, and Vite inlines the smallest images (some logo
+masks and the QR codes) the same way. Without it the textures go, those logos
+and the QR stickers break, and the sprayed numerals and names vanish: a mask
+image that fails to load hides everything it masks.
 
 ## Wall objects
 
@@ -151,14 +156,19 @@ site's content. A section's placement class (`.flyer__qr`, `.contact__tabs`)
 positions and sizes an object; the object's own partial owns the rest.
 
 - `PastedSheet`, `.c-sheet` — paper pasted to the wall: a stock (`paper`,
-  `white`, `cyan`, `ink`, or `grid` for millimeter paper), torn edges, tape at
-  `top-left`, `top` or `top-right`, a tilt and a place in the paste-in order.
-  Its `seed` keeps the outline and the tape the same on every load.
+  `white`, `cyan`, `ink`, or `grid` for millimeter paper), torn edges, tape
+  along the top (`top-left`, `top`, `top-right`) or at the bottom corners
+  (`bottom-left`, `bottom-right`), real or drawn (`tapeKind`), a tilt and a
+  place in the paste-in order. `worn` handles the paper, folded as `fold`
+  says or not at all; `live` gives a sheet whose content moves a shadow of its
+  own; `near` stands it nearer than the wall (`.c-sheet--near`): it leans out
+  at its foot, casts a deeper shadow and drifts with the `--drift` its section
+  sets through `useScrollDrift`. Its `seed` keeps the outline and the tape the
+  same on every load.
 - `SprayText`, `.c-spray` — words sprayed through a stencil, in the `stencil` or
   `display` face; `tear` repeats a band of the paint shifted sideways. Callers
   set its size and put `aria-hidden` on it, carrying the meaning in real text.
-- `WallLabel`, `.c-label` — embossed label-maker tape: a link when it has
-  `href`, otherwise a decorative tag.
+- `WallLabel`, `.c-label` — embossed label-maker tape, a decorative tag.
 - `BarCode`, `.c-barcode` — decorative bars from a seed, stretched to fill
   whatever box the caller gives it.
 - `QrSticker`, `.c-qr` — a printed code from `assets/qr/` and its label, shown
@@ -168,10 +178,10 @@ positions and sizes an object; the object's own partial owns the rest.
 - `TearTabs`, `.c-tear-tabs` — the address on vertical tabs. A tab copies it,
   announces the copy politely and tears off; without clipboard access it opens
   the mail client. Only the first intact tab is focusable, and the last one
-  copies but never tears, so the address stays on the wall.
-- `DitherPhoto`, `.c-dither` — a 1-bit render scaled up without smoothing, with
-  bands where the cyan copy slips sideways and one smeared row; `priority` loads
-  it first, for the hero.
+  copies but never tears, to keep the address on the wall.
+- `DitherPhoto`, `.c-dither` — a 1-bit render, scaled up smoothly, as its dots
+  are fine enough to stay crisp, with bands where the cyan copy slips sideways
+  and one smeared row; `priority` loads it first, for the hero.
 - `WallSection`, `.c-wall-section` — a stretch of the wall: the `<section>` with
   its anchor, the big faint sprayed number (`numeralAt` puts it left or right)
   and the paste-in of its sheets. Its slot receives `titleId` for the heading
@@ -184,7 +194,8 @@ torn outline. `foot` hangs from the bottom edge outside the clip, for tear-off
 tabs: a missing tab leaves a gap to the wall and a torn one falls past the edge.
 A sheet with a foot keeps its bottom edge untorn, as the tabs hang from it.
 `over` holds things stuck on top, also outside the clip, such as a QR sticker.
-The wrapper carries the tilt and a `drop-shadow` that follows the torn outline.
+The wrapper carries the tilt and a `drop-shadow` that follows the torn outline;
+a live sheet draws its shadow on a layer under the paper instead.
 The stock modifiers set `--sheet-stock` and `--sheet-ink`, which the tabs in the
 foot read to cut themselves from the same stock.
 
@@ -196,31 +207,33 @@ their own. A component that uses one draws the whole control.
 A section partial contains only what makes that section different:
 
 - `_hero.scss` — the dithered poster on ink stock, the first name sprayed beside
-  it with two labels, the notice on cyan stock with tear-off tabs, and the
-  surname sprayed across the poster's lower edge. The notice runs down into a
-  flexible last row, so longer copy never pushes the surname off the poster. The
+  it, the notice on cyan stock with tear-off tabs, and the surname sprayed
+  across the poster's lower edge. The notice stands nearer than the wall
+  (`near`), rising off its place as the page scrolls, and runs down into a
+  flexible last row: longer copy never pushes the surname off the poster. The
   hero isolates its stacking order. Its `h1` is visually hidden, as the sprayed
   names are decorative.
 - `_practice.scss` — the drawing sheet on millimeter paper: the kicker naming
-  the section, the statement with its marked words, the exploded stack, the
-  figure caption and the title block, plus two labels on the wall. Its three
-  layouts are under [Responsive](#responsive).
+  the section, the statement with its marked words and the exploded stack. Its
+  three layouts are under [Responsive](#responsive).
 - `_stack.scss` — `ExplodedStack`: an isometric drawing of three plates, one per
   layer, and their numbered callouts.
 - `_commerce.scss` — the sprayed heading and the cable the passes hang from.
-  Each grid cell draws its own stretch of cable and a hook, so the cable follows
-  the grid at any number of columns. Each hook also holds a wire, an SVG with a
+  The cable follows the grid at any number of columns: each grid cell draws its
+  own stretch of cable and a hook. Each hook also holds a wire, an SVG with a
   polyline for its stretch of cable and a path for its pass's cord, which
   `usePassPhysics` draws while the passes are live; `commerce__cable--live` then
   hides the CSS stretches and lets each ring ride the cable down.
-- `_pass.scss` — `AccessPass`: a visitor's pass with the dithered face, the
-  company, unit, role, one line of what was built and a barcode. Each pass hangs
-  at its own seeded angle and drop (`--tilt`, `--drop`) and pivots on its hook.
-  Passes are focusable, so a keyboard can take one in hand. Under
-  `commerce__cable--live`, script moves each pass about the slot its clip goes
-  through, and the stylesheet's tilt, hover lift and cord stand down. The clip
-  and the card sit in `pass__twist`, which turns round the cord when the pass is
-  poked, and `pass__shade` darkens the edge a twist turns from the light.
+- `_pass.scss` — `AccessPass`: a company's pass, one of six kinds drawn in
+  `passes/` and their `_pass-*.scss` partials, carrying the company's logo
+  (`PassMark`), the role, the months it was valid and one line of what was
+  built. Each pass hangs at its own seeded angle and drop (`--tilt`, `--drop`)
+  and pivots on its hook. Passes are focusable: a keyboard can take one in hand.
+  Under `commerce__cable--live`, script moves each pass about the slot its clip
+  goes through, and the stylesheet's tilt, hover lift and cord stand down. The
+  clip and the card sit in `pass__twist`, which turns round the cord when the
+  pass is poked, and `pass__shade` darkens the edge a twist turns from the
+  light.
 - `_open-source.scss` — the sprayed heading and the board, which places the
   first three flyers at different widths and heights; any further flyer takes a
   third of the board, or half below `xl`.
@@ -229,29 +242,35 @@ A section partial contains only what makes that section different:
   into `--fit`, and the name's size is `--fit` times the flyer's width, up to a
   cap. Paper flyers carry a vertical barcode; where the QR sticker shows, the
   flyer keeps room for it.
-- `_contact.scss` — the last notice: the headline, the address in stencil and
-  tear-off tabs; a hint pointing up at the tabs; the photo booth strip, four
-  frames cropped from the poster render, one a cold negative; and the profile
-  labels.
+- `_contact.scss` — the last notice, nearer than the wall (`near`): the
+  headline, the profile links in stencil and the tear-off tabs; the hint
+  scrawled under them, with its drawn arrow; and where the CV printer stands,
+  beside the notice from `xl` up and under it below.
+- `_printer.scss` — `CvPrinter`: a receipt printer bolted to the wall, its case's
+  top and side drawn in the component; template and role keys, the print button,
+  and the receipt that feeds out in steps and tears off into the room the
+  printer's own padding keeps under it; a job that fails prints a paper jam
+  and turns the light red, and Turnstile's widget, when Cloudflare wants a
+  tick, waits at the foot of the window (`.printer__check`).
 
 ## Motion and interaction
 
 Transitions take their durations from `--motion-fast` and `--motion-base`. Both
-drop to `0ms` under `prefers-reduced-motion: reduce`, so a transition needs no
+drop to `0ms` under `prefers-reduced-motion: reduce`. A transition needs no
 reduced-motion rule of its own. Animations, and moves that would still jump at
 `0ms`, sit inside `prefers-reduced-motion: no-preference`.
 
 Tilts and moves use the standalone `rotate`, `translate` and `scale` properties
-rather than `transform`, so an animation or a hover that moves an object keeps
-its tilt. Live passes are the exception: script draws each one with an inline
-`transform`, and their `rotate` and `translate` are `none` while it does.
+rather than `transform`, letting an animation or a hover that moves an object
+keep its tilt. Live passes are the exception: script draws each one with an
+inline `transform`, and their `rotate` and `translate` are `none` while it does.
 
 - Paste-in (`utilities/_paste.scss`). `WallSection` carries `u-paste`, and
   `useReveal` adds `u-paste--shown` the first time the section comes into view.
   Each sheet in it then settles onto the wall from slightly larger and lower,
-  staggered by its `order`. Only `opacity`, `scale` and `translate` move, so
-  the tilt stays, and the `backwards` fill leaves nothing applied once it ends.
-  Sheets are hidden only before the reveal and only on screen, so a printed page
+  staggered by its `order`. Only `opacity`, `scale` and `translate` move, never
+  the tilt, and the `backwards` fill leaves nothing applied once it ends.
+  Sheets are hidden only before the reveal and only on screen. A printed page
   shows them all. While anything in the section holds focus, its sheets stay
   visible: `opacity: 1 !important` outranks the running animation without
   restarting it.
@@ -271,7 +290,7 @@ its tilt. Live passes are the exception: script draws each one with an inline
   a strip behind a hovered card keeps the pointer on it as it lifts. It applies
   only without the physics, where motion is allowed but the passes aren't live
   (the `commerce__cable--live` rules cancel it), and its hover lift only where a
-  pointer can hover, so a tap leaves no pass lifted.
+  pointer can hover, as a tap would leave a pass lifted.
 - Tear-off. A torn tab falls, turns and fades. If it had focus, focus moves to
   the next intact tab, and the copy is announced after that move, as moving
   focus can cancel speech already queued.
@@ -293,9 +312,9 @@ tilts shrink through `--tilt-scale` rather than objects being moved.
   the contact section re-span their grids.
 - `tools.below(md)` is the phone: one column, less tilt, the passes on one
   cable that scrolls sideways, and no QR stickers. Focusing a pass centers it by
-  scrolling the cable, never the page, so a tap doesn't move the page.
-- Nothing scrolls the page sideways: `.o-app-layout` clips horizontal overflow,
-  so numerals and sprayed names may run off the edge.
+  scrolling the cable, never the page: a tap doesn't move the page.
+- Nothing scrolls the page sideways: `.o-app-layout` clips horizontal overflow.
+  Numerals and sprayed names may run off the edge.
 
 The drawing has three layouts, chosen by the width of its sheet rather than the
 viewport:
@@ -303,8 +322,8 @@ viewport:
 - From 880px of sheet width, the wide sheet, laid out as on paper: a grid in
   flow in the proportions of the full-size sheet, type in container units
   (`cqw`), and leader lines from each plate to its callout. The drawing spans
-  the whole sheet and paints over the text: only its plates take the pointer, so
-  the text stays selectable, and the drawing has to keep out of the text
+  the whole sheet and paints over the text: only its plates take the pointer,
+  leaving the text selectable, and the drawing has to keep out of the text
   columns. `aspect-ratio` is only a minimum: longer copy, a fallback font or
   WCAG text spacing make the sheet taller instead of overlapping. The switch is
   `WIDE_SHEET` in `PracticeSection.vue`, measured by `useElementWidth`, because
@@ -315,24 +334,25 @@ viewport:
 - Below that, it sits above them.
 
 Both narrower layouts number the plates with balloons instead of leader lines
-and cap the drawing at `min(30rem, 62svh)`, so it shows whole on a landscape
+and cap the drawing at `min(30rem, 62svh)` to show it whole on a landscape
 phone.
 
 ## Conventions
 
 - Lists of copy (lines, labels, kicker halves, points, specs) are keyed by
-  index, so two equal strings in `site.json` never clash; records with an
-  identity of their own (a company, a project, a link, a layer) are keyed by it.
+  index, which keeps two equal strings in `site.json` from clashing; records
+  with an identity of their own (a company, a project, a link, a layer) are
+  keyed by it.
 - A styled content list carries `role="list"`: the reset sets
   `list-style: none` on every list with a class, and Safari drops list
   semantics under it.
 - A label that is read but not seen goes in `.u-visually-hidden`, written in
-  sentence case. Headings are uppercase by default, and uppercase can make a
-  screen reader spell a word out, so the utility sets `text-transform: none`.
+  sentence case. The utility sets `text-transform: none`, as headings are
+  uppercase by default and uppercase can make a screen reader spell a word out.
 - Decoration stays out of the accessibility tree: sprayed text, numerals, tape,
   barcodes and the QR sticker are `aria-hidden`, and a drawn character such as
   the header's slash gets empty alternative text (`content: '/' / ''`).
-- Lines set as separate blocks keep a real space between them, so copied text
+- Lines set as separate blocks keep a real space between them: copied text
   and reader modes don't run them together.
 - Comments say why: the constraint, measurement or browser behavior behind a
   value, not what the line does.
@@ -343,7 +363,7 @@ A few values are written out where the app's CSS can't reach; change them
 together with their source.
 
 `public/404.html` is one self-contained document: CloudFront serves it directly
-at any missing URL, so it has no app bundle and can't read the app's CSS or
+at any missing URL. It has no app bundle and can't read the app's CSS or
 `site.json`. Its opening comment lists the sources it copies by hand:
 
 - from `settings/`: the palette, the font stacks and `md`, written out as
@@ -359,7 +379,7 @@ at any missing URL, so it has no app bundle and can't read the app's CSS or
 `themes/_site.scss`, `tools/_noise.scss`, `objects/_wall.scss`,
 `components/_kicker.scss` and `_site-header.scss` point back to it. The other
 sources (`tools/_mixins.scss`, `generic/`, `components/_sheet.scss`,
-`_spray.scss` and `sections/_flyer.scss`) don't, so check the 404 when changing
+`_spray.scss` and `sections/_flyer.scss`) don't. Check the 404 when changing
 them.
 
 `app/src/utils/pass-physics.ts` draws the live passes, and a pass at rest
@@ -383,5 +403,8 @@ Elsewhere:
 
 - `theme-color` in `index.html` and `public/404.html` is `$color-wall`.
 - `scripts/optimize-images.js` paints the cyan render in `$color-cyan`.
+- `CvPrinter.vue` draws the case's top and side for `.printer__body`'s 224 × 262
+  and 9px corners, and its `FEED_MS` and `FALL_MS` are the receipt's feed and
+  fall in `sections/_printer.scss`.
 - The statement's underline in `sections/_practice.scss` is drawn in
   `$color-ink`, written into its `data:` URI.

@@ -7,15 +7,11 @@ import type { Project } from '@/contents'
 
 const props = defineProps<{
   project: Project
-  /** Place on the board: picks the tilt and the torn edge, and the paste-in order. */
   order: number
 }>()
 
 const STOCKS = ['paper', 'cyan', 'ink'] as const
 const TILTS = [-1.6, 2.3, -0.8]
-// Advance widths of Big Shoulders Display 900 capitals, digits and common
-// punctuation in em, as measured in Chrome; anything else counts as a
-// generous 0.55em, so an unknown character errs small.
 const ADVANCES: Partial<Record<string, number>> = {
   A: 0.478,
   B: 0.472,
@@ -63,15 +59,12 @@ const ADVANCES: Partial<Record<string, number>> = {
 
 const stock = computed(() => STOCKS.find((s) => s === props.project.stock) ?? 'paper')
 const tilt = computed(() => TILTS[props.order % TILTS.length] ?? 0)
-// A sticker needs a code and a first link for it to open.
 const sticker = computed(() => {
   const link = props.project.links[0]
   return props.project.qr && link
     ? { code: props.project.qr, href: link.href, label: link.label }
     : null
 })
-// The name fills the sheet's width: its font size is `fit` times that width.
-// The 0.97 leaves room for kerning.
 const fit = computed(() => {
   const em = [...props.project.name.toUpperCase()].reduce(
     (sum, c) => sum + (ADVANCES[c] ?? 0.55),
@@ -109,7 +102,6 @@ const fit = computed(() => {
           <dd>{{ spec.value }}</dd>
         </template>
       </dl>
-      <!-- The role, because Safari drops list semantics under `list-style: none`. -->
       <ul v-if="project.links.length" class="flyer__links" role="list">
         <li v-for="link in project.links" :key="link.href">
           <a

@@ -1,21 +1,14 @@
 <script setup lang="ts">
+import PassFacts from '@/components/sections/passes/PassFacts.vue'
 import PassMark from '@/components/sections/passes/PassMark.vue'
 import type { Company } from '@/contents'
-import { validity } from '@/utils/format'
 
-/**
- * A clear contactless smart card, its antenna and chip showing, on a vinyl
- * strap with a snap: the company's mark printed on, the facts in a row
- * under it.
- */
 defineProps<{ company: Company; number: string; holder: string; nameId: string }>()
 </script>
 
 <template>
   <span class="pass-smartcard__strap" aria-hidden="true" />
   <div class="pass__body pass-smartcard">
-    <!-- The antenna: five turns of copper round the card and the bridge to its
-         chip, stretched to the card's size. -->
     <svg
       class="pass-smartcard__coil"
       viewBox="0 0 168 290"
@@ -46,31 +39,12 @@ defineProps<{ company: Company; number: string; holder: string; nameId: string }
       </g>
     </svg>
     <span class="pass-smartcard__slot" aria-hidden="true" />
-    <!-- Read, not shown: the mark says it. -->
     <h3 :id="nameId" class="u-visually-hidden">{{ company.name }}</h3>
     <p class="pass-smartcard__band" aria-hidden="true">
       <span>Access</span>{{ ' ' }}<span>{{ number }}</span>
     </p>
-    <PassMark class="pass-smartcard__mark" :name="company.name" />
-    <dl class="pass__facts pass-smartcard__facts">
-      <!-- The same holder on every pass: printed, not read out six times. -->
-      <div class="pass__fact" aria-hidden="true">
-        <dt class="pass__term">Name</dt>
-        <dd class="pass__value">{{ holder }}</dd>
-      </div>
-      <div class="pass__fact">
-        <dt class="pass__term">Unit</dt>
-        <dd class="pass__value">{{ company.unit }}</dd>
-      </div>
-      <div class="pass__fact">
-        <dt class="pass__term">Role</dt>
-        <dd class="pass__value">{{ company.role }}</dd>
-      </div>
-      <div class="pass__fact">
-        <dt class="pass__term">Valid</dt>
-        <dd class="pass__value">{{ validity(company.from, company.to) }}</dd>
-      </div>
-    </dl>
+    <PassMark class="pass-smartcard__mark" :logo="company.id" />
+    <PassFacts class="pass-smartcard__facts" :company="company" :holder="holder" />
     <p class="pass-smartcard__note">{{ company.note }}</p>
     <p class="pass-smartcard__foot" aria-hidden="true">
       <span>13.56 MHz</span>

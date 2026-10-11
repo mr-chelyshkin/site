@@ -1,22 +1,13 @@
 @layer sections {
-  /* A fault, wherever the drawing shows one: the struck-out node and its
-     server's light. */
   .stack {
     --stack-fault: #e5484d;
   }
 
-  /* The exploded drawing and its callouts. On the wide sheet the stack is the
-     callout column of the sheet's grid, the drawing lies behind the whole
-     sheet, and type is sized in the sheet's container units (`cqw`). */
   .stack--wide {
-    /* Callouts start 104 of the sheet's 1184 units apart, as drawn; a longer
-       one pushes the next down, keeping at least the gap. */
     --sheet-callout-pitch: 8.784cqw;
     --sheet-callout-gap: 1.2cqw;
   }
 
-  /* On a tablet the drawing and its callouts sit side by side, so the drawing
-     is not as tall as the sheet is wide. */
   @container practice-drawing (min-width: 600px) {
     .stack:not(.stack--wide) {
       display: grid;
@@ -30,23 +21,15 @@
     }
   }
 
-  /* The drawing: a layer for each plate and one for the leaders, stacked in
-     one box, which takes the view's proportions out of the wide sheet (set
-     inline). */
   .stack__drawing {
     position: relative;
     width: 100%;
 
-    /* Out of the wide sheet the drawing stays within about three quarters of
-       a landscape phone's height, so it shows whole, and within 30rem. */
     .stack:not(.stack--wide) & {
       max-width: min(30rem, 62svh);
       margin-inline: auto;
     }
 
-    /* Over the whole sheet, text included: it paints above the in-flow text,
-       and only the plates take the pointer, so the text stays selectable. That
-       is safe only while the drawing keeps out of the text columns. */
     .stack--wide & {
       position: absolute;
       inset: 0;
@@ -55,8 +38,6 @@
     }
   }
 
-  /* The drawing's own box at the view's proportions, unpainted: scroll
-     progress follows its middle. */
   .stack__frame {
     position: absolute;
     top: 0;
@@ -73,14 +54,11 @@
     overflow: visible;
     pointer-events: none;
 
-    /* Lines keep their weight however far the drawing scales. */
     * {
       vector-effect: non-scaling-stroke;
     }
   }
 
-  /* A plate's layer slides into place on the compositor while the stack
-     explodes (its transform set inline), without a repaint. */
   .stack__layer--plate {
     will-change: transform;
   }
@@ -89,7 +67,6 @@
     pointer-events: auto;
   }
 
-  /* An opaque ground under the hatch, so a side face hides what is behind it. */
   .stack__hatch-ground {
     fill: var(--color-paper-white);
   }
@@ -127,14 +104,6 @@
     }
   }
 
-  /* A photograph printed on a plate: dark dots only, in a thin border. */
-  .stack__print-edge {
-    fill: none;
-    stroke: var(--color-ink);
-    stroke-width: 0.8;
-  }
-
-  /* What stands on a plate: boxes drawn as the plates are, a little lighter. */
   .stack__box-face {
     stroke: var(--color-ink);
     stroke-width: 1;
@@ -153,7 +122,6 @@
     }
   }
 
-  /* Work just placed on a node, lit until it settles. */
   .stack__pod--fresh {
     .stack__box-face--top {
       fill: var(--color-cyan-pale);
@@ -190,7 +158,7 @@
 
   .stack__label {
     fill: var(--color-ink);
-    font: 700 7px var(--font-mono);
+    font: 800 7px var(--font-mono);
     letter-spacing: 0.08em;
   }
 
@@ -214,24 +182,17 @@
     }
   }
 
-  /* The server chassis (StackMetal), tinted under the ink as a technical
-     illustration is: each part lit from above, its top lightest, its front
-     darker, its right side darkest. The tones follow the front photo's, dark
-     and a little warm, so the drawn steel and the photographed bezels read as
-     one machine. */
   .stack__solid {
     stroke: var(--color-ink);
     stroke-width: 0.7;
     stroke-linejoin: round;
 
-    /* The outer shell: the lid. */
     &--shell {
       --lit: #3f3a34;
       --mid: #2a2622;
       --shade: #1f1c19;
     }
 
-    /* Inner sheet steel: the drive cage. */
     &--steel {
       --lit: #5b564e;
       --mid: #48443d;
@@ -250,7 +211,6 @@
       --shade: #2c4436;
     }
 
-    /* A memory stick: the edge on top, the board and its chips on the side. */
     &--dimm {
       --lit: #23201d;
       --mid: #1e1c19;
@@ -269,7 +229,6 @@
       --shade: #78746d;
     }
 
-    /* The laptop (StackLaptop): bead-blasted aluminium, smooth and pale. */
     &--aluminum {
       --lit: #e3e5e6;
       --mid: #c9cdcf;
@@ -287,12 +246,10 @@
     }
   }
 
-  /* A face lit by a gradient, which its `fill` names; the outline is the part's. */
   .stack__painted {
     stroke-width: 0.7;
   }
 
-  /* The polished cut along an aluminium edge. */
   .stack__chamfer {
     fill: none;
     stroke: #fff;
@@ -306,14 +263,10 @@
     stroke: none;
   }
 
-  /* The screen: black glass round a terminal, and the light across it. */
   .stack__bezel {
     fill: #0d0e10;
   }
 
-  /* The desktop: a translucent menu bar with the camera's notch in it, and
-     the terminal's window, its shadow stacked from faint layers, which no
-     blur filter has to redo. */
   .stack__menubar {
     fill: rgb(16 18 22 / 62%);
     stroke: none;
@@ -322,10 +275,10 @@
   .stack__menu-text {
     fill: #e8ecef;
     stroke: none;
-    font: 500 3.6px var(--font-mono);
+    font: 400 3.6px var(--font-mono);
 
     &--app {
-      font-weight: 700;
+      font-weight: 800;
     }
 
     &--clock {
@@ -379,7 +332,7 @@
   .stack__term {
     fill: #c5ced6;
     stroke: none;
-    font: 500 5.6px var(--font-mono);
+    font: 400 5.6px var(--font-mono);
 
     &--title {
       font-size: 4.4px;
@@ -625,7 +578,7 @@
   /* A server's name on its sticker, as a label printer prints it. */
   .stack__sticker {
     fill: #161514;
-    font: 700 7px var(--font-mono);
+    font: 800 7px var(--font-mono);
     letter-spacing: 0.06em;
     text-anchor: middle;
   }
@@ -746,8 +699,8 @@
     line-height: 1;
   }
 
-  /* Roomy enough for the figure's whole line, so it centres on its own; a
-     smaller circle let the line overflow and pushed the figure low. */
+  /* The figure centers on its own in a circle roomy enough for its whole line;
+     a smaller circle let the line overflow and pushed the figure low. */
   .stack__number {
     display: inline-grid;
     flex: none;

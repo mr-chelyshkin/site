@@ -9,8 +9,6 @@ const router = createRouter({
       name: 'home',
       component: HomeView,
     },
-    // Unknown client-side paths show the home page; CloudFront serves
-    // `public/404.html` for missing files.
     {
       path: '/:pathMatch(.*)*',
       component: HomeView,

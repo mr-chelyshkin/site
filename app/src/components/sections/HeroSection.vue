@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import DitherPhoto from '@/components/ui/DitherPhoto.vue'
 import PastedSheet from '@/components/ui/PastedSheet.vue'
 import SprayText from '@/components/ui/SprayText.vue'
@@ -13,21 +13,21 @@ defineProps<{
   copied: string
 }>()
 
-// Where the cyan channel slips, in percent of the photo, kept off the face; the
-// smear stretches row 1020 of the render across its band.
 const bands = [
   { at: 9, height: 4.5, shift: -1.2 },
   { at: 64, height: 2.4, shift: 1.6 },
 ]
 const smear = { at: 74, height: 6, row: 1020, shift: -4.2 }
 
-// The notice rises a little faster than the page, nearer than the rest.
-const hero = ref<HTMLElement | null>(null)
-useScrollDrift(hero, 0.08)
+const notice = ref<InstanceType<typeof PastedSheet> | null>(null)
+useScrollDrift(
+  computed(() => notice.value?.$el ?? null),
+  { rate: 0.08 },
+)
 </script>
 
 <template>
-  <section ref="hero" class="hero o-wall" aria-labelledby="hero-title">
+  <section class="hero o-wall" aria-labelledby="hero-title">
     <h1 id="hero-title" class="u-visually-hidden">{{ content.title }}</h1>
 
     <PastedSheet
@@ -53,6 +53,8 @@ useScrollDrift(hero, 0.08)
     <SprayText class="hero__first" :lines="[content.firstName]" aria-hidden="true" />
 
     <PastedSheet
+      ref="notice"
+      near
       class="hero__notice"
       seed="hero-notice"
       stock="cyan"
@@ -70,14 +72,12 @@ useScrollDrift(hero, 0.08)
           </template>
         </p>
         <p class="hero__headline">
-          <!-- The space keeps copied text and reader modes from running the lines together. -->
           <template v-for="(line, i) in content.notice.headline" :key="i">
             <span class="hero__headline-line">{{ line }}</span
             >{{ ' ' }}
           </template>
         </p>
         <p class="hero__discipline">{{ content.notice.discipline }}</p>
-        <!-- The role, because Safari drops list semantics under `list-style: none`. -->
         <ul class="hero__points" role="list">
           <li v-for="(point, i) in content.notice.points" :key="i" class="hero__point">
             {{ point }}
@@ -86,7 +86,13 @@ useScrollDrift(hero, 0.08)
         <p class="hero__note">{{ content.notice.note }}</p>
       </div>
       <template #foot>
-        <TearTabs :email="email" :count="8" :gone="[1, 2, 3, 5, 7]" :copied="copied" />
+        <TearTabs
+          seed="hero-notice"
+          :email="email"
+          :count="8"
+          :gone="[1, 2, 3, 5, 7]"
+          :copied="copied"
+        />
       </template>
     </PastedSheet>
 

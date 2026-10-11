@@ -1,7 +1,4 @@
 @layer components {
-  /* The header row of a sheet: small caps pushed to its two ends. A half that
-     doesn't fit wraps whole onto its own line. `public/404.html` keeps a copy
-     as `.kicker`. */
   .c-kicker {
     display: flex;
     flex-wrap: wrap;

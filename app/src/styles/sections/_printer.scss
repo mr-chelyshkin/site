@@ -1,20 +1,15 @@
 @use '../tools';
 
 @layer sections {
-  /* A receipt printer bolted to the wall (CvPrinter), made for this wall: a
-     box of graphite powder-coated steel, scuffed at the corners, a label-maker
-     tape for a name, industrial keys and a cyan print button, and a serrated
-     tear bar over the slot the receipt feeds out of. While it prints, it buzzes
-     without a sound: the box shivers and the paper comes out in small steps.
-     The room under it is the receipt's. */
   .printer {
+    --receipt-room: 430px;
+
     position: relative;
     width: min(100%, 224px);
     margin-inline: auto;
-    padding-bottom: 430px;
+    padding-bottom: var(--receipt-room);
   }
 
-  /* The power cable, out of the right side and down the wall to a socket. */
   .printer__cable {
     position: absolute;
     top: 0;
@@ -48,7 +43,6 @@
     stroke-width: 1.2;
   }
 
-  /* The socket it runs to: a wall plate and the plug in it. */
   .printer__socket {
     fill: #d9dddd;
     stroke: rgb(0 0 0 / 35%);
@@ -76,7 +70,6 @@
       inset 0 1px 0 rgb(255 255 255 / 18%),
       0 3px 4px rgb(0 0 0 / 55%);
 
-    /* Two screws into the concrete. */
     &::before,
     &::after {
       content: '';
@@ -100,12 +93,10 @@
     }
   }
 
-  /* The case: its front, and the top and right side its depth shows, seen a
-     little from above and the left; the depth's drawing is fixed to the
-     front's 224 × 262. */
   .printer__box {
     position: relative;
     z-index: 1;
+    filter: drop-shadow(0 2px 3px rgb(0 0 0 / 45%)) drop-shadow(0 16px 20px rgb(0 0 0 / 45%));
   }
 
   .printer__depth {
@@ -115,16 +106,6 @@
     width: 240px;
     height: 270px;
     overflow: visible;
-  }
-
-  .printer__top {
-    fill: #4c5458;
-    stroke: rgb(255 255 255 / 10%);
-    stroke-width: 0.6;
-  }
-
-  .printer__side {
-    fill: #191d1f;
   }
 
   .printer__body {
@@ -138,11 +119,8 @@
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 12%),
       inset 0 0 0 1px rgb(255 255 255 / 4%),
-      inset 0 -5px 9px rgb(0 0 0 / 45%),
-      0 2px 4px rgb(0 0 0 / 50%),
-      0 18px 26px rgb(0 0 0 / 60%);
+      inset 0 -5px 9px rgb(0 0 0 / 45%);
 
-    /* Paint worn through at the corners. */
     &::before {
       content: '';
       position: absolute;
@@ -154,13 +132,11 @@
           18px 8px at calc(100% - 6px) calc(100% - 3px),
           rgb(190 200 204 / 30%),
           transparent
-        ),
-        radial-gradient(10px 16px at calc(100% - 2px) 30%, rgb(190 200 204 / 18%), transparent);
+        );
       pointer-events: none;
     }
   }
 
-  /* Where the paper roll's cover meets the case, and the notch to lift it by. */
   .printer__seam {
     position: absolute;
     top: 38px;
@@ -183,7 +159,6 @@
     }
   }
 
-  /* The site's label-maker tape, smaller, stuck on the cover askew. */
   .printer__label {
     position: absolute;
     top: 8px;
@@ -192,8 +167,6 @@
     font-size: 10.5px;
   }
 
-  /* A light behind a lens, its legend printed under it: ready cyan, amber
-     while it prints. */
   .printer__led {
     position: absolute;
     top: 10px;
@@ -211,9 +184,8 @@
       box-shadow: 0 0 6px var(--color-cyan);
     }
 
-    i {
+    &-legend {
       font: 600 5px var(--font-mono);
-      font-style: normal;
       letter-spacing: 0.2em;
       text-transform: uppercase;
       opacity: 0.6;
@@ -223,9 +195,13 @@
       background: radial-gradient(circle at 35% 35%, #fff1d6, #f2a93b 60%);
       box-shadow: 0 0 6px rgb(242 169 59 / 85%);
     }
+
+    .printer--jammed &::before {
+      background: radial-gradient(circle at 35% 35%, #ffd9d6, #e5484d 60%);
+      box-shadow: 0 0 6px rgb(229 72 77 / 85%);
+    }
   }
 
-  /* A membrane panel set into the case. */
   .printer__panel {
     display: grid;
     gap: 7px;
@@ -237,14 +213,12 @@
       0 1px 0 rgb(255 255 255 / 8%);
   }
 
-  /* A row of keys, as many columns as it has keys (`--keys`, set inline). */
   .printer__keys {
     display: grid;
     grid-template-columns: repeat(var(--keys, 3), minmax(0, 1fr));
     gap: 4px 5px;
   }
 
-  /* Printed on the panel over each row of keys. */
   .printer__legend {
     grid-column: 1 / -1;
     font: 600 5.5px var(--font-mono);
@@ -253,7 +227,6 @@
     opacity: 0.55;
   }
 
-  /* Industrial keys, each with a light that shows it's chosen. */
   .printer__key {
     position: relative;
     padding: 10px 2px 5px;
@@ -300,7 +273,6 @@
     }
   }
 
-  /* A cyan mushroom in a steel bezel. */
   .printer__print {
     justify-self: center;
     width: 44px;
@@ -325,7 +297,7 @@
       0 5px 8px rgb(0 0 0 / 45%);
     cursor: pointer;
 
-    &:active:not(:disabled) {
+    &:active:not([aria-disabled='true']) {
       translate: 0 2px;
       box-shadow:
         inset 0 -1px 2px rgb(0 0 0 / 30%),
@@ -334,13 +306,12 @@
         0 0 0 6px rgb(255 255 255 / 12%);
     }
 
-    &:disabled {
+    &[aria-disabled='true'] {
       cursor: default;
       filter: saturate(0.6) brightness(0.85);
     }
   }
 
-  /* The rating sticker, peeling at a corner. */
   .printer__sticker {
     position: absolute;
     bottom: 26px;
@@ -356,10 +327,6 @@
     rotate: -1.5deg;
     box-shadow: 0 0.5px 1px rgb(0 0 0 / 50%);
     clip-path: polygon(0 0, 100% 0, 100% 100%, 9px 100%, 0 calc(100% - 7px));
-
-    b {
-      font-weight: 800;
-    }
   }
 
   .printer__sticker-code {
@@ -367,7 +334,6 @@
     margin-top: 2px;
   }
 
-  /* Slots for the heat to get out. */
   .printer__vents {
     position: absolute;
     right: 14px;
@@ -379,7 +345,6 @@
     box-shadow: 0 1px 0 rgb(255 255 255 / 6%);
   }
 
-  /* The slot, and the steel tear bar under it, its teeth over the paper. */
   .printer__slot {
     position: absolute;
     right: 13%;
@@ -448,11 +413,9 @@
     }
   }
 
-  /* The receipt: thermal paper, fed out of the slot behind the tear bar, which
-     the body's stacking keeps in front of it. */
   .printer__paper {
     position: absolute;
-    top: calc(100% - 430px - 13px);
+    top: calc(100% - var(--receipt-room) - 13px);
     right: 15%;
     left: 15%;
     padding: 0;
@@ -463,12 +426,10 @@
     box-shadow:
       0 2px 3px rgb(0 0 0 / 35%),
       0 10px 14px rgb(0 0 0 / 35%);
-    /* Curled from the roll: its foot leans out from the wall. */
     transform: perspective(700px) rotateX(-7deg);
     transform-origin: 50% 0;
     cursor: grab;
 
-    /* The tear bar's shadow at the top, and the light down the curl. */
     &::before {
       content: '';
       position: absolute;
@@ -490,10 +451,9 @@
     display: grid;
     gap: 4px;
     padding: 18px 10px 12px;
-    font: 500 7px / 1.35 var(--font-mono);
+    font: 400 7px / 1.35 var(--font-mono);
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    /* Thermal print: warm and a little faded. */
     text-shadow: 0 0 0.3px currentColor;
   }
 
@@ -518,19 +478,10 @@
     border-top: 1px dashed rgb(52 49 44 / 55%);
   }
 
-  /* A line of the receipt: what on the left, how much or when on the right. */
   .printer__item {
     display: flex;
     justify-content: space-between;
     gap: 6px;
-
-    b {
-      font-weight: 800;
-    }
-
-    i {
-      font-style: normal;
-    }
 
     &--total {
       font-size: 8.5px;
@@ -577,11 +528,33 @@
     letter-spacing: 0.1em;
   }
 
-  /* Beside the receipt, clear of it, in the room the printer's column leaves. */
+  .printer__jam {
+    margin-top: 4px;
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 0.24em;
+    text-align: center;
+  }
+
+  .printer__jam-line {
+    margin-bottom: 4px;
+    text-align: center;
+    text-transform: none;
+  }
+
+  .printer__check {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    z-index: 100;
+    translate: -50% 0;
+  }
+
   .printer__hint {
     position: absolute;
     top: 46%;
     right: -96px;
+    width: max-content;
     color: var(--color-wall-text);
     font: 500 19px / 1 var(--font-hand);
     rotate: 6deg;
@@ -590,8 +563,20 @@
       content: ' ↓';
     }
 
+    @include tools.below(md) {
+      top: 100%;
+      right: auto;
+      left: 50%;
+      translate: -50% 0;
+      rotate: -3deg;
+
+      &::after {
+        content: ' ↑';
+      }
+    }
+
     &--note {
-      top: 36%;
+      top: calc(100% - var(--receipt-room) + 34px);
       right: auto;
       left: 50%;
       width: max-content;
@@ -605,7 +590,6 @@
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    /* The buzz: a shiver too small to blur the print. */
     @keyframes printer-buzz {
       25% {
         translate: 0.6px -0.3px;
@@ -620,8 +604,6 @@
       }
     }
 
-    /* Fed in small steps, as a thermal printer does. Mirrored in CvPrinter as
-       `FEED_MS`. */
     @keyframes printer-feed {
       from {
         clip-path: inset(0 0 100% 0);
@@ -632,7 +614,6 @@
       }
     }
 
-    /* Torn off and dropped. Mirrored in CvPrinter as `FALL_MS`. */
     @keyframes printer-fall {
       to {
         opacity: 0;
@@ -647,7 +628,7 @@
       }
     }
 
-    .printer--printing .printer__body {
+    .printer--printing .printer__box {
       animation: printer-buzz 90ms linear infinite;
     }
 

@@ -1,10 +1,6 @@
 @use '../tools';
 
 @layer sections {
-  /* The last notice: the profiles in stencil and tear-off tabs, with a CV
-     printer beside it. From xl up the printer also spans a flexible third row,
-     which takes whatever height it has beyond the sheet and the hint, so the
-     hint stays close under the tabs. */
   .contact__board {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -16,6 +12,7 @@
   .contact__sheet {
     grid-column: 1 / 9;
     grid-row: 1;
+    z-index: 5;
   }
 
   .contact__body {
@@ -40,8 +37,6 @@
     line-height: 1.65;
   }
 
-  /* The profiles in stencil, a row that wraps on a phone; each opens
-     elsewhere, so it carries an arrow. */
   .contact__links {
     display: flex;
     flex-wrap: wrap;
@@ -71,9 +66,6 @@
     height: 150px;
   }
 
-  /* Scrawled on the wall under the tabs, a little crooked, with an arrow
-     drawn up at them; at every width the hint sits under the tabs. The whole
-     note is hidden from screen readers. */
   .contact__hint {
     position: relative;
     grid-column: 5 / 9;
@@ -139,8 +131,6 @@
       margin-top: 48px;
     }
 
-    /* Eleven tabs across a phone: smaller type keeps both lines of the address
-       on every tab. */
     .contact__tabs {
       height: 120px;
       font-size: 9px;

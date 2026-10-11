@@ -2,34 +2,23 @@
 @use '../settings';
 @use 'noise';
 
-/* Media */
-
-// Styles for viewports narrower than a breakpoint from `settings.$breakpoints`.
-// `max-width` includes its value, so 0.01rem less keeps the breakpoint itself out.
 @mixin below($name) {
   @media (max-width: map.get(settings.$breakpoints, $name) - 0.01rem) {
     @content;
   }
 }
 
-// Where a QR sticker shows: a pointer that hovers, from `md` up; a phone can't
-// scan its own screen. The sticker and the room kept for it both use this.
 @mixin qr-shown {
   @media (hover: hover) and (min-width: map.get(settings.$breakpoints, 'md')) {
     @content;
   }
 }
 
-/* Interaction */
-
 @mixin focus-ring {
   outline: 2px solid currentColor;
   outline-offset: 4px;
 }
 
-/* Wall */
-
-// Paint sprayed through a stencil: grainy coverage.
 @mixin spray-mask {
   -webkit-mask-image: noise.$spray-mask;
   mask-image: noise.$spray-mask;

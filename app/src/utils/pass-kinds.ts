@@ -1,10 +1,6 @@
 import type { PassCord } from './pass-physics'
-
-/** The kinds of pass on the cable. */
 export const PASS_KINDS = ['holder', 'reel', 'laminated', 'smartcard', 'metal', 'visitor'] as const
 export type PassKind = (typeof PASS_KINDS)[number]
-
-/** Black cord, a reel's nylon line that pays out, a woven ribbon, and a ball chain. */
 export const CORDS = {
   cord: { hz: 3.2, stretch: 50, thins: true, stub: 16 },
   nylon: { hz: 1.7, stretch: 150, thins: false, stub: 0 },
@@ -13,18 +9,6 @@ export const CORDS = {
 } as const satisfies Record<string, PassCord>
 export type CordKind = keyof typeof CORDS
 
-/**
- * How a kind of pass hangs:
- * - `width`: how wide the pass is;
- * - `dropExtra`: how much lower it hangs, so a reel has room;
- * - `slot`: its pivot below the card's top edge;
- * - `tie`: where its cord ties on above the pivot;
- * - `hookY`: where the cord swings from below the ring;
- * - `cord`: which cord it hangs on.
- *
- * Each kind's partial (`_pass-*.scss`) draws its slot and hardware at these
- * places; a reel's mouth, at `hookY`, is `.commerce__reel` in `_commerce.scss`.
- */
 export interface PassShape {
   width: number
   dropExtra: number
@@ -43,6 +27,5 @@ export const SHAPES: Record<PassKind, PassShape> = {
   visitor: { width: 206, dropExtra: 0, slot: 6, tie: 22, hookY: 0, cord: 'ribbon' },
 }
 
-/** The kind the content names, or a holder for anything else. */
 export const kindOf = (value: string | undefined): PassKind =>
   PASS_KINDS.find((kind) => kind === value) ?? 'holder'

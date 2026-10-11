@@ -1,8 +1,4 @@
 @layer utilities {
-  /* Sheets settle onto the wall the first time their section comes into view.
-     Only `opacity`, `scale` and `translate` move, so a sheet's tilt (`rotate`)
-     is left alone; the `backwards` fill leaves nothing applied once it ends.
-     Screen only, so a printed page shows every sheet. */
   @media screen and (prefers-reduced-motion: no-preference) {
     @keyframes paste-in {
       from {
@@ -22,8 +18,6 @@
       opacity: 0;
     }
 
-    /* Keyboard navigation must never arrive at an invisible sheet. `!important`
-       outranks the running paste-in without restarting it. */
     .u-paste:focus-within .c-sheet {
       opacity: 1 !important;
     }

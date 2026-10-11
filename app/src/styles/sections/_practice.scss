@@ -1,28 +1,15 @@
 @layer sections {
-  /* The drawing sheet. Under 880px wide its content flows in one column, the
-     callouts beside the drawing on a tablet. From 880px
-     (`.practice__drawing--wide`) it is laid out as on paper, in proportion
-     and with type in container units, so it scales like a drawing. */
   .practice__sheet {
     width: 100%;
     max-width: 1184px;
     margin-inline: auto;
   }
 
-  /* The top padding keeps the kicker clear of the corner tape, which is
-     larger from the tablet breakpoint up. */
   .practice__drawing {
     container: practice-drawing / inline-size;
     padding: clamp(31px, 7.2vw, 56px) 18px 30px;
   }
 
-  /* The wide sheet is a grid: the kicker across the top, the statement and
-     then the callouts in the right-hand column, the drawing over all of it.
-     The measures are those of the full-size 1184 × 980 sheet, as fractions of
-     its width; content that needs more room makes the sheet taller instead of
-     overlapping. The kicker keeps pixels, as the tape at the corners doesn't
-     scale. The first two rows size from `min-content`: an `auto` row would
-     take its items' min-height as the floor and let longer copy overflow it. */
   .practice__drawing--wide {
     --sheet-column-start: 59.1%;
     --sheet-column-width: 37.2%;
@@ -85,15 +72,12 @@
   }
 
   .practice__drawing--wide {
-    /* Its box reaches down to where the statement starts. */
     .practice__kicker {
       grid-area: kicker;
       min-height: calc(var(--sheet-statement-top) - var(--sheet-kicker-top));
       margin: var(--sheet-kicker-top) var(--sheet-kicker-inset) 0;
     }
 
-    /* Its box reaches down to where the callouts start as drawn; a longer
-       statement pushes them down. */
     .practice__statement {
       grid-area: statement;
       min-height: calc(

@@ -1,11 +1,8 @@
 @layer objects {
-  /* Header, page and footer in one column. The page takes the free height, so
-     the footer rests at the bottom of a short page. */
   .o-app-layout {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    /* Numerals and sprayed names run off the edge; the page never scrolls sideways. */
     overflow-x: clip;
   }
 

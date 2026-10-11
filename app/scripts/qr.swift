@@ -1,15 +1,3 @@
-// Writes a QR code for each open-source project with a `qr` name in
-// `src/contents/site.json` to `src/assets/qr/<qr>.png`, one pixel per module,
-// pointing at the project's first link. Core Image adds a one-module white border;
-// the standard asks for four, so the sticker's padding supplies the rest.
-// `src/assets/qr/targets.json` records the link in each code, so the build can tell
-// when site.json has moved on and the codes need regenerating.
-//
-//   npm run qr-codes
-//   swift scripts/qr.swift [app-directory]
-//
-// Without an argument it uses the app directory this script belongs to. It uses
-// Core Image, so it runs on macOS only; the codes are committed.
 import CoreImage
 import CoreImage.CIFilterBuiltins
 import Foundation
@@ -43,8 +31,6 @@ else {
   fail("Unexpected shape of \(contentURL.path)")
 }
 
-// Every code is rendered before the folder is touched, so a bad entry leaves the
-// committed codes as they were.
 let context = CIContext()
 var codes: [(name: String, href: String, image: CGImage)] = []
 for project in projects {
@@ -66,7 +52,6 @@ for project in projects {
 }
 
 do {
-  // Old codes go first, so a removed or renamed project leaves no orphan behind.
   let fileManager = FileManager.default
   try fileManager.createDirectory(at: outputDir, withIntermediateDirectories: true)
   for file in try fileManager.contentsOfDirectory(at: outputDir, includingPropertiesForKeys: nil)
@@ -88,7 +73,6 @@ do {
     print("\(code.name).png \(code.image.width)×\(code.image.height) → \(code.href)")
   }
 
-  // Laid out the way Prettier formats JSON, so `npm run format` leaves it as it is.
   let encoder = JSONEncoder()
   encoder.outputFormatting = .withoutEscapingSlashes
   func quote(_ string: String) throws -> String { String(decoding: try encoder.encode(string), as: UTF8.self) }

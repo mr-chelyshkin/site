@@ -20,13 +20,10 @@
     line-height: 1.7;
   }
 
-  /* The cable, and what the wall says once every pass is torn off. */
   .commerce__board {
     position: relative;
   }
 
-  /* The easter egg's end, sprayed where the passes hung, over the empty
-     hooks: the words take no pointer, the link and the button do. */
   .commerce__revoked {
     position: absolute;
     inset: 0;
@@ -48,15 +45,14 @@
     max-width: 52ch;
     font-size: var(--text-size-sm);
     line-height: 1.7;
-
-    a {
-      pointer-events: auto;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
   }
 
-  /* A strip of dark tape to hang them back by. */
+  .commerce__cta {
+    pointer-events: auto;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
   .commerce__rehang {
     padding: 9px 14px;
     background: var(--color-ink);
@@ -83,8 +79,6 @@
     }
   }
 
-  /* Passes hang from a cable. Each cell draws its stretch of cable and a hook,
-     so the cable follows the grid at any number of columns. */
   .commerce__cable {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -99,9 +93,6 @@
     justify-content: center;
     padding-bottom: 24px;
 
-    /* Neighbors' stretches overlap by a pixel, so no seam shows where they
-       meet at fractional widths and pixel ratios. The overhang and the 2px are
-       mirrored in pass-physics.ts, which draws the live cable as far. */
     &::before {
       content: '';
       position: absolute;
@@ -112,7 +103,6 @@
       background: var(--color-steel);
     }
 
-    /* Above a pass taken in hand too, so its cord still runs into the ring. */
     &::after {
       content: '';
       position: absolute;
@@ -128,12 +118,6 @@
     }
   }
 
-  /* Where a row of cable ends, it's nailed to the concrete: a nail head
-     photographed from above (`--nail-start` and `--nail-end`, from the
-     component), the cable wound twice round the nail and its cut end hanging,
-     the head's shadow on the wall. Centred on the cable's end, 1px down its
-     2px, where the live cable ends too, so the nail holds it there. Hidden
-     here; the rules after the cable's breakpoints show a row's two ends. */
   .commerce__nail {
     position: absolute;
     top: -9.5px;
@@ -151,9 +135,6 @@
       right: calc(var(--cable-gap) / -2 - 13.5px);
     }
 
-    /* The turns round the shank under the head, which peek out below it as
-       they sag, and the hanging end; dark under light, so the steel reads on
-       the wall. */
     &::before {
       content: '';
       position: absolute;
@@ -186,8 +167,6 @@
     }
   }
 
-  /* The hook's stretch of cable and the pass's cord, drawn in the hook's own
-     pixels while the passes are live; overflow shows them past its box. */
   .commerce__wire {
     position: absolute;
     top: 0;
@@ -201,23 +180,16 @@
   .commerce__line {
     fill: none;
     stroke: var(--color-steel);
-    /* Mirrored in pass-physics.ts, which runs the line 1px down, so it covers
-       the same 2px as the stretch it replaces. */
     stroke-width: 2px;
   }
 
   .commerce__cord {
     fill: none;
     stroke: var(--color-ink);
-    /* As thick as the stylesheet's cord, `.pass::before`. Script thins it
-       through `--cord-scale` as it stretches, to no less than 1.6px, a floor
-       mirrored in pass-physics.ts. */
     stroke-width: calc(3px * var(--cord-scale, 1));
     stroke-linecap: round;
   }
 
-  /* Drawn along the cord, over it: the ribbon's stripe and the chain's
-     highlights. A plain cord or a nylon line has none. */
   .commerce__seam {
     fill: none;
   }
@@ -229,31 +201,37 @@
     }
   }
 
-  /* A reel's nylon line: thin and light. */
-  .commerce__hook--nylon .commerce__cord {
-    stroke: #c8cfd2;
-    stroke-width: 1.3px;
+  .commerce__hook--nylon {
+    --cord: #c8cfd2;
+
+    .commerce__cord {
+      stroke: var(--cord);
+      stroke-width: 1.3px;
+    }
   }
 
-  /* A woven ribbon with a stitched stripe down its middle. */
   .commerce__hook--ribbon {
+    --cord: #24343b;
+    --cord-stitch: color-mix(in srgb, var(--color-cyan) 70%, transparent);
+
     .commerce__cord {
-      stroke: #24343b;
+      stroke: var(--cord);
       stroke-width: 9px;
       stroke-linecap: butt;
     }
 
     .commerce__seam {
-      stroke: rgb(95 176 191 / 70%);
+      stroke: var(--cord-stitch);
       stroke-width: 1.4px;
       stroke-dasharray: 5 3;
     }
   }
 
-  /* A ball chain: round beads, each with a highlight up and to the left. */
   .commerce__hook--chain {
+    --cord: #a9b2b5;
+
     .commerce__cord {
-      stroke: #a9b2b5;
+      stroke: var(--cord);
       stroke-width: 4.6px;
       stroke-dasharray: 0 6.2;
     }
@@ -267,9 +245,6 @@
     }
   }
 
-  /* A retractable reel clipped to the ring, for a pass on a nylon line: the
-     line pays out of its mouth, 44px under the ring (`hookY` in
-     pass-kinds.ts). Above a pass taken in hand, as the ring is. */
   .commerce__reel {
     position: absolute;
     top: 4px;
@@ -280,7 +255,6 @@
     pointer-events: none;
     z-index: 3;
 
-    /* The casing. */
     &::before {
       content: '';
       position: absolute;
@@ -296,7 +270,6 @@
         0 4px 6px rgb(0 0 0 / 55%);
     }
 
-    /* The mouth the line pays out of. */
     &::after {
       content: '';
       position: absolute;
@@ -322,8 +295,6 @@
       inset 0 -1px 1px rgb(0 0 0 / 30%);
   }
 
-  /* Live, the drawn cable takes over from each hook's stretch, and the ring
-     and a reel ride it down, under the passes, which can rise past them. */
   .commerce__cable--live .commerce__hook {
     &::before {
       content: none;
@@ -340,34 +311,27 @@
     translate: 0 var(--dip, 0px);
   }
 
-  /* Six to a cable only where a pass is wide enough for its facts. */
   @include tools.below(xxl) {
     .commerce__cable {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
-  /* One cable you scroll along. */
   @include tools.below(md) {
     .commerce__cable {
       grid-template-columns: none;
       grid-auto-columns: min(68vw, 240px);
       grid-auto-flow: column;
       margin-inline: calc(var(--wall-gutter) * -1);
-      /* Room above for the nails at the cable's ends. */
       padding: 12px var(--wall-gutter) 24px;
       overflow-x: auto;
-      /* A swinging pass never scrolls the cable up and down. */
       overflow-y: hidden;
       overscroll-behavior-x: contain;
       scroll-snap-type: x mandatory;
-      /* The padding's width, so the last hook's end snap (below) is where the
-         cable stops at rest; on both sides, so centered snaps don't move. */
       scroll-padding-inline: var(--wall-gutter);
       scrollbar-width: none;
     }
 
-    /* A mouse can't swipe: a thin scrollbar shows there is more cable. */
     @media (hover: hover) and (pointer: fine) {
       .commerce__cable {
         scrollbar-width: thin;
@@ -378,16 +342,11 @@
       scroll-snap-align: center;
     }
 
-    /* Centered, the last hook's snap would lie past the end of the scroll and
-       be held at that end, which a swinging pass pushes out, so the cable
-       would follow the swing. Its end edge gives a snap that stays put. */
     .commerce__hook:last-child {
       scroll-snap-align: end;
     }
   }
 
-  /* The nails at a row's two ends: six to a row from xxl, three to a row
-     below it, and a phone's one long cable, which ends only at its ends. */
   .commerce__hook:first-child .commerce__nail--start,
   .commerce__hook:last-child .commerce__nail--end {
     display: block;

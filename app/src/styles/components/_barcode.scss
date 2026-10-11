@@ -1,6 +1,4 @@
 @layer components {
-  /* An `<svg>` would size itself from its viewBox ratio; the wrapper takes the
-     caller's box instead and the bars stretch to fill it. */
   .c-barcode {
     display: block;
     fill: currentColor;

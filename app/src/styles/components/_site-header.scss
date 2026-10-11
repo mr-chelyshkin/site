@@ -1,9 +1,6 @@
 @use '../tools';
 
 @layer components {
-  /* Printed straight onto the wall above the hero; it scrolls away with it.
-     Where name and links don't fit one row, the links drop below as a whole.
-     `public/404.html` keeps a written-out copy; mirror changes there. */
   .site-header {
     display: flex;
     flex-wrap: wrap;
@@ -20,7 +17,7 @@
       flex-direction: column;
       gap: 10px;
       padding-top: 18px;
-      font-size: 11px;
+      font-size: var(--text-size-xsm);
     }
   }
 
@@ -29,7 +26,6 @@
     flex-wrap: wrap;
     gap: 4px 0.9em;
 
-    /* Name over role on a phone; the slash only separates them on one line. */
     @include tools.below(md) {
       flex-direction: column;
       gap: 4px;
@@ -40,9 +36,6 @@
     color: var(--color-paper);
   }
 
-  /* Drawn, not read: the second declaration gives the slash empty alternative
-     text where supported; elsewhere the first applies. It ends the name's
-     line, so a wrapped role never starts with it. */
   .site-header__name::after {
     content: '/';
     content: '/' / '';

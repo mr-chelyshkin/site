@@ -1,8 +1,6 @@
 @use '../tools';
 
 @layer sections {
-  /* A printed pass under a clear laminate, on a split ring through a brass
-     eyelet. The laminate grows with its paper. */
   .pass-laminated {
     display: flex;
     min-height: 322px;
@@ -15,9 +13,6 @@
       var(--shadow-offset) 20px rgb(0 0 0 / 50%);
   }
 
-  /* Drawn in the card's own pixels, over the eyelet. Its tie point, the
-     ring's top 3px above the card, is mirrored in pass-kinds.ts as the
-     laminate's `tie`, from the pivot in the eyelet. */
   .pass-laminated__ring {
     position: absolute;
     top: -8px;
@@ -36,13 +31,11 @@
     stroke-linecap: round;
   }
 
-  /* Behind the card, out of the light. */
   .pass-laminated__ring-back {
     stroke: #5b6569;
     stroke-width: 2;
   }
 
-  /* The dark line between the ring's two turns. */
   .pass-laminated__ring-seam {
     stroke: rgb(30 36 39 / 70%);
     stroke-width: 2;
@@ -60,7 +53,6 @@
     background: tools.$paper-grain, #f1efe6;
     color: #1a1a19;
     box-shadow: 0 0.5px 1px rgb(0 0 0 / 30%);
-    /* Office-printer ink, a little soft. */
     text-shadow: 0 0 0.35px currentColor;
   }
 
@@ -76,7 +68,6 @@
     text-transform: uppercase;
   }
 
-  /* The mark across the top, under the head; the facts in two columns under it. */
   .pass-laminated__mark {
     --mark-at: left center;
 
@@ -108,10 +99,8 @@
     margin-top: 2px;
   }
 
-  /* Punched through paper and laminate; the wall shows through its hole. */
   .pass-laminated__eyelet {
     position: absolute;
-    /* Its middle is the pivot, mirrored in pass-kinds.ts as the laminate's `slot`. */
     top: 8px;
     left: 50%;
     z-index: 5;
@@ -131,7 +120,6 @@
     box-shadow: 0 1px 1px rgb(0 0 0 / 45%);
   }
 
-  /* Air trapped under the laminate. */
   .pass-laminated__bubble {
     position: absolute;
     z-index: 2;

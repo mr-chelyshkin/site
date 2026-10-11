@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import nailStart from '@/assets/images/cable-nail-a.webp'
 import nailEnd from '@/assets/images/cable-nail-b.webp'
 import AccessPass from '@/components/sections/AccessPass.vue'
@@ -9,27 +9,28 @@ import { usePassPhysics } from '@/composables/usePassPhysics'
 import type { HomeContent } from '@/contents'
 import { SHAPES, kindOf } from '@/utils/pass-kinds'
 
-defineProps<{
+const props = defineProps<{
   content: HomeContent['commerce']
   holder: string
-  /** Where the wall points once every pass is torn off. */
   email: string
 }>()
 
-// The passes swing, stretch and twist under a hand, unless the reader asks for
-// less motion; then the stylesheet hangs them still. Pulled hard, a pass tears
-// off; once they all have, the wall says so, and they can be hung back.
 const cable = ref<HTMLElement | null>(null)
 const { live, revoked, restore } = usePassPhysics(cable)
 
-// The two nails that hold the cable to the wall, photographed from above.
+const announcement = computed(
+  () => `${props.content.revoked.headline.join(' ')}. ${props.content.revoked.note}`,
+)
+
+function rehang() {
+  restore()
+  void nextTick(() =>
+    cable.value?.querySelector<HTMLElement>('.pass')?.focus({ preventScroll: true }),
+  )
+}
+
 const nails = { '--nail-start': `url(${nailStart})`, '--nail-end': `url(${nailEnd})` }
 
-// Chrome scrolls a focused element sideways only when none of it shows, and on
-// a phone the next pass always peeks in, so the cable centers the pass that
-// takes focus. Sideways only: scrolling the page to a partly visible pass is
-// left to the browser, so a tap never moves the page. And only a cable that
-// scrolls: on wider screens its overhanging ends count in `scrollWidth` too.
 function centerFocusedPass(event: FocusEvent) {
   const list = event.currentTarget as HTMLElement
   const hook = (event.target as Element).closest('.commerce__hook')
@@ -58,7 +59,6 @@ function centerFocusedPass(event: FocusEvent) {
     </header>
 
     <div class="commerce__board">
-      <!-- The role, because Safari drops list semantics under `list-style: none`. -->
       <ul
         ref="cable"
         class="commerce__cable"
@@ -69,23 +69,17 @@ function centerFocusedPass(event: FocusEvent) {
       >
         <li
           v-for="(company, i) in content.companies"
-          :key="company.name"
+          :key="company.id"
           class="commerce__hook"
           :class="`commerce__hook--${SHAPES[kindOf(company.pass)].cord}`"
         >
-          <!-- The hook's stretch of cable and the pass's cord, drawn by script
-             while the passes are live, and blank until then. The seam runs
-             along the cord: a ribbon's stripe, a chain's highlights. -->
           <svg class="commerce__wire" aria-hidden="true" focusable="false">
             <polyline class="commerce__line" />
             <path class="commerce__cord" />
             <path class="commerce__seam" />
           </svg>
-          <!-- The cable is nailed to the wall where a row of it ends: every hook
-             has both nails, and the stylesheet shows the ones at a row's ends. -->
           <span class="commerce__nail commerce__nail--start" aria-hidden="true" />
           <span class="commerce__nail commerce__nail--end" aria-hidden="true" />
-          <!-- A reel pass hangs from a retractable reel clipped to the ring. -->
           <span v-if="kindOf(company.pass) === 'reel'" class="commerce__reel" aria-hidden="true">
             <span class="commerce__reel-cap" />
           </span>
@@ -93,8 +87,7 @@ function centerFocusedPass(event: FocusEvent) {
         </li>
       </ul>
 
-      <!-- Every pass torn off: the wall where they hung answers the lede. -->
-      <div v-if="revoked" class="commerce__revoked" role="status">
+      <div v-if="revoked" class="commerce__revoked">
         <SprayText
           class="commerce__revoked-title"
           :lines="content.revoked.headline"
@@ -103,12 +96,13 @@ function centerFocusedPass(event: FocusEvent) {
         <p class="commerce__revoked-note">
           <span class="u-visually-hidden">{{ content.revoked.headline.join(' ') }}. </span>
           {{ content.revoked.note }}
-          <a :href="`mailto:${email}`">{{ content.revoked.cta }}</a>
+          <a class="commerce__cta" :href="`mailto:${email}`">{{ content.revoked.cta }}</a>
         </p>
-        <button type="button" class="commerce__rehang" @click="restore">
+        <button type="button" class="commerce__rehang" @click="rehang">
           {{ content.revoked.restore }}
         </button>
       </div>
+      <p class="u-visually-hidden" role="status">{{ revoked ? announcement : '' }}</p>
     </div>
   </WallSection>
 </template>

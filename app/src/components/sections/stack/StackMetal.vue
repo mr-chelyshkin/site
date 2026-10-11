@@ -3,7 +3,13 @@ import { computed, inject, ref, useId, watch } from 'vue'
 import rackFront from '@/assets/images/stack-rack.webp'
 import { blinkStyle } from '@/utils/blink'
 import {
+  DOWNWARD,
+  X,
+  Y,
   boxFaces,
+  onFront,
+  onRight,
+  onTop,
   planeTransform,
   svgPoints,
   type Box,
@@ -11,69 +17,45 @@ import {
   type Projector,
   type Vec3,
 } from '@/utils/isometric'
-import { DOWN, LANDINGS, LOOP, downness, phase, storyClock } from '@/utils/stack-story'
+import {
+  DOWN,
+  LANDINGS,
+  LOOP,
+  downness,
+  phase,
+  serverName,
+  serverOf,
+  storyClock,
+} from '@/utils/stack-story'
 
-/**
- * The bottom plate as what it stands for: three 1U servers racked one on
- * another, their front the photograph of a real rack, the rest drawn as a
- * technical illustration. The top server's lid lifts off and fades as the
- * stack comes apart, and shows what's inside: the board with
- * its processors and memory, the power supply, the fans and the drive cage.
- * As the story plays (stack-story.ts), the top server is the one whose node
- * goes down: its fans spin down and its fault light comes on, and they spin up
- * again as work lands on it. Every server's lights blink, and flash as work
- * lands on its node.
- */
 const props = defineProps<{
   project: Projector
-  /** The back corner of the chassis top, in world units. */
   origin: Vec3
   width: number
   depth: number
-  /** Three servers tall, the front photo's height at the chassis width. */
   height: number
-  /** 0 with the lid on, 1 with it lifted off: it follows the explode. */
   rise: number
 }>()
 
-const X: Vec3 = [1, 0, 0]
-const Y: Vec3 = [0, 1, 0]
-const DOWNWARD: Vec3 = [0, 0, -1]
-
-// In chassis units: u from the left side, v from the back, z up from the
-// rack's bottom. Sheet steel is WALL thick.
 const WALL = 2
-// How far the lid lifts off.
 const LIFT = 30
 const FAN = { u: 18, pitch: 46, v: 152, size: 28, depth: 24, count: 7 }
-// A fan blade from the hub out, pointing right; five turn round the fan's middle.
 const BLADE = 'M4 0C7-4 10-5 12-3L12 1C9 0 7 1 4 2Z'
 const REVS = 1.2
-// Grain like the photo's, for the drawn steel to wear: fractal noise in gray,
-// a fifth opaque, tiled.
 const GRAIN = `data:image/svg+xml,${encodeURIComponent(
   "<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 .2'/></filter><rect width='96' height='96' filter='url(#n)'/></svg>",
 )}`
 const id = useId()
 const ids = { grain: `${id}-grain`, side: `${id}-side`, lid: `${id}-lid` }
 
-// Where the photo has each server's lights, in units of the front: its row,
-// the two lit ones at the right, and the fault light beside them.
 const ROWS = [13.7, 47.8, 83] as const
 const LIT = [306.6, 314.8] as const
 const FAULT = 298.3
-// Where the photo's hostname stickers are, blurred, in units of the front:
-// the middle of each, which takes its server's name.
 const STICKERS = [
   [120.7, 10.2],
   [119.2, 45.6],
   [88.1, 80.8],
 ] as const
-// srv1 to srv3, the nodes at the front of the runtime plate, run on the
-// servers shown, top to bottom; the others on the rest of the rack, out of the
-// picture. srv1, the node that goes down, is the open top server.
-const SERVER_OF: Partial<Record<number, number>> = { 3: 0, 4: 1, 5: 2 }
-const serverOf = (node: number) => SERVER_OF[node] ?? -1
 const OPEN = serverOf(DOWN)
 
 type MarkTag = 'line' | 'rect' | 'circle' | 'path' | 'polyline'
@@ -81,7 +63,6 @@ interface Mark {
   tag: MarkTag
   attrs: Record<string, string | number>
 }
-/** Marks drawn flat on a face, in that face's own units. */
 interface Marks {
   transform: string
   marks: Mark[]
@@ -100,8 +81,6 @@ const mark = (tag: MarkTag, kind: string, attrs: Record<string, string | number>
 const range = (count: number, from: number, step: number) =>
   Array.from({ length: count }, (_, i) => from + i * step)
 
-// Everything that holds still, built once: it paints in two passes, the open
-// server's insides first, then what stands in front of them.
 const chassis = computed(() => {
   const [x0, y0, top] = props.origin
   const { width: w, depth: d, height: h } = props
@@ -120,11 +99,6 @@ const chassis = computed(() => {
   })
   const at = (u: number, v: number, z: number, a: Vec3, b: Vec3) =>
     planeTransform(props.project, [x0 + u, y0 + v, base + z], a, b)
-  const onTop = (b: Box) => planeTransform(props.project, [b.x, b.y, b.z + b.height], X, Y)
-  const onFront = (b: Box) =>
-    planeTransform(props.project, [b.x, b.y + b.depth, b.z + b.height], X, DOWNWARD)
-  const onRight = (b: Box) =>
-    planeTransform(props.project, [b.x + b.width, b.y, b.z + b.height], Y, DOWNWARD)
   const solid = (key: string, material: string, b: Box, marks: Marks[] = []): Solid => ({
     key,
     material,
@@ -138,11 +112,11 @@ const chassis = computed(() => {
     const fins = range(11, 4, 4)
     return solid(`cpu-${u}`, 'alu', b, [
       {
-        transform: onTop(b),
+        transform: onTop(props.project, b),
         marks: fins.map((x) => mark('line', 'fin', { x1: x, y1: 2, x2: x, y2: 46 })),
       },
       {
-        transform: onFront(b),
+        transform: onFront(props.project, b),
         marks: fins.map((x) => mark('line', 'fin', { x1: x, y1: 1, x2: x, y2: 21 })),
       },
     ])
@@ -151,7 +125,7 @@ const chassis = computed(() => {
     const b = box(u, 88, board, 2.6, 60, 22)
     return solid(`dimm-${u}`, 'dimm', b, [
       {
-        transform: onRight(b),
+        transform: onRight(props.project, b),
         marks: range(4, 6, 14).map((x) => mark('rect', 'chip', { x, y: 5, width: 9, height: 9 })),
       },
     ])
@@ -162,11 +136,10 @@ const chassis = computed(() => {
   const fan = (k: number) => box(FAN.u + k * FAN.pitch, FAN.v, floor, FAN.size, FAN.depth, FAN.size)
   const cage = box(8, 200, floor, w - 16, 36, 24)
 
-  // Back to front, left to right, so nearer parts paint over further ones.
   const parts: Solid[] = [
     solid('board', 'pcb', mother, [
       {
-        transform: onTop(mother),
+        transform: onTop(props.project, mother),
         marks: [
           ...[30, 34, 38].map((y, i) =>
             mark('polyline', 'trace', { points: `${110 + i * 4},${y} ${110 + i * 4},80 150,80` }),
@@ -184,7 +157,7 @@ const chassis = computed(() => {
     ...[116, 123, 130, 156, 163, 170].map(dimm),
     solid('chipset', 'alu', chipset, [
       {
-        transform: onTop(chipset),
+        transform: onTop(props.project, chipset),
         marks: range(4, 3, 3.4).map((x) => mark('line', 'fin', { x1: x, y1: 2, x2: x, y2: 14 })),
       },
     ]),
@@ -193,7 +166,7 @@ const chassis = computed(() => {
     solid('connector', 'plastic', connector),
     solid('psu', 'psu', psu, [
       {
-        transform: onTop(psu),
+        transform: onTop(props.project, psu),
         marks: [
           ...range(9, 8, 7).flatMap((y, r) =>
             range(9, 6 + (r % 2) * 3.7, 7.5).map((x) =>
@@ -206,13 +179,11 @@ const chassis = computed(() => {
         ],
       },
       {
-        transform: onFront(psu),
+        transform: onFront(props.project, psu),
         marks: [mark('rect', 'port', { x: 6, y: 15, width: 14, height: 9 })],
       },
     ]),
   ]
-  // On the floor between the power supply and the fans: the power leads and
-  // the drives' data cables.
   const cables = {
     transform: at(0, 0, floor + 0.6, X, Y),
     leads: [
@@ -228,7 +199,7 @@ const chassis = computed(() => {
     const corners = [3, 25].flatMap((x) => [3, 25].map((y) => [x, y] as const))
     return solid(`fan-${k}`, 'plastic', b, [
       {
-        transform: onFront(b),
+        transform: onFront(props.project, b),
         marks: [
           mark('circle', 'opening', { cx: 14, cy: 14, r: 12.5 }),
           ...corners.map(([x, y]) => mark('circle', 'screw', { cx: x, cy: y, r: 1.1 })),
@@ -238,7 +209,7 @@ const chassis = computed(() => {
   })
   const drives = solid('cage', 'steel', cage, [
     {
-      transform: onTop(cage),
+      transform: onTop(props.project, cage),
       marks: [
         ...[81, 162, 243].map((x) => mark('line', 'divider', { x1: x, y1: 0, x2: x, y2: 36 })),
         ...range(4, 0, 81).flatMap((bay) =>
@@ -253,17 +224,14 @@ const chassis = computed(() => {
   return {
     unit,
     inner: { width: w - 2 * WALL, depth: d - 2 * WALL, height: h - floor },
-    // The open server's floor, and the inner faces of its back and left walls.
     floor: at(WALL, WALL, floor, X, Y),
     back: at(WALL, WALL, h, X, DOWNWARD),
     left: at(WALL, WALL, h, Y, DOWNWARD),
     parts,
     cables,
     fans,
-    blades: range(FAN.count, 0, 1).map((k) => onFront(fan(k))),
+    blades: range(FAN.count, 0, 1).map((k) => onFront(props.project, fan(k))),
     drives,
-    // A side panel for each server, top first, the front, and the top rim of
-    // the open server's walls.
     sides: [0, 1, 2].map((k) => at(w, 0, h - k * unit, Y, DOWNWARD)),
     front: at(0, d, h, X, DOWNWARD),
     rim: at(0, 0, h, X, Y),
@@ -284,7 +252,6 @@ const lid = computed(() => {
   return {
     faces: boxFaces(props.project, b),
     top: planeTransform(props.project, [x0, y0, top + lift + WALL], X, Y),
-    // The lid on is solid; lifting, it fades away.
     solid: 1 - props.rise,
   }
 })
@@ -292,7 +259,6 @@ const lid = computed(() => {
 const time = inject(storyClock, ref(0))
 const t = computed(() => time.value % LOOP)
 
-// A flash that fades over a second from the moment work lands on the server.
 const landing = (server: number, now: number) =>
   Math.max(
     0,
@@ -310,7 +276,6 @@ const servers = computed(() =>
   })),
 )
 
-// The open server's fans turn as fast as it's up, and faster as work lands.
 const angle = ref(0)
 watch(time, (now, before) => {
   const step = now - before
@@ -327,8 +292,6 @@ watch(time, (now, before) => {
       <pattern :id="ids.grain" patternUnits="userSpaceOnUse" width="96" height="96">
         <image :href="GRAIN" width="96" height="96" />
       </pattern>
-      <!-- The steel lit from the front: darker toward the back, and the lid
-           toward its far corner. -->
       <linearGradient :id="ids.side">
         <stop class="stack__stop stack__stop--far" offset="0" />
         <stop class="stack__stop stack__stop--near" offset="1" />
@@ -338,7 +301,6 @@ watch(time, (now, before) => {
         <stop class="stack__stop stack__stop--lit" offset="1" />
       </linearGradient>
     </defs>
-    <!-- Inside the open server: floor, walls, parts, cables, fans. -->
     <g v-memo="[chassis]">
       <rect
         class="stack__mat stack__mat--floor"
@@ -387,8 +349,6 @@ watch(time, (now, before) => {
       </template>
     </g>
 
-    <!-- The fan blades turning, each fan's five as one, so a frame moves
-         seven groups rather than thirty-five blades. -->
     <g v-for="(transform, k) in chassis.blades" :key="k" :transform="transform">
       <g :transform="`translate(14 14) rotate(${angle.toFixed(1)})`">
         <path
@@ -402,8 +362,6 @@ watch(time, (now, before) => {
       <circle class="stack__hub" cx="14" cy="14" r="4" />
     </g>
 
-    <!-- In front of the insides: the drive cage, the side panels, the front
-         photo with its rack ears, and the rim of the open server's walls. -->
     <g v-memo="[chassis]">
       <g class="stack__solid stack__solid--steel">
         <polygon class="stack__solid-right" :points="svgPoints(chassis.drives.faces.right)" />
@@ -466,7 +424,7 @@ watch(time, (now, before) => {
           :y2="chassis.unit * k"
         />
         <text v-for="([x, y], k) in STICKERS" :key="k" class="stack__sticker" :x="x" :y="y">
-          srv{{ k + 1 }}
+          {{ serverName(k) }}
         </text>
         <rect class="stack__metal-edge" :width="width" :height="height" />
         <g v-for="k in 3" :key="k">
@@ -497,7 +455,6 @@ watch(time, (now, before) => {
       />
     </g>
 
-    <!-- Lights over the photo's own. -->
     <g :transform="chassis.front">
       <g v-for="(server, i) in servers" :key="i">
         <template v-if="!server.down">
@@ -522,7 +479,6 @@ watch(time, (now, before) => {
       </g>
     </g>
 
-    <!-- The lid: sheet steel with its screws and label, fading as it lifts. -->
     <g v-if="lid.solid > 0.01" class="stack__solid stack__solid--shell" :opacity="lid.solid">
       <polygon class="stack__solid-right" :points="svgPoints(lid.faces.right)" />
       <polygon class="stack__solid-front" :points="svgPoints(lid.faces.front)" />

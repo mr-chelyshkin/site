@@ -1,8 +1,6 @@
 @use '../tools';
 
 @layer components {
-  /* Paint through a stencil: grainy coverage and a little overspray. Size comes
-     from the caller's `font-size`. */
   .c-spray {
     position: relative;
     display: block;
