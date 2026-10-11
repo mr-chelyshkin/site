@@ -1,8 +1,7 @@
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue'
 import { useReducedMotion } from '@/composables/useReducedMotion'
 
-export function useReveal() {
-  const target = ref<HTMLElement | null>(null)
+export function useReveal(target: Ref<Element | null>) {
   const isRevealed = ref(false)
   const reduced = useReducedMotion()
 
@@ -31,5 +30,5 @@ export function useReveal() {
 
   onBeforeUnmount(() => observer?.disconnect())
 
-  return { target, isRevealed }
+  return isRevealed
 }

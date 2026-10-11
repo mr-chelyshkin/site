@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useId, type VNode } from 'vue'
+import { ref, useId, type VNode } from 'vue'
 import SprayText from '@/components/ui/SprayText.vue'
 import { useReveal } from '@/composables/useReveal'
 
@@ -14,13 +14,14 @@ withDefaults(
 defineSlots<{ default(props: { titleId: string }): VNode[] }>()
 
 const titleId = `section-${useId()}`
-const { target, isRevealed } = useReveal()
+const root = ref<HTMLElement | null>(null)
+const isRevealed = useReveal(root)
 </script>
 
 <template>
   <section
     :id="id"
-    ref="target"
+    ref="root"
     class="c-wall-section u-paste"
     :class="{ 'u-paste--shown': isRevealed }"
     :aria-labelledby="titleId"
