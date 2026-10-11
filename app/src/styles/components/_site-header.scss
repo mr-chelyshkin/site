@@ -1,0 +1,65 @@
+@use '../tools';
+
+@layer components {
+  .site-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px 32px;
+    padding-top: 28px;
+    color: var(--color-wall-text);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+
+    @include tools.below(md) {
+      flex-direction: column;
+      gap: 10px;
+      padding-top: 18px;
+      font-size: var(--text-size-xsm);
+    }
+  }
+
+  .site-header__identity {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 0.9em;
+
+    @include tools.below(md) {
+      flex-direction: column;
+      gap: 4px;
+    }
+  }
+
+  .site-header__name {
+    color: var(--color-paper);
+  }
+
+  .site-header__name::after {
+    content: '/';
+    content: '/' / '';
+    margin-left: 0.9em;
+    color: var(--color-wall-text);
+    font-weight: 400;
+
+    @include tools.below(md) {
+      display: none;
+    }
+  }
+
+  .site-header__nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+
+    @include tools.below(md) {
+      gap: 8px 18px;
+    }
+  }
+
+  .site-header__identity:hover .site-header__role,
+  .site-header__link:hover {
+    color: var(--color-paper);
+  }
+}

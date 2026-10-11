@@ -22,6 +22,8 @@ logs/
 .env
 .env.*
 !.env.example
+!/app/.env.development
+!/app/.env.production
 
 # Site
 /.cache/
@@ -42,6 +44,7 @@ logs/
 # Terraform
 /tf/**/terraform.tfstate.d/
 /tf/**/.terraform/
+/tf/**/.build/
 
 /tf/**/tfplan
 /tf/**/*.tfplan

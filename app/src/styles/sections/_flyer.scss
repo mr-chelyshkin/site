@@ -1,0 +1,83 @@
+@use '../tools';
+
+@layer sections {
+  .flyer__body {
+    position: relative;
+    padding: 26px 28px 30px;
+    container-type: inline-size;
+  }
+
+  .flyer--paper .flyer__body {
+    padding-right: 52px;
+  }
+
+  .flyer--with-qr .flyer__body {
+    @include tools.qr-shown {
+      padding-bottom: 226px;
+    }
+  }
+
+  .flyer__name {
+    margin-top: 18px;
+    font-size: min(calc(var(--fit) * 100cqw), 140px);
+    line-height: 0.82;
+  }
+
+  .flyer__summary {
+    max-width: 34ch;
+    margin-top: 16px;
+    font-size: var(--text-size-sm);
+    line-height: 1.6;
+  }
+
+  .flyer__specs {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 4px 18px;
+    margin-top: 18px;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .flyer__spec-term {
+    opacity: 0.75;
+  }
+
+  .flyer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 22px;
+    margin-top: 26px;
+    font-size: var(--text-size-sm);
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .flyer__link {
+    padding-bottom: 2px;
+    border-bottom: 2px solid currentColor;
+  }
+
+  .flyer__barcode {
+    position: absolute;
+    top: 26px;
+    right: 14px;
+    bottom: 26px;
+    width: 18px;
+    height: auto;
+  }
+
+  .flyer__qr {
+    position: absolute;
+    right: 7%;
+    bottom: 26px;
+    rotate: 3deg;
+    z-index: 1;
+  }
+
+  .flyer--paper .flyer__qr {
+    right: max(7%, 44px);
+  }
+}

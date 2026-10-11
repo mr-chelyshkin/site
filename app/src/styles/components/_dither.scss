@@ -1,0 +1,33 @@
+@layer components {
+  .c-dither {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-ink);
+  }
+
+  .c-dither__base {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .c-dither__layer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    background-repeat: no-repeat;
+    pointer-events: none;
+  }
+
+  .c-dither__smear {
+    image-rendering: pixelated;
+  }
+
+  .c-dither__ghost {
+    top: 0;
+    bottom: 0;
+    background-size: 100% 100%;
+    mix-blend-mode: screen;
+    opacity: 0.85;
+  }
+}

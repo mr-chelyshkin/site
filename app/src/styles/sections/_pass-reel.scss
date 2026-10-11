@@ -1,0 +1,139 @@
+@use '../tools';
+
+@layer sections {
+  .pass-reel {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-height: 314px;
+    padding: 30px 15px 14px;
+    border-radius: 13px;
+    color: #e8edef;
+    background:
+      radial-gradient(130% 70% at var(--glint, 30%) -12%, rgb(255 255 255 / 11%), transparent 55%),
+      tools.$specks, linear-gradient(165deg, #2b3135, #1a1e21);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 16%),
+      inset 0 -1px 0 rgb(0 0 0 / 55%),
+      0 0 0 0.5px rgb(0 0 0 / 70%),
+      var(--shadow-offset) 22px rgb(0 0 0 / 55%);
+  }
+
+  .pass-reel__slot {
+    position: absolute;
+    top: 9px;
+    left: 50%;
+    width: 30px;
+    height: 7px;
+    margin-left: -15px;
+    border-radius: 4px;
+    background: var(--color-wall);
+    box-shadow:
+      inset 0 1px 2px rgb(0 0 0 / 80%),
+      0 1px 0 rgb(255 255 255 / 12%);
+  }
+
+  .pass-reel__clasp {
+    position: absolute;
+    top: -21px;
+    left: 50%;
+    z-index: 6;
+    width: 24px;
+    height: 34px;
+    margin-left: -12px;
+    overflow: visible;
+    filter: drop-shadow(0 1.5px 1.5px rgb(0 0 0 / 50%));
+  }
+
+  .pass-reel__strap {
+    fill: rgb(214 234 240 / 16%);
+    stroke: rgb(255 255 255 / 42%);
+    stroke-width: 0.55;
+  }
+
+  .pass-reel__fold {
+    fill: none;
+    stroke: rgb(255 255 255 / 60%);
+    stroke-width: 0.8;
+    stroke-linecap: round;
+  }
+
+  .pass-reel__hole {
+    fill: rgb(10 12 14 / 70%);
+    stroke: rgb(255 255 255 / 35%);
+    stroke-width: 0.4;
+  }
+
+  .pass-reel__loop {
+    fill: none;
+    stroke: var(--cord);
+    stroke-width: 0.9;
+  }
+
+  .pass-reel__crimp {
+    fill: #aeb7ba;
+    stroke: rgb(0 0 0 / 45%);
+    stroke-width: 0.4;
+  }
+
+  .pass-reel__snap {
+    stroke: rgb(0 0 0 / 55%);
+    stroke-width: 0.5;
+  }
+
+  .pass-reel__snap-dome {
+    fill: none;
+    stroke: rgb(255 255 255 / 45%);
+    stroke-width: 0.5;
+  }
+
+  .pass-reel__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .pass-reel__mark {
+    width: 62px;
+    height: 62px;
+    color: rgb(232 237 239 / 88%);
+  }
+
+  .pass-reel__role {
+    margin-top: 2px;
+    font: 900 24px / 0.88 var(--font-display);
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+  }
+
+  .pass-reel__facts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 10px;
+    color: rgb(232 237 239 / 85%);
+  }
+
+  .pass-reel__note {
+    color: rgb(232 237 239 / 70%);
+    font-size: 9px;
+    line-height: 1.45;
+  }
+
+  .pass-reel__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    font-size: 8px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+
+  .pass-reel__barcode {
+    width: 70px;
+    height: 14px;
+    color: rgb(232 237 239 / 80%);
+  }
+}

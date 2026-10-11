@@ -9,6 +9,11 @@
     padding: 0;
   }
 
+  ul[class],
+  ol[class] {
+    list-style: none;
+  }
+
   :focus-visible {
     @include tools.focus-ring;
   }

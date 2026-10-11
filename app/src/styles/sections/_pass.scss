@@ -1,0 +1,232 @@
+@mixin in-hand {
+  rotate: 0deg;
+  translate: 0 calc(var(--lift) * -1);
+
+  &::before {
+    translate: 0 var(--lift);
+  }
+}
+
+@layer sections {
+  .pass {
+    --lift: 8px;
+
+    position: relative;
+    align-self: start;
+    width: min(100%, var(--w, 210px));
+    margin-top: var(--drop);
+    border-radius: 12px;
+    rotate: calc(var(--tilt) * var(--tilt-scale));
+    transform-origin: 50% calc((var(--drop) - var(--hook-y, 0px)) * -1);
+    transition:
+      rotate var(--motion-base) var(--ease-settle),
+      translate var(--motion-base) var(--ease-settle);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: calc((var(--drop) - var(--hook-y, 0px)) * -1);
+      left: 50%;
+      width: 3px;
+      height: calc(var(--drop) - var(--hook-y, 0px) + var(--slot) - var(--tie));
+      margin-left: -1.5px;
+      border-radius: 2px;
+      background: var(--color-ink);
+      transition: translate var(--motion-base) var(--ease-settle);
+    }
+
+    &:hover,
+    &:focus-visible {
+      z-index: 2;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      &:focus-visible {
+        @include in-hand;
+      }
+
+      @media (hover: hover) {
+        &:hover {
+          @include in-hand;
+        }
+
+        &:hover::after {
+          content: '';
+          position: absolute;
+          inset: 0 -18px -12px;
+          z-index: -1;
+        }
+      }
+    }
+  }
+
+  .pass--reel::before {
+    width: 13px;
+    margin-left: -6.5px;
+    border-radius: 0;
+    background: var(--cord);
+    scale: 0.1 1;
+  }
+
+  .pass--visitor::before {
+    width: 9px;
+    margin-left: -4.5px;
+    border-radius: 0;
+    background:
+      linear-gradient(
+        90deg,
+        var(--cord) calc(50% - 0.7px),
+        transparent 0 calc(50% + 0.7px),
+        var(--cord) 0
+      ),
+      linear-gradient(var(--cord-stitch) 5px, transparent 0) 0 1.5px / 100% 8px,
+      var(--cord);
+  }
+
+  .pass--metal::before {
+    width: 4.6px;
+    margin-left: -2.3px;
+    border-radius: 0;
+    background:
+      radial-gradient(
+          circle at calc(50% - 0.7px) calc(50% - 0.7px),
+          rgb(255 255 255 / 70%) 0.55px,
+          transparent 0.95px
+        )
+        0 -1.6px / 4.6px 6.2px repeat-y,
+      radial-gradient(circle, var(--cord) 2.1px, transparent 2.4px) 0 -1.6px / 4.6px 6.2px repeat-y;
+  }
+
+  .commerce__cable--live .pass {
+    z-index: 2;
+    will-change: transform;
+    rotate: none;
+    translate: none;
+    transform-origin: 50% var(--slot);
+    transition: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+
+    &::before,
+    &::after {
+      content: none;
+    }
+
+    &:hover,
+    &:focus-visible {
+      z-index: 3;
+    }
+
+    &[data-held] {
+      z-index: 4;
+    }
+
+    &[data-torn] {
+      z-index: 5;
+    }
+
+    &[data-gone] {
+      pointer-events: none;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      cursor: grab;
+
+      &[data-held] {
+        cursor: grabbing;
+      }
+    }
+  }
+
+  .pass__twist {
+    position: relative;
+    transform-origin: 50% 40%;
+  }
+
+  .pass__body {
+    --shadow-offset: var(--shadow-x, 0) var(--shadow-y, 16px);
+
+    position: relative;
+  }
+
+  .pass__gloss {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border-radius: inherit;
+    background:
+      linear-gradient(
+        112deg,
+        transparent calc(var(--glint, 30%) - 20%),
+        rgb(255 255 255 / 48%) calc(var(--glint, 30%) - 2%),
+        rgb(255 255 255 / 14%) calc(var(--glint, 30%) + 4%),
+        transparent calc(var(--glint, 30%) + 20%)
+      ),
+      linear-gradient(
+        112deg,
+        transparent calc(var(--glint, 30%) + 22%),
+        rgb(255 255 255 / 14%) calc(var(--glint, 30%) + 27%),
+        transparent calc(var(--glint, 30%) + 31%)
+      );
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+
+  .pass__shade {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    border-radius: inherit;
+    background: linear-gradient(90deg, rgb(0 0 0 / 50%), transparent 75%);
+    opacity: var(--shade, 0);
+    scale: var(--shade-side, 1) 1;
+    pointer-events: none;
+  }
+
+  .pass__mark {
+    position: relative;
+    display: block;
+    flex: none;
+  }
+
+  .pass__mark-ink {
+    position: absolute;
+    inset: 0;
+    background: currentColor;
+    -webkit-mask: var(--logo) var(--mark-at, center) / contain no-repeat;
+    mask: var(--logo) var(--mark-at, center) / contain no-repeat;
+  }
+
+  .pass__facts {
+    font-size: 8.5px;
+    line-height: 1.35;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .pass__term {
+    opacity: 0.7;
+  }
+
+  .pass__value {
+    margin-bottom: 5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    overflow-wrap: anywhere;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes pass-rehang {
+      from {
+        opacity: 0;
+        translate: 0 -18px;
+        scale: 1.04;
+      }
+    }
+
+    .pass[data-rehang] {
+      animation: pass-rehang 520ms var(--ease-settle) backwards;
+    }
+  }
+}

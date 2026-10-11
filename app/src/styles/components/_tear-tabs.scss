@@ -1,0 +1,107 @@
+@use '../tools';
+
+@layer components {
+  .c-tear-tabs {
+    display: flex;
+    height: 124px;
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    line-height: 1.3;
+  }
+
+  .c-tear-tabs__tab {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    overflow: hidden;
+    border-top: 2px dashed color-mix(in srgb, currentColor 55%, transparent);
+    border-right: 1px dashed color-mix(in srgb, currentColor 50%, transparent);
+    background: tools.$paper-grain, var(--sheet-stock, var(--color-paper));
+    color: var(--sheet-ink, var(--color-ink));
+    letter-spacing: inherit;
+
+    &:last-of-type {
+      border-right: 0;
+    }
+
+    &:hover {
+      background-color: color-mix(in srgb, currentColor 8%, var(--sheet-stock, var(--color-paper)));
+    }
+
+    &:focus-visible {
+      outline-offset: -4px;
+    }
+  }
+
+  .c-tear-tabs__text {
+    writing-mode: vertical-rl;
+    rotate: 180deg;
+  }
+
+  .c-tear-tabs__tab--gone,
+  .c-tear-tabs__tab--torn {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .c-tear-tabs__tab--gone {
+    position: relative;
+    overflow: visible;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      right: 0;
+      left: 0;
+      height: 16px;
+      border-top: 2px dashed color-mix(in srgb, currentColor 55%, transparent);
+      background: tools.$paper-grain, var(--sheet-stock, var(--color-paper));
+      clip-path: var(--scrap);
+      visibility: visible;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes tear-off {
+      to {
+        opacity: 0;
+        translate: 0 60px;
+        rotate: 16deg;
+        visibility: hidden;
+      }
+    }
+
+    @keyframes tab-sway {
+      18% {
+        rotate: calc(4.5deg * var(--sway-dir, 1));
+      }
+
+      42% {
+        rotate: calc(-2.6deg * var(--sway-dir, 1));
+      }
+
+      66% {
+        rotate: calc(1.2deg * var(--sway-dir, 1));
+      }
+
+      84% {
+        rotate: calc(-0.4deg * var(--sway-dir, 1));
+      }
+    }
+
+    .c-tear-tabs__tab--sway {
+      position: relative;
+      z-index: 1;
+      transform-origin: 50% 0;
+      animation: tab-sway 1.1s ease-in-out;
+    }
+
+    .c-tear-tabs__tab--torn {
+      visibility: visible;
+      animation: tear-off 420ms ease-in forwards;
+    }
+  }
+}

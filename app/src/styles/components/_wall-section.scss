@@ -1,0 +1,27 @@
+@layer components {
+  .c-wall-section {
+    position: relative;
+    padding-top: var(--section-space);
+  }
+
+  .c-wall-section > .o-wall {
+    position: relative;
+    z-index: 1;
+  }
+
+  .c-wall-section > .c-wall-section__numeral {
+    position: absolute;
+    top: calc(var(--section-space) * 0.45);
+    font-size: clamp(220px, 39vw, 560px);
+    opacity: 0.13;
+    pointer-events: none;
+  }
+
+  .c-wall-section__numeral--left {
+    left: max(-0.06em, calc((100% - var(--wall-max)) / 2 - 0.06em));
+  }
+
+  .c-wall-section__numeral--right {
+    right: max(-0.06em, calc((100% - var(--wall-max)) / 2 - 0.06em));
+  }
+}

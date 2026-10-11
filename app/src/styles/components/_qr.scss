@@ -1,0 +1,34 @@
+@use '../tools';
+
+@layer components {
+  .c-qr {
+    display: none;
+    width: 162px;
+    padding: 16px 16px 10px;
+    background: var(--color-paper-white);
+    color: var(--color-ink);
+    box-shadow: 0 3px 6px rgb(0 0 0 / 35%);
+    forced-color-adjust: none;
+
+    @include tools.qr-shown {
+      display: block;
+    }
+  }
+
+  .c-qr__code {
+    display: block;
+    width: 130px;
+    height: 130px;
+    image-rendering: pixelated;
+    mix-blend-mode: multiply;
+  }
+
+  .c-qr__label {
+    display: block;
+    margin-top: 15px;
+    font: 800 9.5px/1.2 var(--font-mono);
+    letter-spacing: 0.14em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+}

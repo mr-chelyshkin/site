@@ -1,0 +1,36 @@
+@use '../tools';
+
+@layer components {
+  .site-footer {
+    padding: clamp(64px, 9vw, 120px) 0 32px;
+    overflow-x: clip;
+  }
+
+  .site-footer__tape {
+    margin-inline: -20px;
+    padding: 18px 20px;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    rotate: calc(-0.6deg * var(--tilt-scale));
+    box-shadow: 0 6px 14px rgb(0 0 0 / 50%);
+
+    @include tools.below(md) {
+      font-size: var(--text-size-xsm);
+    }
+  }
+
+  .site-footer__row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 6px 24px;
+
+    @include tools.below(md) {
+      flex-direction: column;
+      gap: 4px;
+    }
+  }
+}

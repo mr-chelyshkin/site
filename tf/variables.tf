@@ -1,19 +1,31 @@
 variable "aws_region" {
-  type     = string
-  nullable = false
+  description = "AWS region for bucket."
+  type        = string
+  nullable    = false
 }
 
 variable "domain_name" {
-  type     = string
-  nullable = false
+  description = "Hostname."
+  type        = string
+  nullable    = false
 }
 
 variable "site_bucket_name" {
-  type     = string
-  nullable = false
+  description = "S3 bucket name for the static contents."
+  type        = string
+  nullable    = false
 }
 
 variable "acm_certificate_arn" {
-  type     = string
-  nullable = false
+  description = "ARN of an issued ACM certificate."
+  type        = string
+  nullable    = false
+}
+
+variable "turnstile_secret_key" {
+  description = "Cloudflare Turnstile secret key."
+  type        = string
+  sensitive   = true
+  ephemeral   = true
+  nullable    = false
 }

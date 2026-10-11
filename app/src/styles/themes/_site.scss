@@ -1,54 +1,49 @@
 @use '../settings';
+@use '../tools';
 
 :root {
-  /* Surfaces and ink */
-  --color-background-main: #{settings.$color-background-main};
-  --color-background-contrast: #{settings.$color-background-contrast};
-  --color-background-tint: #{settings.$color-background-tint};
-  --color-text-main: #{settings.$color-text-main};
-  --color-text-muted: #{settings.$color-text-muted};
-  --color-text-muted-tint: #{settings.$color-text-muted-tint};
-  --color-text-contrast: #{settings.$color-text-contrast};
-  --color-border-main: #{settings.$color-border-main};
-  --color-rule-main: #{settings.$color-rule-main};
-  --color-rule-tint: #{settings.$color-rule-tint};
-
-  /* Accents and signal fringes */
-  --color-accent: #{settings.$color-accent};
-  --color-accent-cool: #{settings.$color-accent-cool};
-  --color-accent-warm: #{settings.$color-accent-warm};
-  --signal-cool: #{settings.$color-signal-cool};
-  --signal-warm: #{settings.$color-signal-warm};
-
-  /* Type */
-  --font-main: #{settings.$font-main};
+  --font-display: #{settings.$font-display};
+  --font-stencil: #{settings.$font-stencil};
   --font-mono: #{settings.$font-mono};
+  --font-hand: #{settings.$font-hand};
   --text-size-md: #{settings.$text-size-md};
   --text-size-sm: #{settings.$text-size-sm};
   --text-size-xsm: #{settings.$text-size-xsm};
 
-  /* Poster geometry shared by every full-bleed section: the rail runs the
-     height of the page, the gutter sets one left edge for display type, and the
-     block rhythm keeps the sections on a single vertical cadence. */
-  --poster-rail: clamp(3rem, 6.5vw, 7rem);
-  --poster-gutter: clamp(1.25rem, 5vw, 5rem);
-  --poster-block: clamp(3.5rem, 7vw, 7rem);
-  --poster-gap: clamp(2.5rem, 5vw, 5rem);
-
-  /* Layout and chrome */
-  --max-width: #{settings.$max-width};
-  --header-height: #{settings.$header-height};
-  --z-index-nav-menu: #{settings.$z-index-nav-menu};
-  --z-index-nav-overlay: #{settings.$z-index-nav-overlay};
-  --z-index-nav-button: #{settings.$z-index-nav-button};
-  --z-index-header: #{settings.$z-index-header};
-
-  /* Motion */
   --motion-fast: 160ms;
+  --motion-base: 300ms;
+  --ease-settle: cubic-bezier(0.2, 0.7, 0.3, 1);
+
+  --color-wall: #{settings.$color-wall};
+  --color-wall-text: #{settings.$color-wall-text};
+  --color-paper: #{settings.$color-paper};
+  --color-paper-white: #{settings.$color-paper-white};
+  --color-ink: #{settings.$color-ink};
+  --color-ink-soft: #{settings.$color-ink-soft};
+  --color-stock-cyan: #{settings.$color-stock-cyan};
+  --color-cyan: #{settings.$color-cyan};
+  --color-cyan-deep: #{settings.$color-cyan-deep};
+  --color-cyan-pale: #{settings.$color-cyan-pale};
+  --color-steel: #{settings.$color-steel};
+  --color-tape: #{settings.$color-tape};
+
+  --wall-max: 1440px;
+  --wall-gutter: clamp(16px, 4vw, 56px);
+  --wall-gap: clamp(12px, 2vw, 32px);
+  --section-space: clamp(72px, 10vw, 150px);
+
+  --tilt-scale: 1;
+}
+
+@include tools.below(md) {
+  :root {
+    --tilt-scale: 0.45;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
     --motion-fast: 0ms;
+    --motion-base: 0ms;
   }
 }

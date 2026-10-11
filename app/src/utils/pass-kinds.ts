@@ -1,0 +1,31 @@
+import type { PassCord } from './pass-physics'
+export const PASS_KINDS = ['holder', 'reel', 'laminated', 'smartcard', 'metal', 'visitor'] as const
+export type PassKind = (typeof PASS_KINDS)[number]
+export const CORDS = {
+  cord: { hz: 3.2, stretch: 50, thins: true, stub: 16 },
+  nylon: { hz: 1.7, stretch: 150, thins: false, stub: 0 },
+  ribbon: { hz: 5, stretch: 28, thins: false, stub: 18 },
+  chain: { hz: 8, stretch: 14, thins: false, stub: 14 },
+} as const satisfies Record<string, PassCord>
+export type CordKind = keyof typeof CORDS
+
+export interface PassShape {
+  width: number
+  dropExtra: number
+  slot: number
+  tie: number
+  hookY: number
+  cord: CordKind
+}
+
+export const SHAPES: Record<PassKind, PassShape> = {
+  holder: { width: 206, dropExtra: 0, slot: 13, tie: 28, hookY: 0, cord: 'cord' },
+  reel: { width: 194, dropExtra: 32, slot: 13, tie: 30, hookY: 44, cord: 'nylon' },
+  laminated: { width: 202, dropExtra: 0, slot: 16, tie: 19, hookY: 0, cord: 'cord' },
+  smartcard: { width: 212, dropExtra: 0, slot: 12, tie: 38, hookY: 0, cord: 'cord' },
+  metal: { width: 204, dropExtra: 0, slot: 15, tie: 2, hookY: 0, cord: 'chain' },
+  visitor: { width: 206, dropExtra: 0, slot: 6, tie: 22, hookY: 0, cord: 'ribbon' },
+}
+
+export const kindOf = (value: string | undefined): PassKind =>
+  PASS_KINDS.find((kind) => kind === value) ?? 'holder'

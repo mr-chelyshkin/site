@@ -1,0 +1,8 @@
+@layer objects {
+  .o-wall {
+    width: 100%;
+    max-width: var(--wall-max);
+    margin-inline: auto;
+    padding-inline: var(--wall-gutter);
+  }
+}

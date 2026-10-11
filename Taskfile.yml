@@ -9,6 +9,7 @@ includes:
       CONTAINER_ENVS: >-
         AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_REGION AWS_DEFAULT_REGION
         TF_VAR_aws_region TF_VAR_domain_name TF_VAR_site_bucket_name TF_VAR_acm_certificate_arn
+        TF_VAR_turnstile_secret_key
   node:
     taskfile: https://raw.githubusercontent.com/mr-chelyshkin/tasks/v0.0.1/taskfiles/node/Taskfile.yml
     vars:
@@ -20,44 +21,44 @@ includes:
 
 tasks:
   run/dev:
-    desc: "Run dev environment"
+    desc: Run dev environment
     cmds:
       - task: node:_npm/tool
         vars:
           CONTAINER_PORTS: "127.0.0.1:5173:5173"
           CMD: "sh -c 'npm install && npm run optimize-images && exec ./node_modules/.bin/vite --host 0.0.0.0 --port 5173'"
 
-  ci/build:
-    desc: "Run build static"
+  ci/static/build:
+    desc: Run static build
     cmds:
       - task: node:_npm/tool
         vars:
           CMD: "sh -c 'npm ci && npm run lint && npm run build'"
 
-  ci/test:
-    desc: "Run application checks"
+  ci/static/test:
+    desc: Run static tests
     cmds:
       - task: node:run
         vars:
           SCRIPT: type-check
 
-  ci/audit:
-    desc: "Run dependencies audit"
+  ci/static/audit:
+    desc: Run deps audit
     cmds:
       - task: node:audit
 
-  ci/terraform-fmt:
-    desc: "Run terraform fmt check"
+  ci/terraform/fmt:
+    desc: Run terraform fmt
     cmds:
       - task: terraform:fmt
 
-  ci/terraform-validate:
-    desc: "Run terraform validation"
+  ci/terraform/validate:
+    desc: Run terraform validation
     cmds:
       - task: terraform:validate
 
-  ci/terraform-plan:
-    desc: "Run terraform plan"
+  ci/terraform/plan:
+    desc: Run terraform plan
     requires:
       vars: [TF_STATE_BUCKET, TF_STATE_KEY, TF_STATE_REGION]
     cmds:

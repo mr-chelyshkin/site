@@ -1,0 +1,368 @@
+@use '../tools';
+
+@layer sections {
+  .commerce {
+    --cable-gap: clamp(10px, 1.4vw, 20px);
+  }
+
+  .commerce__head {
+    max-width: 600px;
+  }
+
+  .commerce__title {
+    font-size: clamp(64px, 8.9vw, 128px);
+  }
+
+  .commerce__lede {
+    max-width: 46ch;
+    margin-top: 22px;
+    font-size: var(--text-size-sm);
+    line-height: 1.7;
+  }
+
+  .commerce__board {
+    position: relative;
+  }
+
+  .commerce__revoked {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 18px;
+    padding: 24px;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .commerce__revoked-title {
+    font-size: clamp(56px, 7.5vw, 112px);
+  }
+
+  .commerce__revoked-note {
+    max-width: 52ch;
+    font-size: var(--text-size-sm);
+    line-height: 1.7;
+  }
+
+  .commerce__cta {
+    pointer-events: auto;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .commerce__rehang {
+    padding: 9px 14px;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font: 600 var(--text-size-xsm) / 1 var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    rotate: -2deg;
+    box-shadow: 0 3px 8px rgb(0 0 0 / 45%);
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes revoked-in {
+      from {
+        opacity: 0;
+        scale: 1.06;
+      }
+    }
+
+    .commerce__revoked {
+      animation: revoked-in 700ms var(--ease-settle) both;
+    }
+  }
+
+  .commerce__cable {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    column-gap: var(--cable-gap);
+    row-gap: 56px;
+    margin-top: clamp(48px, 6vw, 96px);
+  }
+
+  .commerce__hook {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 24px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: calc(var(--cable-gap) / -2 - 0.5px);
+      right: calc(var(--cable-gap) / -2 - 0.5px);
+      height: 2px;
+      background: var(--color-steel);
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: -3px;
+      left: 50%;
+      width: 8px;
+      height: 8px;
+      margin-left: -4px;
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--color-steel) 65%, var(--color-paper));
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-ink) 75%, var(--color-steel));
+      z-index: 3;
+    }
+  }
+
+  .commerce__nail {
+    position: absolute;
+    top: -9.5px;
+    z-index: 2;
+    display: none;
+    width: 26px;
+    height: 30px;
+    pointer-events: none;
+
+    &--start {
+      left: calc(var(--cable-gap) / -2 - 13.5px);
+    }
+
+    &--end {
+      right: calc(var(--cable-gap) / -2 - 13.5px);
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='26' height='30' viewBox='0 0 26 30'><g fill='none' stroke-linecap='round'><g stroke='%2321262a' stroke-width='2.6'><ellipse cx='13' cy='12.2' rx='7.6' ry='6.8'/><ellipse cx='12.6' cy='12.9' rx='7.1' ry='6.2' transform='rotate(-12 13 13)'/><path d='M13.6 18.9c.6 3-1.6 6-1 9.4'/></g><g stroke='%23a3abaf' stroke-width='1.4'><ellipse cx='13' cy='12.2' rx='7.6' ry='6.8'/><ellipse cx='12.6' cy='12.9' rx='7.1' ry='6.2' transform='rotate(-12 13 13)'/><path d='M13.6 18.9c.6 3-1.6 6-1 9.4'/></g></g></svg>")
+        no-repeat;
+      filter: drop-shadow(1px 2px 1px rgb(0 0 0 / 55%));
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 3.5px;
+      left: 6px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: center / cover no-repeat;
+      box-shadow:
+        1px 3px 4px rgb(0 0 0 / 60%),
+        inset 0 0 0 0.5px rgb(0 0 0 / 40%);
+    }
+
+    &--start::after {
+      background-image: var(--nail-start);
+    }
+
+    &--end::after {
+      background-image: var(--nail-end);
+    }
+  }
+
+  .commerce__wire {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .commerce__line {
+    fill: none;
+    stroke: var(--color-steel);
+    stroke-width: 2px;
+  }
+
+  .commerce__cord {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: calc(3px * var(--cord-scale, 1));
+    stroke-linecap: round;
+  }
+
+  .commerce__seam {
+    fill: none;
+  }
+
+  .commerce__hook--cord,
+  .commerce__hook--nylon {
+    .commerce__seam {
+      display: none;
+    }
+  }
+
+  .commerce__hook--nylon {
+    --cord: #c8cfd2;
+
+    .commerce__cord {
+      stroke: var(--cord);
+      stroke-width: 1.3px;
+    }
+  }
+
+  .commerce__hook--ribbon {
+    --cord: #24343b;
+    --cord-stitch: color-mix(in srgb, var(--color-cyan) 70%, transparent);
+
+    .commerce__cord {
+      stroke: var(--cord);
+      stroke-width: 9px;
+      stroke-linecap: butt;
+    }
+
+    .commerce__seam {
+      stroke: var(--cord-stitch);
+      stroke-width: 1.4px;
+      stroke-dasharray: 5 3;
+    }
+  }
+
+  .commerce__hook--chain {
+    --cord: #a9b2b5;
+
+    .commerce__cord {
+      stroke: var(--cord);
+      stroke-width: 4.6px;
+      stroke-dasharray: 0 6.2;
+    }
+
+    .commerce__seam {
+      stroke: rgb(255 255 255 / 70%);
+      stroke-width: 1.5px;
+      stroke-linecap: round;
+      stroke-dasharray: 0 6.2;
+      transform: translate(-0.7px, -0.7px);
+    }
+  }
+
+  .commerce__reel {
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    width: 38px;
+    height: 44px;
+    margin-left: -19px;
+    pointer-events: none;
+    z-index: 3;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 34% 28%, #6a7478, #2a3033 52%, #15181a);
+      box-shadow:
+        inset 0 1px 1px rgb(255 255 255 / 35%),
+        inset 0 -2px 3px rgb(0 0 0 / 50%),
+        0 4px 6px rgb(0 0 0 / 55%);
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 15px;
+      width: 8px;
+      height: 9px;
+      border-radius: 2px 2px 4px 4px;
+      background: linear-gradient(90deg, #2a3033, #59636a 50%, #2a3033);
+    }
+  }
+
+  .commerce__reel-cap {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fbfdfd, #b9c2c5 45%, #6f797d);
+    box-shadow:
+      0 0 0 1.5px rgb(0 0 0 / 35%),
+      inset 0 -1px 1px rgb(0 0 0 / 30%);
+  }
+
+  .commerce__cable--live .commerce__hook {
+    &::before {
+      content: none;
+    }
+
+    &::after {
+      z-index: 1;
+      translate: 0 var(--dip, 0px);
+    }
+  }
+
+  .commerce__cable--live .commerce__reel {
+    z-index: 1;
+    translate: 0 var(--dip, 0px);
+  }
+
+  @include tools.below(xxl) {
+    .commerce__cable {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @include tools.below(md) {
+    .commerce__cable {
+      grid-template-columns: none;
+      grid-auto-columns: min(68vw, 240px);
+      grid-auto-flow: column;
+      margin-inline: calc(var(--wall-gutter) * -1);
+      padding: 12px var(--wall-gutter) 24px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: var(--wall-gutter);
+      scrollbar-width: none;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .commerce__cable {
+        scrollbar-width: thin;
+      }
+    }
+
+    .commerce__hook {
+      scroll-snap-align: center;
+    }
+
+    .commerce__hook:last-child {
+      scroll-snap-align: end;
+    }
+  }
+
+  .commerce__hook:first-child .commerce__nail--start,
+  .commerce__hook:last-child .commerce__nail--end {
+    display: block;
+  }
+
+  @include tools.below(xxl) {
+    .commerce__hook:nth-child(3n + 1) .commerce__nail--start,
+    .commerce__hook:nth-child(3n) .commerce__nail--end {
+      display: block;
+    }
+  }
+
+  @include tools.below(md) {
+    .commerce__hook:not(:first-child) .commerce__nail--start,
+    .commerce__hook:not(:last-child) .commerce__nail--end {
+      display: none;
+    }
+  }
+}

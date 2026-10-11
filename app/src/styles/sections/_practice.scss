@@ -1,0 +1,95 @@
+@layer sections {
+  .practice__sheet {
+    width: 100%;
+    max-width: 1184px;
+    margin-inline: auto;
+  }
+
+  .practice__drawing {
+    container: practice-drawing / inline-size;
+    padding: clamp(31px, 7.2vw, 56px) 18px 30px;
+  }
+
+  .practice__drawing--wide {
+    --sheet-column-start: 59.1%;
+    --sheet-column-width: 37.2%;
+    --sheet-kicker-top: 40px;
+    --sheet-kicker-inset: 44px;
+    --sheet-statement-top: 7.77cqw;
+    --sheet-statement-gap: 1.5cqw;
+    --sheet-callouts-top: 33.446cqw;
+
+    position: relative;
+    display: grid;
+    grid-template:
+      'kicker kicker kicker' minmax(min-content, auto)
+      '. statement .' minmax(min-content, auto)
+      '. callouts .' 1fr
+      / var(--sheet-column-start) var(--sheet-column-width) 1fr;
+    aspect-ratio: 1184 / 980;
+    padding: 0;
+  }
+
+  .practice__title {
+    font: inherit;
+    letter-spacing: inherit;
+  }
+
+  .practice__statement {
+    margin-top: 20px;
+    font: 900 clamp(30px, 7.4vw, 44px) / 0.93 var(--font-display);
+    text-transform: uppercase;
+  }
+
+  .practice__mark--highlight {
+    position: relative;
+    display: inline-block;
+    z-index: 0;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 8% -0.18em 4% -0.22em;
+      z-index: -1;
+      background: var(--color-stock-cyan);
+      transform: skew(-4deg) rotate(-1deg);
+    }
+  }
+
+  .practice__mark--stencil {
+    font-family: var(--font-stencil);
+  }
+
+  .practice__mark--underline {
+    display: inline-block;
+    padding-bottom: 0.08em;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'><path d='M2 10 C 40 4, 80 14, 120 7 S 180 6, 198 9' stroke='%230c0d0e' stroke-width='6' fill='none' stroke-linecap='round'/></svg>")
+      left bottom / 100% 0.32em no-repeat;
+  }
+
+  .practice__stack {
+    margin-top: 18px;
+  }
+
+  .practice__drawing--wide {
+    .practice__kicker {
+      grid-area: kicker;
+      min-height: calc(var(--sheet-statement-top) - var(--sheet-kicker-top));
+      margin: var(--sheet-kicker-top) var(--sheet-kicker-inset) 0;
+    }
+
+    .practice__statement {
+      grid-area: statement;
+      min-height: calc(
+        var(--sheet-callouts-top) - var(--sheet-statement-top) - var(--sheet-statement-gap)
+      );
+      margin: 0 0 var(--sheet-statement-gap);
+      font-size: 3.55cqw;
+    }
+
+    .practice__stack {
+      grid-area: callouts;
+      margin: 0;
+    }
+  }
+}
