@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
       - name: Verify tag commit belongs to the default branch
-        uses: mr-chelyshkin/actions/check-tag-branch@v1
+        uses: mr-chelyshkin/actions/tag-branch-check@v2
         with:
           branch: main
 
@@ -33,8 +33,8 @@ jobs:
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Build static site
-        uses: mr-chelyshkin/actions/invoke-taskfile@v1
-        with: { command: ci/static/build }
+        uses: mr-chelyshkin/actions/task-run@v2
+        with: { task: ci/node/build }
       - name: Upload static artifact
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -45,18 +45,18 @@ jobs:
 
   publish:
     needs: build
-    uses: mr-chelyshkin/actions/.github/workflows/tag-aws-s3-static-release.yml@v1
+    uses: mr-chelyshkin/actions/.github/workflows/cd-aws-s3-static.yml@v2
     permissions:
       contents: read
       id-token: write
     with:
       artifact-name: ${{ needs.build.outputs.artifact-name }}
-      terraform-workdir: tf
+      working-directory: tf
       aws-region: ${{ vars.AWS_REGION }}
       terraform-state-bucket: ${{ vars.TF_STATE_BUCKET }}
       terraform-state-key: ${{ vars.TF_STATE_KEY }}
       terraform-state-region: ${{ vars.TF_STATE_REGION }}
-      terraform-role-arn: ${{ vars.AWS_TERRAFORM_DEPLOY_ROLE_ARN }}
+      aws-role-arn: ${{ vars.AWS_TERRAFORM_DEPLOY_ROLE_ARN }}
       domain-name: ${{ vars.SITE_DOMAIN_NAME }}
       site-bucket-name: ${{ vars.SITE_BUCKET_NAME }}
       acm-certificate-arn: ${{ vars.SITE_ACM_CERTIFICATE_ARN }}

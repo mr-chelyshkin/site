@@ -10,20 +10,20 @@ permissions:
   contents: read
 
 jobs:
-  static-ci:
-    name: static ci
-    uses: mr-chelyshkin/actions/.github/workflows/pr-static-site.yml@v1
+  node-ci:
+    name: node ci
+    uses: mr-chelyshkin/actions/.github/workflows/ci-node.yml@v2
 
   terraform-ci:
     name: terraform ci
-    uses: mr-chelyshkin/actions/.github/workflows/pr-terraform.yml@v1
+    uses: mr-chelyshkin/actions/.github/workflows/ci-terraform.yml@v2
     permissions:
       contents: read
       id-token: write
     with:
-      terraform-role-arn: ${{ vars.AWS_TERRAFORM_DEPLOY_ROLE_ARN }}
+      aws-role-arn: ${{ vars.AWS_TERRAFORM_DEPLOY_ROLE_ARN }}
       aws-region: ${{ vars.AWS_REGION }}
-      environment: |
+      env-vars: |
         {
           "TF_STATE_KEY": ${{ toJSON(vars.TF_STATE_KEY) }},
           "TF_VAR_aws_region": ${{ toJSON(vars.AWS_REGION) }},
