@@ -7,4 +7,3 @@
        width="800">
 </p>
 
-The code is open to read, not to reuse: see [LICENSE](LICENSE).
