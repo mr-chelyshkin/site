@@ -15,5 +15,7 @@ export interface Project {
   specs: readonly { term: string; value: string }[]
   links: readonly { label: string; href: string }[]
   qr?: string
+  sketch?: { command: string; from: readonly string[]; image: string; to: string }
+  stain?: string
 }
 export type SocialProfiles = SiteContent['socialProfiles']
