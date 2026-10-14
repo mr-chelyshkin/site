@@ -89,7 +89,7 @@ function pageHtml(): Plugin {
     configResolved(config) {
       outDir = resolve(config.root, config.build.outDir)
     },
-    closeBundle() {
+    writeBundle() {
       const index = readFileSync(join(outDir, 'index.html'), 'utf8')
       const canonical = /<link\b[^>]*rel="canonical"[^>]*href="([^"]+)"/.exec(index)?.[1]
       if (!canonical) throw new Error('page-html: no canonical link in index.html')

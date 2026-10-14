@@ -78,6 +78,16 @@ const faces = [
   },
 ]
 
+const overlays = [
+  {
+    name: 'coffee-stain',
+    source: 'coffee-stain.svg',
+    crop: [0, 0, 1, 1],
+    width: 240,
+    scale: 2,
+  },
+]
+
 const logos = [
   { name: 'raiffeisen-bank', source: 'raiffeisen.svg' },
   { name: 'vk', source: 'vk.svg' },
@@ -299,6 +309,8 @@ async function main() {
   for (const options of renders) await render(options)
   console.log('\ncutting: stack faces')
   for (const options of faces) await face(options)
+  console.log('\ncutting: overlays')
+  for (const options of overlays) await face(options)
   console.log('\nshaping: logos')
   for (const options of logos) await logo(options)
 }
