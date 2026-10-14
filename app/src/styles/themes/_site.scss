@@ -33,6 +33,11 @@
   --section-space: clamp(72px, 10vw, 150px);
 
   --tilt-scale: 1;
+
+  /* Depth on the wall: paint stays in the flow, a torn pass slides over it,
+     paper and hardware sit over the pass. */
+  --z-loose: 10;
+  --z-paper: 20;
 }
 
 @include tools.below(md) {

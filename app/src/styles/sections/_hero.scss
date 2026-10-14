@@ -6,8 +6,9 @@
     grid-template-columns: repeat(12, minmax(0, 1fr));
     grid-template-rows: auto auto auto 1fr;
     column-gap: var(--wall-gap);
+    position: relative;
+    z-index: var(--z-paper);
     padding-top: clamp(56px, 5vw, 72px);
-    isolation: isolate;
   }
 
   .hero__poster {

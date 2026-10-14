@@ -5,6 +5,7 @@
     --receipt-room: 430px;
 
     position: relative;
+    z-index: var(--z-paper);
     width: min(100%, 224px);
     margin-inline: auto;
     padding-bottom: var(--receipt-room);
