@@ -10,6 +10,7 @@ import ProjectFlyer from '@/components/sections/ProjectFlyer.vue'
 import SprayText from '@/components/ui/SprayText.vue'
 import WallLabel from '@/components/ui/WallLabel.vue'
 import { ciPlatformContent as content, siteContent } from '@/contents'
+import { vMagnet } from '@/directives/magnet'
 import '@/styles/ci-platform.scss'
 
 let previousTitle = ''
@@ -27,7 +28,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="ci-platform">
     <header class="ci-hero o-wall">
-      <a class="ci-hero__back" :href="content.back.href" :aria-label="content.back.label">
+      <a v-magnet class="ci-hero__back" :href="content.back.href" :aria-label="content.back.label">
         <WallLabel :text="`← ${content.back.label}`" :tilt="-3" />
       </a>
       <div class="ci-hero__grid">
