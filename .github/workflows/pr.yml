@@ -1,39 +1,24 @@
-name: PR action
+name: PR flow
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
+    branches: [main]
+    types: [opened, reopened, synchronize]
 
 concurrency:
-  group: pr-action-${{ github.ref }}
+  group: pr-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 permissions:
   contents: read
-  pull-requests: read
 
 jobs:
-  label-check:
-    name: Label check
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: mr-chelyshkin/actions/changelog-label-check@v2
-        with:
-          allowed-labels: |
-            feature
-            bug
-            docs
-            deps
-            tooling
-            other
-            skip
-
-  node-ci:
-    name: node ci
+  node:
     uses: mr-chelyshkin/actions/.github/workflows/ci-node.yml@v2
+    permissions:
+      contents: read
 
-  terraform-ci:
-    name: terraform ci
+  terraform:
     uses: mr-chelyshkin/actions/.github/workflows/ci-terraform.yml@v2
     permissions:
       contents: read
@@ -56,10 +41,11 @@ jobs:
         turnstile_secret_key=${{ secrets.TURNSTILE_SECRET_KEY }}
 
   gate:
-    name: ci / gate
     if: always()
-    needs: [label-check, node-ci, terraform-ci]
+    needs: [node, terraform]
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - uses: mr-chelyshkin/actions/job-results-check@v2
         with:
