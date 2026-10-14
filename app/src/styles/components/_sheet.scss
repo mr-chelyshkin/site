@@ -4,6 +4,7 @@
   .c-sheet {
     display: block;
     position: relative;
+    z-index: var(--z-paper);
     rotate: calc(var(--tilt, 0deg) * var(--tilt-scale));
     filter: drop-shadow(0 18px 22px rgb(0 0 0 / 55%));
 
