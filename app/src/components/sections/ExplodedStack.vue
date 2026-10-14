@@ -6,7 +6,8 @@ import StackRuntime from '@/components/sections/stack/StackRuntime.vue'
 import { useClock } from '@/composables/useClock'
 import { useElementWidth } from '@/composables/useElementWidth'
 import { useInView } from '@/composables/useInView'
-import { useScrollProgress } from '@/composables/useScrollProgress'
+import { useReducedMotion } from '@/composables/useReducedMotion'
+import { useReveal } from '@/composables/useReveal'
 import type { StackLayer } from '@/contents'
 import { plateFaces, projector, svgPoints, type Point, type Vec3 } from '@/utils/isometric'
 import { clamp01, easeOutCubic } from '@/utils/math'
@@ -24,10 +25,19 @@ const VIEWS = {
 } as const
 const SHELF = 40
 
+const UNFOLD_SECONDS = 1.6
+
 const PLATES = {
-  platforms: { width: 212, depth: 146, thickness: 12, assembled: -66, exploded: 160 },
-  runtime: { width: 276, depth: 192, thickness: 20, assembled: -86, exploded: 16 },
-  infrastructure: { width: 340, depth: 240, thickness: 105, assembled: -110, exploded: -110 },
+  platforms: { width: 212, depth: 146, thickness: 12, assembled: -66, exploded: 160, delay: 0 },
+  runtime: { width: 276, depth: 192, thickness: 20, assembled: -86, exploded: 16, delay: 0.2 },
+  infrastructure: {
+    width: 340,
+    depth: 240,
+    thickness: 105,
+    assembled: -110,
+    exploded: -110,
+    delay: 0,
+  },
 } as const
 type PlateKey = keyof typeof PLATES
 type Plate = (typeof PLATES)[PlateKey]
@@ -58,7 +68,16 @@ const viewBox = computed(() => {
 const aspect = computed(() => `${view.value.width} / ${view.value.height}`)
 const drawing = ref<HTMLElement | null>(null)
 const frame = ref<HTMLElement | null>(null)
-const progress = useScrollProgress(frame, { anchor: 0.5, span: 0.6 })
+const reduced = useReducedMotion()
+const started = useReveal(frame, 0.4)
+const unfolded = ref(false)
+const elapsed = useClock(computed(() => started.value && !unfolded.value))
+watch(elapsed, (seconds) => {
+  if (seconds >= UNFOLD_SECONDS) unfolded.value = true
+})
+const progress = computed(() =>
+  reduced.value || unfolded.value ? 1 : clamp01(elapsed.value / UNFOLD_SECONDS),
+)
 const eased = computed(() => easeOutCubic(progress.value))
 const reveal = computed(() => Math.max(0, (eased.value - 0.55) / 0.45))
 const rise = computed(() => clamp01((eased.value - 0.25) / 0.5))
@@ -66,7 +85,9 @@ const inView = useInView(drawing)
 const running = computed(() => inView.value && eased.value > 0.9)
 provide(storyClock, useClock(running))
 
-const below = (plate: Plate) => (plate.exploded - plate.assembled) * (1 - eased.value)
+const lift = (plate: Plate) =>
+  easeOutCubic(clamp01((progress.value - plate.delay) / (1 - plate.delay)))
+const below = (plate: Plate) => (plate.exploded - plate.assembled) * (1 - lift(plate))
 const width = useElementWidth(drawing)
 const slide = (key: PlateKey) => {
   const pixels = (below(PLATES[key]) * width.value) / view.value.width
