@@ -1,7 +1,7 @@
 import { onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue'
 import { useReducedMotion } from '@/composables/useReducedMotion'
 
-export function useReveal(target: Ref<Element | null>) {
+export function useReveal(target: Ref<Element | null>, threshold = 0) {
   const isRevealed = ref(false)
   const reduced = useReducedMotion()
 
@@ -18,9 +18,14 @@ export function useReveal(target: Ref<Element | null>) {
       reveal()
       return
     }
-    observer = new IntersectionObserver((entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) reveal()
-    })
+    observer = new IntersectionObserver(
+      (entries) => {
+        const seen = (entry: IntersectionObserverEntry) =>
+          entry.isIntersecting && entry.intersectionRatio >= threshold
+        if (entries.some(seen)) reveal()
+      },
+      { threshold },
+    )
     observer.observe(target.value)
   })
 

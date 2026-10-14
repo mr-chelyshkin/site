@@ -675,7 +675,7 @@
     }
   }
 
-  /* The opacity set from the scroll position takes no transition: it would
+  /* The opacity set from the unfold progress takes no transition: it would
      restart every frame and lag behind. */
   .stack__callout {
     /* The title size, which the description's indent follows. */
