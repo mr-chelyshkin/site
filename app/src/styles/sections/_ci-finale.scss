@@ -1,0 +1,88 @@
+@use '../tools';
+
+@layer sections {
+  .ci-finale__wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 32px var(--wall-gap);
+  }
+
+  .ci-finale__sheet {
+    max-width: 760px;
+  }
+
+  .ci-finale__body {
+    @include tools.sheet-inset;
+  }
+
+  .ci-finale__title {
+    margin-top: 14px;
+    font-size: clamp(40px, 5vw, 72px);
+    line-height: 0.9;
+  }
+
+  .ci-finale__copy {
+    max-width: 56ch;
+    margin-top: 16px;
+  }
+
+  .ci-finale__list {
+    display: grid;
+    gap: 10px;
+    margin-top: 22px;
+    font-size: var(--text-size-sm);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .ci-finale__item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ci-finale__item::before {
+    content: '';
+    flex: none;
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid currentColor;
+  }
+
+  .ci-finale__item::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 3px;
+    width: 13px;
+    height: 6px;
+    border-bottom: 2.5px solid currentColor;
+    border-left: 2.5px solid currentColor;
+    rotate: -48deg;
+    translate: 0 -80%;
+    transition:
+      opacity var(--motion-fast) var(--ease-settle),
+      scale var(--motion-fast) var(--ease-settle);
+  }
+
+  .ci-finale__back {
+    display: inline-block;
+    padding: 8px;
+  }
+
+  @media screen {
+    .ci-finale__item:not(.ci-finale__item--done)::after {
+      opacity: 0;
+      scale: 0.4;
+    }
+  }
+
+  @include tools.below(md) {
+    .ci-finale__wrap {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}

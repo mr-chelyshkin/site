@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 import vue from '@vitejs/plugin-vue'
 import { defineConfig, type Plugin } from 'vite'
@@ -6,6 +7,18 @@ import { defineConfig, type Plugin } from 'vite'
 interface PrinterContent {
   home: { contact: { printer: { templates: { id: string }[]; roles: { id: string }[] } } }
 }
+
+interface PageContent {
+  title: string
+  description: string
+}
+
+const PAGES: Record<string, string> = {
+  '/works/ci-platform': './src/contents/ci-platform.json',
+}
+
+const readJson = <T>(path: string) =>
+  JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8')) as T
 
 function placeholderPdf(text: string) {
   const content = `BT /F1 20 Tf 72 760 Td (${text}) Tj ET`
@@ -30,8 +43,8 @@ function placeholderPdf(text: string) {
 }
 
 function cvApi(): Plugin {
-  const content = readFileSync(new URL('./src/contents/site.json', import.meta.url), 'utf8')
-  const { templates, roles } = (JSON.parse(content) as PrinterContent).home.contact.printer
+  const { templates, roles } = readJson<PrinterContent>('./src/contents/site.json').home.contact
+    .printer
   return {
     name: 'cv-api',
     apply: 'serve',
@@ -54,8 +67,57 @@ function cvApi(): Plugin {
   }
 }
 
+const escapeAttribute = (value: string) =>
+  value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;')
+
+function setTag(html: string, marker: string, attribute: string, value: string) {
+  const tag = new RegExp(`<(?:meta|link)\\b[^>]*${marker}[^>]*>`).exec(html)?.[0]
+  if (!tag) throw new Error(`page-html: no ${marker} tag in index.html`)
+  const updated = tag.replace(
+    new RegExp(`${attribute}="[^"]*"`),
+    `${attribute}="${escapeAttribute(value)}"`,
+  )
+  return html.replace(tag, () => updated)
+}
+
+function pageHtml(): Plugin {
+  const { fullName } = readJson<{ brand: { fullName: string } }>('./src/contents/site.json').brand
+  let outDir = ''
+  return {
+    name: 'page-html',
+    apply: 'build',
+    configResolved(config) {
+      outDir = resolve(config.root, config.build.outDir)
+    },
+    closeBundle() {
+      const index = readFileSync(join(outDir, 'index.html'), 'utf8')
+      const canonical = /<link\b[^>]*rel="canonical"[^>]*href="([^"]+)"/.exec(index)?.[1]
+      if (!canonical) throw new Error('page-html: no canonical link in index.html')
+      for (const [route, source] of Object.entries(PAGES)) {
+        const { title: name, description } = readJson<PageContent>(source)
+        const title = `${name} | ${fullName}`
+        const url = new URL(route, canonical).href
+        let html = index.replace(
+          /<title>[^<]*<\/title>/,
+          () => `<title>${escapeAttribute(title)}</title>`,
+        )
+        html = setTag(html, 'rel="canonical"', 'href', url)
+        html = setTag(html, 'name="description"', 'content', description)
+        html = setTag(html, 'property="og:title"', 'content', title)
+        html = setTag(html, 'property="og:description"', 'content', description)
+        html = setTag(html, 'property="og:url"', 'content', url)
+        html = setTag(html, 'name="twitter:title"', 'content', title)
+        html = setTag(html, 'name="twitter:description"', 'content', description)
+        const file = join(outDir, `${route}.html`)
+        mkdirSync(dirname(file), { recursive: true })
+        writeFileSync(file, html)
+      }
+    },
+  }
+}
+
 export default defineConfig({
-  plugins: [vue(), cvApi()],
+  plugins: [vue(), cvApi(), pageHtml()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
