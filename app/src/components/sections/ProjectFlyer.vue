@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
+import coffeeStain from '@/assets/images/coffee-stain.webp'
+import FlyerSketch from '@/components/sections/FlyerSketch.vue'
 import BarCode from '@/components/ui/BarCode.vue'
 import PastedSheet from '@/components/ui/PastedSheet.vue'
 import QrSticker from '@/components/ui/QrSticker.vue'
@@ -96,11 +98,12 @@ const fit = computed(() => {
         </template>
       </p>
       <h3 class="flyer__name">{{ project.name }}</h3>
+      <FlyerSketch v-if="project.sketch" class="flyer__sketch" :sketch="project.sketch" />
       <p class="flyer__summary">{{ project.summary }}</p>
-      <dl class="flyer__specs">
+      <dl v-if="project.specs.length" class="flyer__specs">
         <template v-for="(spec, i) in project.specs" :key="i">
           <dt class="flyer__spec-term">{{ spec.term }}</dt>
-          <dd>{{ spec.value }}</dd>
+          <dd class="flyer__spec-value">{{ spec.value }}</dd>
         </template>
       </dl>
       <ul v-if="project.links.length" class="flyer__links" role="list">
@@ -120,6 +123,16 @@ const fit = computed(() => {
         </li>
       </ul>
       <BarCode v-if="stock === 'paper'" class="flyer__barcode" :seed="project.name" vertical />
+      <img
+        v-if="project.stain"
+        class="flyer__stain"
+        :src="coffeeStain"
+        alt=""
+        width="480"
+        height="600"
+        loading="lazy"
+        decoding="async"
+      />
     </div>
     <template v-if="sticker" #over>
       <QrSticker

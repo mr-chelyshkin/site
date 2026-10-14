@@ -40,12 +40,12 @@
   .contact__links {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px clamp(20px, 3vw, 40px);
+    gap: 8px clamp(14px, 2.1vw, 28px);
     margin-top: 22px;
   }
 
   .contact__link {
-    font: 900 clamp(26px, 3.8vw, 52px) / 1 var(--font-stencil);
+    font: 900 clamp(18px, 2.66vw, 36px) / 1 var(--font-stencil);
     text-transform: uppercase;
 
     &::after {
@@ -70,7 +70,7 @@
     position: relative;
     grid-column: 5 / 9;
     grid-row: 2;
-    margin-top: 22px;
+    margin-top: 60px;
     padding-left: 44px;
     @include tools.handwritten;
     rotate: -2deg;

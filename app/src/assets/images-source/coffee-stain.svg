@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="800" viewBox="0 0 640 800">
+  <defs>
+    <filter id="edge" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.009" numOctaves="2" seed="5" result="wobble" />
+      <feDisplacementMap in="SourceGraphic" in2="wobble" scale="16" xChannelSelector="R" yChannelSelector="G" result="wavy" />
+      <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="21" result="grain" />
+      <feDisplacementMap in="wavy" in2="grain" scale="7" xChannelSelector="R" yChannelSelector="G" result="rough" />
+      <feGaussianBlur in="rough" stdDeviation="0.6" />
+    </filter>
+    <filter id="mottle" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.014" numOctaves="4" seed="4" result="noise" />
+      <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1.7 0 0 0 -0.12" result="amount" />
+      <feComposite in="SourceGraphic" in2="amount" operator="in" />
+    </filter>
+    <filter id="patches" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.0065" numOctaves="2" seed="9" />
+      <feColorMatrix type="matrix" values="2.6 0 0 0 -0.55  2.6 0 0 0 -0.55  2.6 0 0 0 -0.55  0 0 0 0 1" />
+    </filter>
+    <mask id="rim-breaks" maskUnits="userSpaceOnUse" x="0" y="0" width="640" height="800">
+      <rect width="640" height="800" filter="url(#patches)" />
+    </mask>
+    <linearGradient id="second-fade" x1="1" y1="0" x2="0.35" y2="0.75">
+      <stop offset="0" stop-color="#fff" />
+      <stop offset="0.5" stop-color="#fff" stop-opacity="0.55" />
+      <stop offset="1" stop-color="#000" />
+    </linearGradient>
+    <mask id="second-arc" maskUnits="userSpaceOnUse" x="0" y="0" width="640" height="800">
+      <rect width="640" height="800" fill="url(#second-fade)" />
+    </mask>
+    <radialGradient id="wash" cx="310" cy="300" r="238" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#b07a45" stop-opacity="0.04" />
+      <stop offset="0.6" stop-color="#b07a45" stop-opacity="0.065" />
+      <stop offset="0.86" stop-color="#9a6334" stop-opacity="0.12" />
+      <stop offset="0.95" stop-color="#82481f" stop-opacity="0.26" />
+      <stop offset="0.985" stop-color="#6a3412" stop-opacity="0.56" />
+      <stop offset="1" stop-color="#6a3412" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="run" x1="0" y1="520" x2="0" y2="762" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9a6334" stop-opacity="0.3" />
+      <stop offset="0.35" stop-color="#9a6334" stop-opacity="0.2" />
+      <stop offset="1" stop-color="#82481f" stop-opacity="0.48" />
+    </linearGradient>
+  </defs>
+
+  <g filter="url(#edge)">
+    <circle cx="310" cy="300" r="238" fill="url(#wash)" filter="url(#mottle)" />
+    <circle cx="310" cy="300" r="237" fill="none" stroke="#5e2a0b" stroke-opacity="0.76" stroke-width="5" mask="url(#rim-breaks)" />
+    <circle cx="310" cy="300" r="229" fill="none" stroke="#82481f" stroke-opacity="0.18" stroke-width="2" />
+    <circle cx="352" cy="266" r="232" fill="none" stroke="#6a3412" stroke-opacity="0.3" stroke-width="3" mask="url(#second-arc)" />
+
+    <path
+      d="M236 522 C 240 548, 246 566, 245 590 C 244 625, 239 650, 241 690 C 242 712, 236 726, 235 738 C 233 752, 243 763, 252 761 C 262 759, 263 744, 256 734 C 252 722, 254 700, 254 680 C 254 650, 258 622, 257 592 C 256 566, 262 546, 266 522 Z"
+      fill="url(#run)"
+      stroke="#5e2a0b"
+      stroke-opacity="0.45"
+      stroke-width="1.6"
+    />
+    <ellipse cx="248" cy="748" rx="7" ry="9" fill="#6a3412" fill-opacity="0.22" />
+
+    <g fill="#9a6334" fill-opacity="0.3" stroke="#5e2a0b" stroke-opacity="0.55" stroke-width="1.4">
+      <circle cx="566" cy="168" r="5.5" />
+      <circle cx="590" cy="204" r="3" />
+      <circle cx="94" cy="424" r="6.5" />
+      <circle cx="68" cy="458" r="2.6" />
+      <circle cx="472" cy="596" r="4" />
+      <circle cx="120" cy="120" r="2.2" />
+    </g>
+  </g>
+</svg>

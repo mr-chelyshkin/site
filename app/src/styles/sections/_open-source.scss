@@ -12,6 +12,7 @@
 
   .open-source__lede {
     @include tools.public-work-lede;
+    max-width: 75ch;
   }
 
   .open-source__board {
@@ -53,6 +54,10 @@
   }
 
   @include tools.below(xl) {
+    .open-source__lede {
+      max-width: 54ch;
+    }
+
     .open-source__flyer {
       grid-column: span 6;
     }

@@ -166,19 +166,22 @@
       "index": "03",
       "label": "Open source",
       "headline": ["Public works"],
-      "description": "Independent tools for running tasks and building development environments. Take the code, or use them in your own work.",
+      "description": "Setups I got tired of rebuilding and finally wrote down. The code is open, the idea is free to steal.",
       "labels": [],
       "projects": [
         {
           "name": "CI/CD Platform",
           "stock": "grid",
           "kicker": ["Images / Tasks / Actions", "Walkthrough"],
-          "summary": "Tool images, shared Taskfiles and a few workflows add up to a whole CI/CD process. The same task runs on your laptop and on any runner. Not a service: borrow the parts, or build your own.",
-          "specs": [
-            { "term": "Focus", "value": "Platform CI/CD" },
-            { "term": "Built with", "value": "Taskfile / Docker" },
-            { "term": "Runs on", "value": "Any CI runner" }
-          ],
+          "summary": "Same command, same box, on your laptop and in any CI.",
+          "specs": [],
+          "sketch": {
+            "command": "task ci/node/build",
+            "from": ["laptop", "any CI"],
+            "image": "node:22",
+            "to": "same box"
+          },
+          "stain": "coffee",
           "links": [{ "label": "Read the walkthrough", "href": "/works/ci-platform" }]
         }
       ]
