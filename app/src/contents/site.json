@@ -8,10 +8,10 @@
     "home": "/"
   },
   "navigation": [
-    { "label": "Build", "href": "#build" },
-    { "label": "Work", "href": "#work" },
-    { "label": "Code", "href": "#code" },
-    { "label": "Contact", "href": "#contact" }
+    { "label": "Build", "href": "/#build" },
+    { "label": "Work", "href": "/#work" },
+    { "label": "Code", "href": "/#code" },
+    { "label": "Contact", "href": "/#contact" }
   ],
   "tearTabs": {
     "copied": "Address copied"
@@ -167,55 +167,19 @@
       "label": "Open source",
       "headline": ["Public works"],
       "description": "Independent tools for running tasks and building development environments. Take the code, or use them in your own work.",
-      "labels": ["NixOS"],
+      "labels": [],
       "projects": [
         {
-          "qr": "taskvisor",
-          "name": "Taskvisor",
-          "stock": "paper",
-          "kicker": ["Rust crate", "Apache-2.0"],
-          "summary": "Task supervision for async Rust services. Retries, cancellation and clean shutdown, inside your application.",
+          "name": "CI/CD Platform",
+          "stock": "grid",
+          "kicker": ["Images / Tasks / Actions", "Walkthrough"],
+          "summary": "Tool images, shared Taskfiles and a few workflows add up to a whole CI/CD process. The same task runs on your laptop and on any runner. Not a service: borrow the parts, or build your own.",
           "specs": [
-            { "term": "Focus", "value": "Task supervision" },
-            { "term": "Language", "value": "Rust" },
-            { "term": "License", "value": "Apache-2.0" }
+            { "term": "Focus", "value": "Platform CI/CD" },
+            { "term": "Built with", "value": "Taskfile / Docker" },
+            { "term": "Runs on", "value": "Any CI runner" }
           ],
-          "links": [
-            { "label": "GitHub", "href": "https://github.com/soltiHQ/taskvisor" },
-            { "label": "Docs", "href": "https://docs.rs/taskvisor" }
-          ]
-        },
-        {
-          "qr": "solti",
-          "name": "Solti",
-          "stock": "cyan",
-          "kicker": ["Rust / Go", "Agent runtime"],
-          "summary": "A task-execution stack. Build agents with the Rust SDK and coordinate them through a Go control plane.",
-          "specs": [
-            { "term": "Focus", "value": "Agent runtime" },
-            { "term": "Languages", "value": "Rust / Go" },
-            { "term": "License", "value": "Apache-2.0" }
-          ],
-          "links": [
-            { "label": "GitHub", "href": "https://github.com/soltiHQ" },
-            { "label": "Website", "href": "https://solti.io" }
-          ]
-        },
-        {
-          "qr": "limanix",
-          "name": "LimaNix",
-          "stock": "ink",
-          "kicker": ["Lima / NixOS", "macOS"],
-          "summary": "Linux development environments on your Mac. Keep your editor close and run tools, services and builds in a modular NixOS VM.",
-          "specs": [
-            { "term": "Focus", "value": "Developer environments" },
-            { "term": "Built with", "value": "Lima / NixOS" },
-            { "term": "Host", "value": "macOS" }
-          ],
-          "links": [
-            { "label": "GitHub", "href": "https://github.com/limanix" },
-            { "label": "Website", "href": "https://limanix.dev" }
-          ]
+          "links": [{ "label": "Read the walkthrough", "href": "/works/ci-platform" }]
         }
       ]
     },

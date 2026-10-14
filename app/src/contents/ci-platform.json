@@ -1,0 +1,369 @@
+{
+  "title": "CI/CD Platform",
+  "description": "Describe a build once and run it in the same container on your laptop and in any CI, with deploys kept in CI. The whole picture, then a guide to build your own.",
+  "back": { "label": "Public works", "href": "/#code" },
+  "labels": {
+    "example": "Full example",
+    "replay": "Replay",
+    "newTab": "opens in a new tab",
+    "toc": "Jump to a step",
+    "step": "Step",
+    "do": "Do",
+    "check": "Check",
+    "tip": "Tip",
+    "copy": "Copy",
+    "copied": "Copied"
+  },
+  "parts": { "epilogue": "Epilogue" },
+  "hero": {
+    "kicker": "A guide to platform CI/CD",
+    "headline": ["CI/CD", "Platform"],
+    "statement": ["Same command.", "Same box.", "Your laptop and any CI."],
+    "lead": "Describe a build once, in the project. It runs in the same container on your laptop and in any CI, and deploys stay in CI. Below: the whole picture, then a guide to build your own.",
+    "demo": {
+      "laptop": "your laptop",
+      "runner": "any CI runner",
+      "command": "task ci/node/build",
+      "run": "→ docker run your-registry/node:22",
+      "done": "✓ app/dist ready",
+      "image": "your-registry/node:22",
+      "chips": ["same image", "same mounts", "same flags"],
+      "stamp": "Same box",
+      "poster": "It works on my ~machine~ box."
+    }
+  },
+  "picture": {
+    "id": "picture",
+    "kicker": ["Before the guide", "Everything at once"],
+    "title": "The whole picture.",
+    "body": [
+      "A registry holds tool images. A shared Taskfile knows how to run them. Each project names its work. Your laptop and any CI call those names and get the same box. Delivery waits behind a gate, for CI only."
+    ],
+    "scheme": {
+      "registry": { "title": "your-registry", "tags": ["node:22", "terraform:1.15", "go:1.27"] },
+      "shared": { "title": "Shared Taskfile", "detail": "how to run a tool" },
+      "project": { "title": "Project Taskfile", "detail": "ci/node/build" },
+      "laptop": { "title": "Your laptop", "detail": "task ci/node/build" },
+      "runner": { "title": "Any CI runner", "detail": "task ci/node/build" },
+      "box": { "title": "The box", "detail": "your-registry/node:22" },
+      "result": "app/dist",
+      "gate": "Gate",
+      "delivery": { "title": "Delivery", "detail": "deploy · apply · publish" }
+    },
+    "steps": [
+      { "href": "#step-images", "number": "01", "label": "Pack the tools" },
+      { "href": "#step-run", "number": "02", "label": "Teach the run" },
+      { "href": "#step-contract", "number": "03", "label": "Name the work" },
+      { "href": "#step-ci", "number": "04", "label": "Call it from CI" },
+      { "href": "#step-gate", "number": "05", "label": "Gate the delivery" }
+    ]
+  },
+  "guide": {
+    "id": "guide",
+    "headline": ["The guide"],
+    "title": "The guide: build your own",
+    "intro": "The steps go in build order. Each one ends with a check you can run before moving on.",
+    "navLabel": "Steps of the guide",
+    "needs": {
+      "title": "Before you start",
+      "items": [
+        "Docker and Task on your machine",
+        "A container registry you can push to",
+        "A git repository for shared Taskfiles",
+        "Any CI whose runners can start containers"
+      ]
+    },
+    "steps": [
+      {
+        "id": "step-images",
+        "number": "01",
+        "title": "Pack the tools",
+        "why": "Every tool a project needs lives in an image, at a pinned version. Nobody installs a toolchain by hand.",
+        "actions": [
+          "Write a Dockerfile per tool and keep the versions it takes next to it.",
+          "Build it for every platform your laptops and runners use.",
+          "Push it to your registry under a version tag. Skip `latest`."
+        ],
+        "code": [
+          {
+            "label": "tools/node/Dockerfile",
+            "code": "ARG NODE_VERSION=22\nFROM node:${NODE_VERSION}-bookworm-slim\nWORKDIR /workspace"
+          },
+          {
+            "label": "Build and publish",
+            "code": "docker buildx build --platform linux/amd64,linux/arm64 \\\n  --build-arg NODE_VERSION=22 \\\n  --tag your-registry/node:22 --push tools/node"
+          }
+        ],
+        "check": "`docker run --rm your-registry/node:22 node --version` prints the version you pinned.",
+        "tip": "Rebuild on a schedule to pick up patches. Pin a digest when you need the exact bytes.",
+        "links": [
+          {
+            "label": "images → ci/node",
+            "href": "https://github.com/mr-chelyshkin/images/tree/main/ci/node"
+          },
+          {
+            "label": "Publishing and tags",
+            "href": "https://github.com/mr-chelyshkin/images#publishing-and-tags"
+          }
+        ]
+      },
+      {
+        "id": "step-run",
+        "number": "02",
+        "title": "Teach the run",
+        "why": "One shared Taskfile knows how to start each tool's container. Projects call it instead of copying `docker run` lines.",
+        "actions": [
+          "Create a repository for shared Taskfiles, one file per tool.",
+          "Add a task that runs a command in the tool's image, with the project mounted and the cache kept on the host.",
+          "Lock the container down: drop capabilities, forbid new privileges, run as the host user.",
+          "Tag a release. Projects will pin its commit."
+        ],
+        "code": [
+          {
+            "label": "shared-tasks/node/Taskfile.yml",
+            "code": "version: '3'\n\ntasks:\n  exec:\n    cmds:\n      - docker run --rm --init --cap-drop ALL\n          --security-opt no-new-privileges\n          --user \"$(id -u):$(id -g)\"\n          --volume \"{{.ROOT_DIR}}:/workspace\"\n          --volume \"{{.ROOT_DIR}}/.cache/node:/tmp/cache\"\n          --workdir /workspace\n          your-registry/node:{{.NODE_VERSION | default \"22\"}}\n          sh -c '{{.CMD}}'"
+          }
+        ],
+        "table": {
+          "caption": "What the flags do",
+          "rows": [
+            { "flag": "--rm --init", "note": "The container goes away after the run." },
+            {
+              "flag": "--volume <project>:/workspace",
+              "note": "Your project is mounted, not copied."
+            },
+            {
+              "flag": "--volume .cache/node",
+              "note": "The cache stays on your disk between runs."
+            },
+            {
+              "flag": "--cap-drop ALL, no-new-privileges",
+              "note": "No superpowers inside the box."
+            },
+            { "flag": "--user $(id -u):$(id -g)", "note": "Files come out yours, not root's." }
+          ]
+        },
+        "check": "`task --taskfile shared-tasks/node/Taskfile.yml exec CMD='node --version'` prints the version from inside the container, and no root-owned files appear.",
+        "links": [
+          {
+            "label": "tasks · Quick start",
+            "href": "https://github.com/mr-chelyshkin/tasks#quick-start"
+          },
+          {
+            "label": "The Docker runner",
+            "href": "https://github.com/mr-chelyshkin/tasks/blob/main/taskfiles/docker/Taskfile.yml"
+          },
+          {
+            "label": "The Node module",
+            "href": "https://github.com/mr-chelyshkin/tasks/blob/main/taskfiles/node/Taskfile.yml"
+          },
+          {
+            "label": "Ephemeral runtime, persistent files",
+            "href": "https://github.com/mr-chelyshkin/tasks/blob/main/concept.md#ephemeral-runtime-persistent-files"
+          }
+        ]
+      },
+      {
+        "id": "step-contract",
+        "number": "03",
+        "title": "Name the work",
+        "why": "The project owns the names CI will call and what they do. The name is the contract. The steps behind it are yours.",
+        "actions": [
+          "Include the shared Taskfile, pinned to a commit.",
+          "Declare a `ci/<area>/<verb>` task for everything CI should run: build, test, lint.",
+          "Change the steps behind a name whenever you like. Keep the name."
+        ],
+        "code": [
+          {
+            "label": "Taskfile.yml, in the project",
+            "code": "version: '3'\n\nincludes:\n  node: https://your-git/shared-tasks/raw/<commit>/node/Taskfile.yml\n\ntasks:\n  ci/node/build:\n    cmds:\n      - task: node:exec\n        vars: { CMD: npm ci && npm run build }"
+          },
+          { "label": "Run it", "code": "task ci/node/build" }
+        ],
+        "check": "`task ci/node/build` passes on your laptop.",
+        "tip": "Shared templates can bring ready jobs. A project uses one as it is, overrides it, or writes its own.",
+        "links": [
+          {
+            "label": "This site's Taskfile",
+            "href": "https://github.com/mr-chelyshkin/site/blob/main/Taskfile.yml"
+          }
+        ]
+      },
+      {
+        "id": "step-ci",
+        "number": "04",
+        "title": "Call it from CI",
+        "why": "CI runs the same names on its runners. It needs Docker, Task and nothing project-specific.",
+        "actions": [
+          "Make sure your runners can start containers. Docker-in-docker is fine, with capabilities dropped.",
+          "Install Task in the job, or use a small adapter that does it for you.",
+          "Call `task <name>` for each check. Decide in the workflow which events run which names."
+        ],
+        "code": [
+          {
+            "label": "The same call, different CIs",
+            "code": "# GitHub Actions\n- run: task ci/node/build\n\n# GitLab CI\nscript: task ci/node/build\n\n# Jenkins\nsh 'task ci/node/build'"
+          }
+        ],
+        "check": "A pull request runs the same `ci/node/build` as your laptop and gets the same result.",
+        "links": [
+          {
+            "label": "actions → task-run",
+            "href": "https://github.com/mr-chelyshkin/actions/tree/main/task-run"
+          },
+          {
+            "label": "Workflow presets",
+            "href": "https://github.com/mr-chelyshkin/actions#workflows"
+          }
+        ]
+      },
+      {
+        "id": "step-gate",
+        "number": "05",
+        "title": "Gate the delivery",
+        "why": "Deploys need production keys. They run only in CI, after the checks, and skip the task wrapper.",
+        "actions": [
+          "Add a final job that passes only when every check passed.",
+          "Run delivery after it, on tags or the main branch, with short-lived keys.",
+          "Keep delivery out of Taskfiles. Nobody should be able to deploy from a laptop."
+        ],
+        "zones": {
+          "label": "Reproducible tasks run anywhere. Privileged delivery runs only in CI.",
+          "reproducible": {
+            "label": "Reproducible · anywhere",
+            "items": ["fmt", "lint", "test", "build", "docs", "plan"]
+          },
+          "gate": "Gate",
+          "privileged": {
+            "label": "Privileged · CI only",
+            "items": ["deploy", "apply", "publish", "invalidate"]
+          },
+          "note": "deploy is a right, not a command."
+        },
+        "check": "Your laptop can run every `ci/*` task and none of the delivery steps.",
+        "links": [
+          {
+            "label": "The gate",
+            "href": "https://github.com/mr-chelyshkin/actions/tree/main/job-results-check"
+          },
+          {
+            "label": "terraform-apply",
+            "href": "https://github.com/mr-chelyshkin/actions/tree/main/terraform-apply"
+          },
+          {
+            "label": "aws-cloudfront-invalidate",
+            "href": "https://github.com/mr-chelyshkin/actions/tree/main/aws-cloudfront-invalidate"
+          }
+        ]
+      }
+    ]
+  },
+  "finePrint": {
+    "id": "fine-print",
+    "kicker": ["Epilogue", "Read before use"],
+    "title": "The fine print, in large type.",
+    "body": ["Pin versions on purpose. And know what the box promises, and what it doesn't."],
+    "linksLabel": "Read more",
+    "links": [
+      {
+        "label": "Choose versions deliberately",
+        "href": "https://github.com/mr-chelyshkin/tasks/blob/main/concept.md#choose-versions-deliberately"
+      },
+      {
+        "label": "What matches, what can differ",
+        "href": "https://github.com/mr-chelyshkin/tasks/blob/main/concept.md#what-matches-what-can-differ"
+      }
+    ],
+    "sheet": {
+      "pinned": {
+        "title": "Pinned on purpose",
+        "items": [
+          "Task: an exact version",
+          "Shared Taskfiles: a commit",
+          "Images: a tag, or a digest for strict runs",
+          "Third-party CI steps: a commit"
+        ]
+      },
+      "honest": {
+        "title": "Same box, honestly",
+        "same": { "label": "Same", "text": "commands, image, mounts, env and cache rules" },
+        "differ": {
+          "label": "May differ",
+          "text": "sources, CPU architecture, host kernel, credentials, network, cache contents"
+        }
+      }
+    }
+  },
+  "mine": {
+    "id": "mine",
+    "kicker": ["Epilogue", "One way to build it"],
+    "title": "One way to build it: mine.",
+    "body": [
+      "My version is built for my stack and for GitHub. Use it as it is, or read it as an example for yours. The process doesn't mind."
+    ],
+    "projects": [
+      {
+        "name": "Images",
+        "stock": "paper",
+        "kicker": ["Step 01", "Tool images"],
+        "summary": "Images for the stacks I use: Go, Rust, Python, Node, Nix and Terraform. Rebuilt every week, never tagged latest.",
+        "specs": [
+          { "term": "Registry", "value": "GHCR" },
+          { "term": "Platforms", "value": "amd64 / arm64" }
+        ],
+        "links": [{ "label": "GitHub", "href": "https://github.com/mr-chelyshkin/images" }]
+      },
+      {
+        "name": "Tasks",
+        "stock": "cyan",
+        "kicker": ["Step 02", "Shared Taskfiles"],
+        "summary": "A module per tool on top of one hardened Docker runner. Projects include them pinned to a commit.",
+        "specs": [
+          { "term": "Built with", "value": "Task / Docker" },
+          { "term": "Modules", "value": "Go, Rust, Node, Terraform…" }
+        ],
+        "links": [{ "label": "GitHub", "href": "https://github.com/mr-chelyshkin/tasks" }]
+      },
+      {
+        "name": "Actions",
+        "stock": "ink",
+        "kicker": ["Steps 04–05", "GitHub Actions"],
+        "summary": "task-run calls a task by name. Checks, a gate and delivery steps cover the rest. Built for GitHub.",
+        "specs": [
+          { "term": "Adapter", "value": "task-run" },
+          { "term": "Delivery", "value": "Terraform / S3 / CloudFront" }
+        ],
+        "links": [{ "label": "GitHub", "href": "https://github.com/mr-chelyshkin/actions" }]
+      },
+      {
+        "name": "This site",
+        "stock": "grid",
+        "kicker": ["Step 03", "A consumer"],
+        "summary": "This very page shipped through it: a Taskfile with ci/node/build and a few workflows that call it.",
+        "specs": [
+          { "term": "Stack", "value": "Vue / Vite" },
+          { "term": "Delivery", "value": "S3 / CloudFront" }
+        ],
+        "links": [
+          {
+            "label": "Taskfile",
+            "href": "https://github.com/mr-chelyshkin/site/blob/main/Taskfile.yml"
+          }
+        ]
+      }
+    ]
+  },
+  "finale": {
+    "id": "finale",
+    "kicker": ["Epilogue", "The guide on one card"],
+    "title": "Use these parts. Or build your own.",
+    "body": "Either way, you end up with one command, the same box everywhere, and a gate in front of production.",
+    "checklist": [
+      "tool images in your registry",
+      "a shared Taskfile that runs them",
+      "task names in each project",
+      "a CI that calls the names",
+      "a gate in front of delivery"
+    ]
+  }
+}

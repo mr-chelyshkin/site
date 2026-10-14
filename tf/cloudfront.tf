@@ -106,6 +106,15 @@ resource "aws_cloudfront_response_headers_policy" "site" {
   }
 }
 
+resource "aws_cloudfront_function" "uri_rewrite" {
+  name    = "${local.name_prefix}-uri-rewrite"
+  comment = "Resolve site directory URLs to their S3 objects"
+  runtime = "cloudfront-js-2.0"
+
+  code    = file("${path.module}/functions/uri-rewrite.js")
+  publish = true
+}
+
 resource "aws_cloudfront_distribution" "site" {
   comment             = "Personal site"
   price_class         = "PriceClass_100"
@@ -143,6 +152,11 @@ resource "aws_cloudfront_distribution" "site" {
     cached_methods             = ["GET", "HEAD"]
     viewer_protocol_policy     = "redirect-to-https"
     compress                   = true
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.uri_rewrite.arn
+    }
   }
 
   ordered_cache_behavior {

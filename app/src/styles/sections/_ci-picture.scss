@@ -1,0 +1,211 @@
+@use '../tools';
+
+@layer sections {
+  .ci-picture__scroll {
+    padding: 28px 20px 8px;
+    overflow-x: auto;
+  }
+
+  .ci-picture__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .ci-picture__layout--wide {
+    min-width: 720px;
+  }
+
+  .ci-picture__layout--tall {
+    display: none;
+  }
+
+  .ci-picture__node,
+  .ci-picture__badge,
+  .ci-picture__stop {
+    transition: opacity var(--motion-base) var(--ease-settle);
+  }
+
+  .ci-picture__frame {
+    fill: var(--color-paper-white);
+    stroke: var(--color-ink-soft);
+    stroke-width: 1.2;
+    transition: stroke var(--motion-base) var(--ease-settle);
+  }
+
+  .ci-picture__node--on .ci-picture__frame {
+    stroke: var(--color-cyan-deep);
+    stroke-width: 2;
+  }
+
+  .ci-picture__title {
+    font: 600 11px var(--font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    fill: var(--color-ink-soft);
+  }
+
+  .ci-picture__detail {
+    font: 800 15px var(--font-mono);
+    fill: var(--color-ink);
+  }
+
+  .ci-picture__detail--small {
+    font-size: 12.5px;
+  }
+
+  .ci-picture__tag {
+    fill: var(--color-paper-white);
+    stroke: var(--color-ink-soft);
+  }
+
+  .ci-picture__tag--hot {
+    fill: var(--color-cyan-pale);
+    stroke: var(--color-cyan-deep);
+  }
+
+  .ci-picture__tag-text {
+    font: 800 12px var(--font-mono);
+    fill: var(--color-ink);
+  }
+
+  .ci-picture__edge {
+    fill: none;
+    stroke: var(--color-cyan-deep);
+    stroke-width: 2;
+    stroke-dasharray: 1;
+    transition:
+      stroke-dashoffset var(--motion-base) var(--ease-settle),
+      opacity var(--motion-base) var(--ease-settle);
+  }
+
+  .ci-picture__edge--blocked {
+    stroke: var(--ci-stop);
+    stroke-dasharray: 0.012 0.012;
+  }
+
+  .ci-picture__gate {
+    stroke: var(--color-ink);
+    stroke-width: 3;
+    stroke-dasharray: 2 6;
+  }
+
+  .ci-picture__gate-text {
+    font: 900 16px var(--font-stencil);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    fill: var(--color-ink);
+  }
+
+  .ci-picture__stop {
+    font: 900 30px var(--font-display);
+    fill: var(--ci-stop);
+  }
+
+  .ci-picture__badge-dot {
+    fill: var(--color-ink);
+  }
+
+  .ci-picture__badge-text {
+    font: 800 12px var(--font-mono);
+    fill: var(--color-paper);
+  }
+
+  .ci-picture__route {
+    fill: none;
+    stroke: none;
+  }
+
+  .ci-picture__packet {
+    fill: var(--color-cyan);
+    stroke: var(--color-ink);
+    stroke-width: 2;
+    opacity: 0;
+  }
+
+  .ci-picture__packet--on {
+    opacity: 1;
+  }
+
+  .ci-picture__toc {
+    padding: 4px 20px 22px;
+  }
+
+  .ci-picture__toc-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 24px;
+    padding-top: 6px;
+    border-top: 1.5px dashed color-mix(in srgb, var(--color-ink) 35%, transparent);
+  }
+
+  .ci-picture__toc-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    color: var(--color-ink);
+    font-size: var(--text-size-xsm);
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+
+    @media (hover: hover) {
+      &:hover {
+        color: var(--color-cyan-deep);
+      }
+    }
+  }
+
+  .ci-picture__toc-number {
+    color: var(--color-cyan-deep);
+  }
+
+  @media screen {
+    .ci-picture__node:not(.ci-picture__node--on) {
+      opacity: 0.16;
+    }
+
+    .ci-picture__edge:not(.ci-picture__edge--on) {
+      stroke-dashoffset: 1;
+    }
+
+    .ci-picture__edge--blocked:not(.ci-picture__edge--on),
+    .ci-picture__badge:not(.ci-picture__badge--on),
+    .ci-picture__stop:not(.ci-picture__stop--on) {
+      opacity: 0;
+    }
+  }
+
+  @include tools.below(md) {
+    .ci-picture__scroll {
+      padding-inline: 12px;
+      overflow-x: visible;
+    }
+
+    .ci-picture__layout--wide {
+      display: none;
+    }
+
+    .ci-picture__layout--tall {
+      display: block;
+    }
+
+    .ci-picture__layout--tall .ci-picture__title {
+      font-size: 9.5px;
+    }
+
+    .ci-picture__layout--tall .ci-picture__detail {
+      font-size: 12px;
+    }
+
+    .ci-picture__layout--tall .ci-picture__detail--small,
+    .ci-picture__layout--tall .ci-picture__tag-text {
+      font-size: 10.5px;
+    }
+
+    .ci-picture__layout--tall .ci-picture__badge-text {
+      font-size: 11px;
+    }
+  }
+}

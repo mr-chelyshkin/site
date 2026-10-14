@@ -16,7 +16,7 @@
   }
 
   .contact__body {
-    padding: clamp(28px, 3.4vw, 44px) clamp(22px, 3.6vw, 48px) 26px;
+    @include tools.sheet-inset;
   }
 
   .contact__title {
@@ -72,7 +72,7 @@
     grid-row: 2;
     margin-top: 22px;
     padding-left: 44px;
-    font: 500 clamp(19px, 1.65vw, 24px) / 1.1 var(--font-hand);
+    @include tools.handwritten;
     rotate: -2deg;
   }
 

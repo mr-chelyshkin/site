@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { RouterLink } from 'vue-router'
 import BarCode from '@/components/ui/BarCode.vue'
 import PastedSheet from '@/components/ui/PastedSheet.vue'
 import QrSticker from '@/components/ui/QrSticker.vue'
@@ -10,7 +11,7 @@ const props = defineProps<{
   order: number
 }>()
 
-const STOCKS = ['paper', 'cyan', 'ink'] as const
+const STOCKS = ['paper', 'cyan', 'ink', 'grid'] as const
 const TILTS = [-1.6, 2.3, -0.8]
 const ADVANCES: Partial<Record<string, number>> = {
   A: 0.478,
@@ -104,7 +105,11 @@ const fit = computed(() => {
       </dl>
       <ul v-if="project.links.length" class="flyer__links" role="list">
         <li v-for="link in project.links" :key="link.href">
+          <RouterLink v-if="link.href.startsWith('/')" class="flyer__link" :to="link.href"
+            >{{ link.label }} →</RouterLink
+          >
           <a
+            v-else
             class="flyer__link"
             :href="link.href"
             target="_blank"

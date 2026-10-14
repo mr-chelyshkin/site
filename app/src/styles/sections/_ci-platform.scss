@@ -1,0 +1,88 @@
+@use '../tools';
+
+@layer sections {
+  .ci-platform {
+    --ci-stop: #e5484d;
+    padding-bottom: var(--section-space);
+  }
+
+  .ci-hero {
+    padding-top: clamp(40px, 5vw, 72px);
+  }
+
+  .ci-hero__back {
+    display: inline-block;
+    padding-block: 8px;
+  }
+
+  .ci-hero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 40px var(--wall-gap);
+    margin-top: 20px;
+  }
+
+  .ci-hero__kicker {
+    justify-content: flex-start;
+    color: var(--color-wall-text);
+  }
+
+  .ci-hero__title {
+    margin-top: 14px;
+    font-size: clamp(50px, 7vw, 104px);
+  }
+
+  .ci-hero__statement {
+    margin-top: 26px;
+    color: var(--color-paper);
+    font: 900 clamp(30px, 3.4vw, 50px) / 0.95 var(--font-display);
+    text-transform: uppercase;
+  }
+
+  .ci-hero__statement-line {
+    display: block;
+  }
+
+  .ci-hero__statement-line:last-child {
+    color: var(--color-cyan);
+  }
+
+  .ci-hero__lede {
+    @include tools.public-work-lede;
+    max-width: 56ch;
+  }
+
+  .ci-part {
+    padding-top: var(--section-space);
+    font-size: clamp(56px, 10vw, 150px);
+  }
+
+  .ci-mine {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: start;
+    gap: 48px var(--wall-gap);
+    margin-top: clamp(36px, 4vw, 60px);
+  }
+
+  @include tools.below(xl) {
+    .ci-hero__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ci-hero__demo {
+      max-width: 640px;
+    }
+
+    .ci-mine {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @include tools.below(md) {
+    .ci-mine {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}

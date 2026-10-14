@@ -7,14 +7,11 @@
   }
 
   .open-source__title {
-    font-size: clamp(50px, 9.2vw, 132px);
+    @include tools.public-work-title;
   }
 
   .open-source__lede {
-    max-width: 54ch;
-    margin-top: 20px;
-    font-size: var(--text-size-sm);
-    line-height: 1.7;
+    @include tools.public-work-lede;
   }
 
   .open-source__board {
