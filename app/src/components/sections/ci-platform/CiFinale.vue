@@ -5,6 +5,7 @@ import WallLabel from '@/components/ui/WallLabel.vue'
 import WallSection from '@/components/ui/WallSection.vue'
 import { usePlayback } from '@/composables/usePlayback'
 import type { CiPlatformContent } from '@/contents'
+import { vMagnet } from '@/directives/magnet'
 
 const props = defineProps<{
   content: CiPlatformContent['finale']
@@ -47,7 +48,7 @@ const { frame } = usePlayback(root, props.content.checklist.length, 420)
           </ul>
         </div>
       </PastedSheet>
-      <a class="ci-finale__back" :href="back.href" :aria-label="back.label">
+      <a v-magnet class="ci-finale__back" :href="back.href" :aria-label="back.label">
         <WallLabel :text="`← ${back.label}`" :tilt="2" />
       </a>
     </div>
