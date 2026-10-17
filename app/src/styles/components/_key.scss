@@ -1,0 +1,43 @@
+@layer components {
+  .c-key {
+    position: relative;
+    display: block;
+    transition:
+      translate var(--motion-fast) var(--ease-settle),
+      filter var(--motion-fast) var(--ease-settle),
+      opacity var(--motion-base) var(--ease-settle);
+
+    @media (hover: hover) {
+      &:hover:not(:disabled) {
+        translate: 0 -1px;
+      }
+    }
+
+    &:active:not(:disabled),
+    &--down {
+      translate: 0 2px;
+      filter: brightness(0.95);
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+  }
+
+  .c-key__cap {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .c-key__legend {
+    position: absolute;
+    top: 10.6%;
+    left: 17.5%;
+    width: 61.9%;
+    height: 57.6%;
+    color: #24292c;
+    mix-blend-mode: multiply;
+  }
+}

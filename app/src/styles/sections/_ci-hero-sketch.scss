@@ -1,0 +1,52 @@
+@layer sections {
+  .ci-hero-sketch {
+    position: relative;
+    height: 100%;
+  }
+
+  .ci-hero-sketch__sheet {
+    height: 100%;
+  }
+
+  .ci-hero-sketch__body {
+    height: 100%;
+    padding: 34px 32px 30px;
+    container-type: inline-size;
+  }
+
+  .ci-hero-sketch .flyer-sketch,
+  .ci-hero-sketch .flyer-sketch__layout,
+  .ci-hero-sketch .flyer-sketch__svg {
+    height: 100%;
+  }
+
+  .ci-replay {
+    position: absolute;
+    right: 22px;
+    bottom: -34px;
+    z-index: calc(var(--z-paper) + 1);
+    width: 64px;
+    rotate: 7deg;
+
+    @media (prefers-reduced-motion: reduce) {
+      display: none;
+    }
+  }
+
+  .ci-replay .c-key__legend {
+    display: grid;
+    align-content: space-between;
+    padding: 12% 10%;
+    text-align: left;
+  }
+
+  .ci-replay__icon {
+    font: 800 15px / 1 var(--font-mono);
+  }
+
+  .ci-replay__label {
+    font: 800 7.4px / 1 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}

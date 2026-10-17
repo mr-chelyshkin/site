@@ -3,11 +3,6 @@
 @layer sections {
   .ci-step {
     min-width: 0;
-    scroll-margin-top: 24px;
-  }
-
-  .ci-step__body {
-    padding: clamp(28px, 3.4vw, 44px) clamp(20px, 3.4vw, 44px) clamp(24px, 3vw, 36px);
   }
 
   .ci-step__head {
@@ -18,27 +13,22 @@
 
   .ci-step__number {
     flex: none;
-    font: 900 clamp(56px, 6vw, 84px) / 0.8 var(--font-stencil);
-  }
-
-  .ci-step__kicker {
-    justify-content: flex-start;
-    color: var(--color-ink-soft);
+    font: 900 clamp(46px, 3.8vw, 64px) / 0.8 var(--font-stencil);
   }
 
   .ci-step__title {
-    margin-top: 6px;
-    font-size: clamp(32px, 3.6vw, 52px);
+    font-size: clamp(26px, 2.3vw, 36px);
     line-height: 0.9;
+    text-wrap: balance;
   }
 
   .ci-step__why {
     max-width: 62ch;
-    margin-top: 20px;
+    margin-top: 16px;
   }
 
   .ci-step__label {
-    margin-top: 22px;
+    margin-top: 16px;
     color: var(--color-ink-soft);
     font-size: var(--text-size-xsm);
     font-weight: 800;
@@ -48,8 +38,8 @@
 
   .ci-step__actions {
     display: grid;
-    gap: 10px;
-    margin-top: 10px;
+    gap: 8px;
+    margin-top: 8px;
     counter-reset: ci-action;
   }
 
@@ -75,44 +65,9 @@
     font-weight: 800;
   }
 
-  .ci-step .ci-inline-code {
-    background: color-mix(in srgb, var(--color-ink) 8%, transparent);
-    color: var(--color-ink);
-  }
-
-  .ci-step__table {
-    width: 100%;
-    margin-top: 20px;
-    border-collapse: collapse;
-    font-size: var(--text-size-sm);
-  }
-
-  .ci-step__table-caption {
-    justify-content: flex-start;
-    margin-bottom: 8px;
-    color: var(--color-ink-soft);
-    text-align: left;
-  }
-
-  .ci-step__table-row {
-    border-bottom: 1.5px dashed color-mix(in srgb, var(--color-ink) 30%, transparent);
-  }
-
-  .ci-step__table-flag {
-    padding: 8px 16px 8px 0;
-    font-weight: 800;
-    text-align: left;
-    vertical-align: top;
-    white-space: nowrap;
-  }
-
-  .ci-step__table-note {
-    padding: 8px 0;
-  }
-
   .ci-step__check {
     max-width: 70ch;
-    margin-top: 24px;
+    margin-top: 18px;
     padding: 12px 14px;
     border: 2px solid var(--color-cyan-deep);
     background: color-mix(in srgb, var(--color-cyan-pale) 70%, transparent);
@@ -131,18 +86,8 @@
     content: '✓ ' / '';
   }
 
-  .ci-step__tip {
-    max-width: 62ch;
-    margin-top: 14px;
-    color: var(--color-ink-soft);
-    font-size: var(--text-size-sm);
-  }
-
-  .ci-step__tip-label {
-    color: var(--color-ink);
-    font-size: var(--text-size-xsm);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+  .ci-step .ci-links {
+    margin-top: 16px;
   }
 
   .ci-step .ci-links__label {
@@ -162,11 +107,6 @@
   @include tools.below(md) {
     .ci-step__head {
       gap: 12px;
-    }
-
-    .ci-step__table-flag {
-      white-space: normal;
-      overflow-wrap: anywhere;
     }
   }
 }

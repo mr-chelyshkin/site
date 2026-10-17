@@ -1,0 +1,123 @@
+@use '../tools';
+
+@layer sections {
+  .ci-faq__body {
+    padding: clamp(32px, 4vw, 52px) clamp(22px, 4vw, 56px) clamp(28px, 3.4vw, 44px);
+  }
+
+  .ci-faq__kicker {
+    justify-content: flex-start;
+    gap: 0.4em 1.6em;
+    color: color-mix(in srgb, var(--color-paper) 62%, transparent);
+  }
+
+  .ci-faq__title {
+    margin-top: 10px;
+    font-size: clamp(36px, 4.4vw, 64px);
+    line-height: 0.9;
+  }
+
+  .ci-faq__columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 0 clamp(24px, 3.4vw, 52px);
+    margin-top: clamp(20px, 2.6vw, 32px);
+  }
+
+  .ci-faq__item {
+    border-top: 1.5px dashed color-mix(in srgb, var(--color-paper) 30%, transparent);
+  }
+
+  .ci-faq__column > .ci-faq__item:last-child {
+    border-bottom: 1.5px dashed color-mix(in srgb, var(--color-paper) 30%, transparent);
+  }
+
+  .ci-faq__question {
+    font: inherit;
+    text-transform: none;
+  }
+
+  .ci-faq__toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 0;
+    font-size: var(--text-size-sm);
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    text-align: left;
+    transition: color var(--motion-fast) var(--ease-settle);
+
+    @media (hover: hover) {
+      &:hover {
+        color: var(--color-cyan);
+      }
+    }
+  }
+
+  .ci-faq__item--open .ci-faq__toggle {
+    color: var(--color-cyan);
+  }
+
+  .ci-faq__sign {
+    position: relative;
+    flex: none;
+    width: 12px;
+    height: 12px;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      margin-top: -1px;
+      background: currentColor;
+      transition: rotate var(--motion-base) var(--ease-settle);
+    }
+
+    &::after {
+      rotate: 90deg;
+    }
+  }
+
+  .ci-faq__item--open .ci-faq__sign::after {
+    rotate: 0deg;
+  }
+
+  .ci-faq__answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--motion-base) var(--ease-settle);
+  }
+
+  .ci-faq__item--open .ci-faq__answer {
+    grid-template-rows: 1fr;
+  }
+
+  .ci-faq__answer-inner {
+    overflow: hidden;
+  }
+
+  .ci-faq__text {
+    max-width: 62ch;
+    padding-bottom: 16px;
+    font-size: var(--text-size-sm);
+  }
+
+  @include tools.below(md) {
+    .ci-faq__columns {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ci-faq__column + .ci-faq__column > .ci-faq__item:first-child {
+      border-top: 0;
+    }
+  }
+}

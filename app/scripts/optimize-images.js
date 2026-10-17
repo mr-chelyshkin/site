@@ -86,6 +86,13 @@ const overlays = [
     width: 240,
     scale: 2,
   },
+  {
+    name: 'keycap',
+    source: 'keycap.svg',
+    crop: [0, 0, 1, 1],
+    width: 80,
+    scale: 3,
+  },
 ]
 
 const logos = [

@@ -1,0 +1,81 @@
+@use '../tools';
+
+@layer sections {
+  .ci-ideas__head {
+    max-width: 780px;
+  }
+
+  .ci-ideas__kicker {
+    justify-content: flex-start;
+    color: var(--color-wall-text);
+  }
+
+  .ci-ideas__title {
+    margin-top: 14px;
+    color: var(--color-paper);
+    font: 900 clamp(40px, 5.6vw, 84px) / 0.92 var(--font-display);
+    text-transform: uppercase;
+  }
+
+  .ci-ideas__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    gap: 48px var(--wall-gap);
+    margin-top: clamp(36px, 4vw, 60px);
+  }
+
+  .ci-idea {
+    @include tools.flyer-inset;
+    color: var(--color-ink);
+  }
+
+  .ci-idea__stamp {
+    @include tools.stamp(17px);
+    padding: 5px 11px 3px;
+    border-width: 2.5px;
+    rotate: -3deg;
+  }
+
+  .ci-idea--cd .ci-idea__stamp {
+    color: var(--color-cyan-deep);
+  }
+
+  .ci-idea__title {
+    margin-top: 18px;
+    font: 900 clamp(32px, 2.7vw, 44px) / 0.92 var(--font-display);
+    text-transform: uppercase;
+  }
+
+  .ci-idea__text {
+    margin-top: 14px;
+    font-size: var(--text-size-sm);
+    line-height: 1.65;
+  }
+
+  .ci-idea__code {
+    margin-top: 18px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    border-radius: 3px;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-size: var(--text-size-xsm);
+    line-height: 1.7;
+  }
+
+  .ci-idea__why {
+    margin-top: 16px;
+    color: var(--color-blood);
+    @include tools.handwritten(clamp(21px, 1.7vw, 25px));
+    rotate: -1.5deg;
+    transform-origin: left center;
+  }
+
+  @include tools.below(xl) {
+    .ci-ideas__list {
+      grid-template-columns: minmax(0, 1fr);
+      max-width: 680px;
+    }
+  }
+}

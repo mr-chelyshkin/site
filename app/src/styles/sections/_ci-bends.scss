@@ -1,0 +1,155 @@
+@use '../tools';
+
+@layer sections {
+  .ci-bends .o-wall {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    align-items: center;
+    gap: clamp(36px, 4vw, 60px) clamp(36px, 4vw, 72px);
+  }
+
+  .ci-bends__head {
+    position: relative;
+    max-width: 780px;
+  }
+
+  .ci-bends__arrow {
+    position: absolute;
+    bottom: -110px;
+    left: -54px;
+    width: calc(100% + 100px);
+    height: auto;
+    overflow: visible;
+    fill: none;
+    stroke: var(--color-paper);
+    stroke-width: 26;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.16;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(transparent, #000 32%), tools.$spray-mask;
+    mask-image: linear-gradient(transparent, #000 32%), tools.$spray-mask;
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+
+  .ci-bends__kicker,
+  .ci-bends__title {
+    position: relative;
+  }
+
+  .ci-bends__kicker {
+    justify-content: flex-start;
+    color: var(--color-wall-text);
+  }
+
+  .ci-bends__title {
+    margin-top: 14px;
+    color: var(--color-paper);
+    font: 900 clamp(40px, 4.4vw, 68px) / 0.92 var(--font-display);
+    text-transform: uppercase;
+  }
+
+  .ci-bends__body {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: 28px clamp(22px, 2.6vw, 40px);
+    @include tools.sheet-inset;
+    padding-bottom: clamp(26px, 3vw, 40px);
+    color: var(--color-ink);
+  }
+
+  .ci-bends__column--bends {
+    padding-left: clamp(22px, 2.6vw, 40px);
+    border-left: 1.5px dashed color-mix(in srgb, var(--color-ink) 35%, transparent);
+  }
+
+  .ci-bends__stamp {
+    @include tools.stamp(18px);
+    padding: 5px 11px 3px;
+    border-width: 2.5px;
+    rotate: -3deg;
+  }
+
+  .ci-bends__stamp--bends {
+    color: var(--color-cyan-deep);
+    rotate: 2deg;
+  }
+
+  .ci-bends__list {
+    display: grid;
+    gap: 14px;
+    margin-top: 22px;
+  }
+
+  .ci-bends__item {
+    position: relative;
+    padding-left: 30px;
+    font-size: var(--text-size-sm);
+    line-height: 1.6;
+  }
+
+  .ci-bends__item::before {
+    content: '';
+    position: absolute;
+    top: 0.45em;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    background: var(--color-ink);
+  }
+
+  .ci-bends__list--stays .ci-bends__item {
+    font-weight: 800;
+  }
+
+  .ci-bends__list--bends .ci-bends__item::before {
+    content: '↔';
+    content: '↔' / '';
+    top: 0;
+    width: auto;
+    height: auto;
+    background: none;
+    color: var(--color-cyan-deep);
+    font-weight: 800;
+  }
+
+  @include tools.below(xl) {
+    .ci-bends .o-wall {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ci-bends__arrow {
+      display: none;
+    }
+
+    .ci-bends__title {
+      font-size: clamp(40px, 5.6vw, 84px);
+    }
+
+    .ci-bends__sheet {
+      max-width: 1080px;
+    }
+
+    .ci-bends__body {
+      gap: 28px clamp(28px, 4vw, 64px);
+    }
+
+    .ci-bends__column--bends {
+      padding-left: clamp(28px, 4vw, 64px);
+    }
+  }
+
+  @include tools.below(md) {
+    .ci-bends__body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ci-bends__column--bends {
+      padding-top: 26px;
+      padding-left: 0;
+      border-top: 1.5px dashed color-mix(in srgb, var(--color-ink) 35%, transparent);
+      border-left: 0;
+    }
+  }
+}

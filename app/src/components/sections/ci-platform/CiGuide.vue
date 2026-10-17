@@ -4,40 +4,32 @@ import PastedSheet from '@/components/ui/PastedSheet.vue'
 import SprayText from '@/components/ui/SprayText.vue'
 import WallSection from '@/components/ui/WallSection.vue'
 import CiGuideStep from '@/components/sections/ci-platform/CiGuideStep.vue'
-import type { GuideLabels, GuideStep } from '@/components/sections/ci-platform/types'
+import CiInline from '@/components/sections/ci-platform/CiInline.vue'
+import type { GuideLabels } from '@/components/sections/ci-platform/types'
+import type { CiPlatformContent } from '@/contents'
 
 const props = defineProps<{
-  content: {
-    id: string
-    headline: readonly string[]
-    title: string
-    intro: string
-    navLabel: string
-    needs: { title: string; items: readonly string[] }
-    steps: readonly GuideStep[]
-  }
+  content: CiPlatformContent['guide']
   labels: GuideLabels
 }>()
 
-const TILTS = [-0.35, 0.3, -0.2, 0.35, -0.3]
+const STOCKS = ['paper', 'white', 'paper', 'white', 'cyan'] as const
+const TILTS = [-0.6, 0.5, -0.4, 0.6, -0.5]
 
-const active = ref('')
+const sheets = ref<HTMLElement[]>([])
+const active = ref(props.content.steps[0]?.id ?? '')
 let observer: IntersectionObserver | undefined
 
 onMounted(() => {
   if (typeof IntersectionObserver === 'undefined') return
   observer = new IntersectionObserver(
     (entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) active.value = entry.target.id
-      }
+      const seen = entries.find((entry) => entry.isIntersecting)
+      if (seen) active.value = seen.target.id
     },
     { rootMargin: '-40% 0px -55% 0px' },
   )
-  for (const step of props.content.steps) {
-    const element = document.getElementById(step.id)
-    if (element) observer.observe(element)
-  }
+  sheets.value.forEach((sheet) => observer?.observe(sheet))
 })
 
 onBeforeUnmount(() => observer?.disconnect())
@@ -50,55 +42,74 @@ onBeforeUnmount(() => observer?.disconnect())
         <SprayText :lines="content.headline" aria-hidden="true" />
         <span class="u-visually-hidden">{{ content.title }}</span>
       </h2>
-      <p class="ci-guide__intro">{{ content.intro }}</p>
+      <p class="ci-guide__aside">{{ content.aside }}</p>
+      <div class="ci-guide__text">
+        <p class="ci-guide__intro">{{ content.intro }}</p>
+        <div class="ci-guide__brief">
+          <section v-for="block in content.brief" :key="block.label" class="ci-guide__block">
+            <h3 class="ci-guide__label">{{ block.label }}</h3>
+            <p v-if="block.text" class="ci-guide__copy">
+              <CiInline :text="block.text" :new-tab="labels.newTab" />
+            </p>
+            <ul
+              v-if="block.points"
+              class="ci-guide__points"
+              :class="{ 'ci-guide__points--check': block.check }"
+              role="list"
+            >
+              <li v-for="point in block.points" :key="point" class="ci-guide__point">
+                <CiInline :text="point" :new-tab="labels.newTab" />
+              </li>
+            </ul>
+            <p v-if="block.punch" class="ci-guide__punch">
+              <span class="ci-guide__mark"><CiInline :text="block.punch" /></span>
+            </p>
+            <p v-if="block.aside" class="ci-guide__note">
+              <CiInline :text="block.aside" :new-tab="labels.newTab" />
+            </p>
+          </section>
+        </div>
+      </div>
     </header>
 
-    <div class="ci-guide__layout">
-      <nav class="ci-guide__nav" :aria-label="content.navLabel">
-        <ol class="ci-guide__nav-list" role="list">
+    <div class="ci-guide__body">
+      <nav class="ci-guide__index" :aria-label="content.navLabel">
+        <ol class="ci-guide__index-list" role="list">
           <li v-for="step in content.steps" :key="step.id">
             <a
-              class="ci-guide__nav-link"
-              :class="{ 'ci-guide__nav-link--active': active === step.id }"
+              class="ci-guide__index-link"
+              :class="{ 'ci-guide__index-link--on': active === step.id }"
               :href="`#${step.id}`"
               :aria-current="active === step.id ? 'step' : undefined"
             >
-              <span class="ci-guide__nav-number">{{ step.number }}</span>
+              <span class="ci-guide__index-number">{{ step.number }}</span>
               {{ step.title }}
             </a>
           </li>
         </ol>
       </nav>
 
-      <div class="ci-guide__steps">
-        <PastedSheet
-          class="ci-guide__needs"
-          seed="ci-guide-needs"
-          stock="cyan"
-          :tape="['top-left']"
-          tape-kind="drawn"
-          :tilt="0.6"
-        >
-          <div class="ci-guide__needs-body">
-            <p class="c-kicker ci-guide__needs-title">
-              <span>{{ content.needs.title }}</span>
-            </p>
-            <ul class="ci-guide__needs-list" role="list">
-              <li v-for="(item, i) in content.needs.items" :key="i" class="ci-guide__needs-item">
-                {{ item }}
-              </li>
-            </ul>
-          </div>
-        </PastedSheet>
-
-        <CiGuideStep
+      <ol class="ci-guide__steps" role="list">
+        <li
           v-for="(step, i) in content.steps"
+          :id="step.id"
           :key="step.id"
-          :step="step"
-          :labels="labels"
-          :tilt="TILTS[i % TILTS.length] ?? 0"
-        />
-      </div>
+          ref="sheets"
+          class="ci-guide__step"
+        >
+          <PastedSheet
+            :seed="`ci-guide-${step.id}`"
+            :stock="STOCKS[i % STOCKS.length] ?? 'paper'"
+            :torn="['bottom']"
+            :tape="['top']"
+            :tilt="TILTS[i % TILTS.length] ?? 0"
+          >
+            <div class="ci-guide__sheet">
+              <CiGuideStep :step="step" :labels="labels" />
+            </div>
+          </PastedSheet>
+        </li>
+      </ol>
     </div>
   </WallSection>
 </template>

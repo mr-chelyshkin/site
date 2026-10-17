@@ -1,13 +1,11 @@
 @layer sections {
   .ci-code {
+    position: relative;
     margin-top: 18px;
+    padding-bottom: 26px;
   }
 
   .ci-code__head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
     margin-bottom: 8px;
   }
 
@@ -16,34 +14,44 @@
     color: var(--color-ink-soft);
   }
 
-  .ci-code__copy {
-    min-height: 32px;
-    padding: 0 10px;
-    border: 1px solid color-mix(in srgb, var(--color-ink) 40%, transparent);
-    color: var(--color-ink);
-    font-size: var(--text-size-xsm);
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    transition:
-      border-color var(--motion-fast) var(--ease-settle),
-      color var(--motion-fast) var(--ease-settle);
+  .ci-code__key {
+    position: absolute;
+    right: 16px;
+    bottom: 0;
+    z-index: 1;
+    width: 50px;
+    rotate: 4deg;
 
-    @media (hover: hover) {
-      &:hover {
-        border-color: var(--color-cyan-deep);
-        color: var(--color-cyan-deep);
-      }
+    .c-key__legend {
+      display: grid;
+      align-content: space-between;
+      padding: 12% 6%;
+      text-align: left;
     }
   }
 
-  .ci-code__copy--done {
-    border-color: var(--color-cyan-deep);
-    color: var(--color-cyan-deep);
+  .ci-code:nth-child(even) .ci-code__key {
+    rotate: -3deg;
+  }
+
+  .ci-code__key-icon {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .ci-code__key-label {
+    font: 800 7.4px / 1 var(--font-mono);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
   }
 
   .ci-code__body {
-    padding: 16px 18px;
+    padding: 16px 18px 32px 12px;
     overflow-x: auto;
     border-radius: 3px;
     background: var(--color-ink);
@@ -51,5 +59,49 @@
     font-size: var(--text-size-xsm);
     line-height: 1.7;
     tab-size: 2;
+    counter-reset: line;
+  }
+
+  .ci-code__line {
+    display: block;
+  }
+
+  .ci-code__line::before {
+    display: inline-block;
+    width: 2ch;
+    margin-right: 1.6ch;
+    color: color-mix(in srgb, var(--color-steel) 75%, transparent);
+    text-align: right;
+    content: counter(line);
+    counter-increment: line;
+    user-select: none;
+  }
+
+  .ci-tok--comment {
+    color: #8a9599;
+  }
+
+  .ci-tok--key {
+    color: var(--color-cyan);
+  }
+
+  .ci-tok--punct {
+    color: var(--color-steel);
+  }
+
+  .ci-tok--string {
+    color: #e6c35c;
+  }
+
+  .ci-tok--expr {
+    color: #6fcf87;
+  }
+
+  .ci-tok--flag {
+    color: var(--color-stock-cyan);
+  }
+
+  .ci-tok--keyword {
+    color: #ef6b6f;
   }
 }
