@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted } from 'vue'
-import CiExhibit from '@/components/sections/ci-platform/CiExhibit.vue'
-import CiFinale from '@/components/sections/ci-platform/CiFinale.vue'
-import CiFinePrint from '@/components/sections/ci-platform/CiFinePrint.vue'
+import CiFaq from '@/components/sections/ci-platform/CiFaq.vue'
 import CiGuide from '@/components/sections/ci-platform/CiGuide.vue'
-import CiPicture from '@/components/sections/ci-platform/CiPicture.vue'
-import CiSameBox from '@/components/sections/ci-platform/CiSameBox.vue'
-import ProjectFlyer from '@/components/sections/ProjectFlyer.vue'
+import CiHeroSketch from '@/components/sections/ci-platform/CiHeroSketch.vue'
+import CiBends from '@/components/sections/ci-platform/CiBends.vue'
+import CiBigPicture from '@/components/sections/ci-platform/CiBigPicture.vue'
+import CiDivider from '@/components/sections/ci-platform/CiDivider.vue'
+import CiIdeas from '@/components/sections/ci-platform/CiIdeas.vue'
 import SprayText from '@/components/ui/SprayText.vue'
 import WallLabel from '@/components/ui/WallLabel.vue'
 import { ciPlatformContent as content, siteContent } from '@/contents'
 import { vMagnet } from '@/directives/magnet'
 import '@/styles/ci-platform.scss'
+
+const project = siteContent.home.openSource.projects.find(({ name }) => name === content.title)
 
 let previousTitle = ''
 
@@ -46,42 +48,39 @@ onBeforeUnmount(() => {
               >{{ ' ' }}
             </template>
           </p>
-          <p class="ci-hero__lede">{{ content.hero.lead }}</p>
+          <p class="ci-hero__jump">
+            <a
+              v-for="link in content.hero.jump"
+              :key="link.href"
+              class="ci-hero__jump-link"
+              :href="link.href"
+            >
+              <span aria-hidden="true">↓</span> {{ link.label }}
+            </a>
+          </p>
         </div>
-        <div class="ci-hero__demo">
-          <CiSameBox :content="content.hero.demo" :replay-label="content.labels.replay" />
+        <div v-if="project?.sketch" class="ci-hero__demo">
+          <CiHeroSketch :sketch="project.sketch" :replay-label="content.labels.replay" />
         </div>
       </div>
     </header>
 
-    <CiExhibit :content="content.picture" :labels="content.labels" layout="stacked">
-      <CiPicture
-        :content="content.picture.scheme"
-        :steps="content.picture.steps"
-        :replay-label="content.labels.replay"
-        :toc-label="content.labels.toc"
-      />
-    </CiExhibit>
+    <CiIdeas :content="content.ideas" />
+
+    <CiBigPicture :content="content.picture" />
+
+    <CiBends :content="content.bends" />
+
+    <CiDivider :text="content.divider.text" />
 
     <CiGuide :content="content.guide" :labels="content.labels" />
 
-    <div class="ci-part o-wall" aria-hidden="true">
-      <SprayText :lines="[content.parts.epilogue]" />
-    </div>
-    <CiExhibit :content="content.finePrint" :labels="content.labels">
-      <CiFinePrint :content="content.finePrint.sheet" />
-    </CiExhibit>
-    <CiExhibit :content="content.mine" :labels="content.labels" layout="stacked">
-      <div class="ci-mine">
-        <ProjectFlyer
-          v-for="(project, i) in content.mine.projects"
-          :key="project.name"
-          :project="project"
-          :order="i"
-        />
-      </div>
-    </CiExhibit>
+    <CiFaq :content="content.faq" />
 
-    <CiFinale :content="content.finale" :back="content.back" />
+    <div class="ci-back o-wall">
+      <a v-magnet class="ci-back__link" :href="content.back.href" :aria-label="content.back.label">
+        <WallLabel :text="`← ${content.back.label}`" :tilt="2" />
+      </a>
+    </div>
   </div>
 </template>

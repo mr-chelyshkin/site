@@ -1,0 +1,504 @@
+@layer sections {
+  .ci-scene {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .ci-solid {
+    --lit: var(--color-paper-white);
+    --mid: color-mix(in srgb, var(--color-steel) 18%, var(--color-paper-white));
+    --shade: color-mix(in srgb, var(--color-steel) 34%, var(--color-paper-white));
+    stroke: var(--color-ink);
+    stroke-width: 0.8;
+    stroke-linejoin: round;
+    transition: stroke var(--motion-fast);
+  }
+
+  .ci-solid__top {
+    fill: var(--lit);
+    transition: fill var(--motion-fast);
+  }
+
+  .ci-solid__front {
+    fill: var(--mid);
+  }
+
+  .ci-solid__right {
+    fill: var(--shade);
+  }
+
+  .ci-solid--plate {
+    stroke-width: 1.2;
+  }
+
+  .ci-solid--cd {
+    --lit: var(--color-cyan-pale);
+    --mid: color-mix(in srgb, var(--color-cyan) 45%, var(--color-paper-white));
+    --shade: color-mix(in srgb, var(--color-cyan) 62%, var(--color-paper-white));
+    stroke: var(--color-cyan-deep);
+    stroke-width: 1.2;
+
+    .ci-solid__top {
+      stroke-dasharray: 5 4;
+    }
+  }
+
+  .ci-solid--alu {
+    --lit: #e3e5e6;
+    --mid: #c9cdcf;
+    --shade: #aeb3b6;
+    stroke-width: 0.6;
+  }
+
+  .ci-solid--shell {
+    --lit: #3f3a34;
+    --mid: #2a2622;
+    --shade: #1f1c19;
+  }
+
+  .ci-solid--steel {
+    --lit: #6b665e;
+    --mid: #55514a;
+    --shade: #45413b;
+  }
+
+  .ci-solid--vault {
+    --lit: #5a6064;
+    --mid: #42474b;
+    --shade: #33373a;
+  }
+
+  .ci-solid--kraft {
+    --lit: #dcc59c;
+    --mid: #c4a87a;
+    --shade: #a98d61;
+  }
+
+  .ci-solid--src {
+    --lit: #ef5a5f;
+    --mid: #c1121f;
+    --shade: #9a0e18;
+  }
+
+  .ci-solid--lit {
+    --lit: var(--color-cyan-pale);
+    --mid: color-mix(in srgb, var(--color-cyan) 45%, var(--color-paper-white));
+    --shade: color-mix(in srgb, var(--color-cyan) 60%, var(--color-paper-white));
+    stroke: var(--color-cyan-deep);
+  }
+
+  .ci-scene__hatch-ground {
+    fill: var(--color-paper-white);
+  }
+
+  .ci-scene__hatch {
+    stroke: var(--color-ink);
+    stroke-width: 0.7;
+  }
+
+  .ci-scene__zone-title {
+    fill: var(--color-ink);
+    font: 900 17px var(--font-stencil);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .ci-scene__zone-note {
+    fill: var(--color-ink-soft);
+    font: 500 8.6px var(--font-mono);
+    letter-spacing: 0.04em;
+  }
+
+  .ci-scene__zone--deliver {
+    .ci-scene__zone-title,
+    .ci-scene__zone-note {
+      fill: var(--color-cyan-deep);
+    }
+  }
+
+  .ci-scene__path {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+    stroke-linejoin: round;
+  }
+
+  .ci-scene__token {
+    stroke: var(--color-ink);
+    stroke-width: 1;
+  }
+
+  .ci-scene__dot--laptop .ci-scene__token {
+    fill: var(--dot-laptop);
+  }
+
+  .ci-scene__dot--runner .ci-scene__token {
+    fill: var(--dot-runner);
+  }
+
+  .ci-scene__dot--shared .ci-scene__token {
+    fill: var(--dot-shared);
+  }
+
+  .ci-scene__token-label {
+    fill: var(--color-ink);
+    font: 800 7px var(--font-mono);
+    letter-spacing: 0.04em;
+    paint-order: stroke;
+    stroke: var(--color-paper-white);
+    stroke-width: 2.5px;
+    stroke-linejoin: round;
+  }
+
+  .ci-scene__bezel {
+    fill: #0d0e10;
+    stroke: var(--color-ink);
+    stroke-width: 0.6;
+  }
+
+  .ci-scene__display {
+    fill: #10161d;
+  }
+
+  .ci-scene__term {
+    fill: #c5ced6;
+    font: 400 4.6px var(--font-mono);
+
+    &--prompt {
+      fill: #e6c35c;
+    }
+
+    &--ok {
+      fill: #4ccf6a;
+    }
+  }
+
+  .ci-scene__lid {
+    fill: #c9cdcf;
+    stroke: var(--color-ink);
+    stroke-width: 0.6;
+
+    &--side {
+      fill: #aeb3b6;
+    }
+  }
+
+  .ci-scene__print {
+    fill: var(--color-ink);
+    font: 600 5.2px var(--font-mono);
+
+    &--strong {
+      font-weight: 800;
+    }
+
+    &--tool {
+      font: 900 9px var(--font-mono);
+      text-transform: uppercase;
+    }
+
+    &--small {
+      font-size: 4.4px;
+    }
+
+    &--task {
+      font-size: 7px;
+    }
+
+    &--src {
+      fill: #fff;
+      font-size: 8px;
+      font-weight: 900;
+    }
+  }
+
+  .ci-scene__check {
+    fill: var(--color-cyan-deep);
+    font: 900 6px var(--font-mono);
+
+    &--task {
+      font-size: 7px;
+    }
+  }
+
+  .ci-scene__keyboard {
+    fill: #1a1c1f;
+    stroke: none;
+  }
+
+  .ci-scene__key {
+    fill: #3a3d42;
+    stroke: none;
+  }
+
+  .ci-scene__trackpad {
+    fill: #d5d8da;
+    stroke: #9da2a6;
+    stroke-width: 0.4;
+  }
+
+  .ci-scene__marker {
+    fill: var(--color-cyan);
+    opacity: 0.45;
+  }
+
+  .ci-scene__lines {
+    fill: var(--color-ink);
+    opacity: 0.25;
+  }
+
+  .ci-scene__crate-tape {
+    fill: #efe4cd;
+    opacity: 0.8;
+    stroke: none;
+  }
+
+  .ci-scene__crate-label {
+    fill: var(--color-paper-white);
+    stroke: var(--color-ink);
+    stroke-width: 0.4;
+  }
+
+  .ci-scene__crate-text {
+    fill: var(--color-ink);
+    font: 800 3.6px var(--font-mono);
+    text-anchor: middle;
+  }
+
+  .ci-scene__drum-side {
+    fill: #8f989d;
+    stroke: var(--color-ink);
+    stroke-width: 0.8;
+    stroke-linejoin: round;
+  }
+
+  .ci-scene__drum-band {
+    fill: none;
+    stroke: #5f676b;
+    stroke-width: 0.8;
+  }
+
+  .ci-scene__drum-top {
+    fill: #c3c9cc;
+    stroke: var(--color-ink);
+    stroke-width: 0.8;
+  }
+
+  .ci-scene__drum-glow {
+    fill: var(--color-cyan);
+    stroke: none;
+  }
+
+  .ci-scene__drum-text {
+    fill: #f4f6f6;
+    font: 900 5.4px var(--font-mono);
+    letter-spacing: 0.08em;
+    text-anchor: middle;
+    text-transform: uppercase;
+  }
+
+  .ci-scene__glass-back {
+    fill: color-mix(in srgb, var(--color-cyan) 3%, transparent);
+    stroke: var(--color-cyan-deep);
+    stroke-width: 0.6;
+    stroke-dasharray: 2 2;
+  }
+
+  .ci-scene__glass {
+    fill: color-mix(in srgb, var(--color-cyan) 6%, transparent);
+    stroke: var(--color-cyan-deep);
+    stroke-width: 1.4;
+    stroke-linejoin: round;
+  }
+
+  .ci-scene__glow {
+    fill: var(--color-cyan);
+    stroke: none;
+  }
+
+  .ci-scene__rim {
+    fill: none;
+    stroke: var(--color-cyan-deep);
+    stroke-width: 1.4;
+    stroke-linejoin: round;
+  }
+
+  .ci-scene__glass-tag {
+    fill: var(--color-cyan-deep);
+    font: 800 6px var(--font-mono);
+  }
+
+  .ci-scene__arm {
+    stroke: #f4f1ea;
+    stroke-width: 3.6;
+    stroke-linecap: round;
+
+    &--edge {
+      stroke: var(--color-ink);
+      stroke-width: 5.2;
+    }
+
+    &--stripes {
+      stroke: #e5484d;
+      stroke-dasharray: 7 7;
+      stroke-linecap: butt;
+    }
+  }
+
+  .ci-scene__stencil {
+    fill: #e9ecec;
+    font: 900 8px var(--font-stencil);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .ci-scene__engraving {
+    fill: #c9cdcf;
+    font: 600 4px var(--font-mono);
+    letter-spacing: 0.04em;
+  }
+
+  .ci-scene__dial {
+    fill: #c9cdcf;
+    stroke: var(--color-ink);
+    stroke-width: 0.6;
+  }
+
+  .ci-scene__dial-core {
+    fill: #8d9397;
+    stroke: var(--color-ink);
+    stroke-width: 0.5;
+  }
+
+  .ci-scene__dial-ticks,
+  .ci-scene__handle {
+    fill: none;
+    stroke: #d7dbdd;
+    stroke-width: 1.4;
+    stroke-linecap: round;
+  }
+
+  .ci-scene__shackle {
+    fill: none;
+    stroke: #b9bec1;
+    stroke-width: 1.6;
+  }
+
+  .ci-scene__lock-body {
+    fill: #c9a24a;
+    stroke: var(--color-ink);
+    stroke-width: 0.5;
+  }
+
+  .ci-scene__keyhole {
+    fill: var(--color-ink);
+  }
+
+  .ci-scene__bay {
+    fill: #383c40;
+    stroke: #121314;
+    stroke-width: 0.5;
+  }
+
+  .ci-scene__bay-grip {
+    stroke: #8d9397;
+    stroke-width: 0.8;
+    stroke-linecap: round;
+  }
+
+  .ci-scene__led {
+    fill: #4ccf6a;
+    stroke: none;
+
+    &--amber {
+      fill: #e6c35c;
+    }
+  }
+
+  .ci-scene__power {
+    fill: none;
+    stroke: #8d9397;
+    stroke-width: 0.8;
+  }
+
+  .ci-scene__label {
+    fill: var(--color-ink);
+    font: 800 8.4px var(--font-mono);
+    letter-spacing: 0.12em;
+    text-anchor: middle;
+    text-transform: uppercase;
+    transition: fill var(--motion-fast);
+  }
+
+  .ci-scene__label--decal {
+    font-size: 6.5px;
+  }
+
+  .ci-scene__label-tag {
+    fill: var(--color-paper-white);
+    stroke: var(--color-ink);
+    stroke-width: 0.8;
+    transition:
+      fill var(--motion-fast),
+      stroke var(--motion-fast);
+  }
+
+  .ci-scene__part {
+    cursor: pointer;
+    transition: opacity var(--motion-base) var(--ease-settle);
+
+    &:focus {
+      outline: none;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-cyan-deep);
+      outline-offset: 3px;
+    }
+  }
+
+  .ci-scene__part--live {
+    .ci-scene__label {
+      fill: var(--color-cyan-deep);
+    }
+
+    .ci-scene__label-tag {
+      stroke: var(--color-cyan-deep);
+    }
+  }
+
+  .ci-scene__part--on {
+    .ci-scene__label {
+      fill: var(--color-paper);
+    }
+
+    .ci-scene__label-tag {
+      fill: var(--color-ink);
+    }
+  }
+
+  .ci-scene__part--on .ci-solid {
+    stroke: var(--color-cyan-deep);
+  }
+
+  .ci-scene__part--off,
+  .ci-scene--picked .ci-scene__path,
+  .ci-scene--picked .ci-scene__dot,
+  .ci-scene--picked .ci-scene__plate {
+    opacity: 0.25;
+  }
+
+  .ci-scene__path,
+  .ci-scene__dot,
+  .ci-scene__plate {
+    transition: opacity var(--motion-base) var(--ease-settle);
+  }
+
+  @media (hover: hover) {
+    .ci-scene__part:not(.ci-scene__part--on):hover .ci-scene__label-tag {
+      fill: var(--color-cyan-pale);
+    }
+  }
+}

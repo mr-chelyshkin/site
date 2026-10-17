@@ -29,6 +29,15 @@
   border-bottom: 2px solid currentColor;
 }
 
+@mixin stamp($size: 13px) {
+  display: inline-block;
+  padding: 4px 9px 2px;
+  border: 2px solid currentColor;
+  font: 900 #{$size} / 1 var(--font-stencil);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
 @mixin handwritten($size: clamp(19px, 1.65vw, 24px)) {
   font: 500 #{$size} / 1.1 var(--font-hand);
 }

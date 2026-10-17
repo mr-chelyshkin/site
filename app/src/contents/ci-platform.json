@@ -1,101 +1,364 @@
 {
   "title": "CI/CD Platform",
-  "description": "Describe a build once and run it in the same container on your laptop and in any CI, with deploys kept in CI. The whole picture, then a guide to build your own.",
-  "back": { "label": "Public works", "href": "/#code" },
+  "description": "Same task, same box, on your laptop and in any CI. The whole picture and a guide to build your own.",
+  "back": {
+    "label": "Public works",
+    "href": "/#code"
+  },
   "labels": {
-    "example": "Full example",
+    "example": "See it",
     "replay": "Replay",
     "newTab": "opens in a new tab",
-    "toc": "Jump to a step",
-    "step": "Step",
     "do": "Do",
     "check": "Check",
-    "tip": "Tip",
     "copy": "Copy",
     "copied": "Copied"
   },
-  "parts": { "epilogue": "Epilogue" },
   "hero": {
-    "kicker": "A guide to platform CI/CD",
+    "kicker": "A setup you build yourself",
     "headline": ["CI/CD", "Platform"],
-    "statement": ["Same command.", "Same box.", "Your laptop and any CI."],
-    "lead": "Describe a build once, in the project. It runs in the same container on your laptop and in any CI, and deploys stay in CI. Below: the whole picture, then a guide to build your own.",
-    "demo": {
-      "laptop": "your laptop",
-      "runner": "any CI runner",
-      "command": "task ci/node/build",
-      "run": "→ docker run your-registry/node:22",
-      "done": "✓ app/dist ready",
-      "image": "your-registry/node:22",
-      "chips": ["same image", "same mounts", "same flags"],
-      "stamp": "Same box",
-      "poster": "It works on my ~machine~ box."
-    }
+    "statement": ["Same task.", "Same box.", "Your laptop and any CI."],
+    "jump": [
+      {
+        "label": "How it works",
+        "href": "#how"
+      },
+      {
+        "label": "Build your own",
+        "href": "#guide"
+      },
+      {
+        "label": "FAQ",
+        "href": "#faq"
+      }
+    ]
+  },
+  "ideas": {
+    "id": "how",
+    "kicker": "How it works",
+    "title": "Three ideas. The rest is detail.",
+    "items": [
+      {
+        "stamp": "Run",
+        "title": "Tasks do the work.",
+        "text": "Every check and build is a named task. It runs in a container, the same box on your laptop and on any runner. Common tasks are written once and shared: use them as they are, tweak them or write your own.",
+        "code": "ci/node/build:\n  image: ci/node\n  run: npm run build",
+        "why": "one build, not one for you and one for CI"
+      },
+      {
+        "stamp": "Route",
+        "title": "Workflows only route.",
+        "text": "A workflow listens for events and calls tasks by name. It never installs a toolchain or runs a build itself. Routing and execution are different jobs, and they stay apart.",
+        "code": "on: push\ncall: ci/node/build",
+        "why": "switch CI, keep every task"
+      },
+      {
+        "stamp": "Deliver",
+        "title": "Delivery isn't yours to rewrite.",
+        "text": "Deploy, apply and publish own the credentials and how they run. A project only passes inputs, like a domain or a bucket.",
+        "code": "deliver: static-site\ndomain: example.com\nbucket: my-site",
+        "why": "every release goes the same way"
+      }
+    ]
   },
   "picture": {
     "id": "picture",
-    "kicker": ["Before the guide", "Everything at once"],
-    "title": "The whole picture.",
-    "body": [
-      "A registry holds tool images. A shared Taskfile knows how to run them. Each project names its work. Your laptop and any CI call those names and get the same box. Delivery waits behind a gate, for CI only."
-    ],
-    "scheme": {
-      "registry": { "title": "your-registry", "tags": ["node:22", "terraform:1.15", "go:1.27"] },
-      "shared": { "title": "Shared Taskfile", "detail": "how to run a tool" },
-      "project": { "title": "Project Taskfile", "detail": "ci/node/build" },
-      "laptop": { "title": "Your laptop", "detail": "task ci/node/build" },
-      "runner": { "title": "Any CI runner", "detail": "task ci/node/build" },
-      "box": { "title": "The box", "detail": "your-registry/node:22" },
+    "kicker": "The idea in motion",
+    "title": "Two callers, one box.",
+    "lede": "Everything from the first call to the release, on one sheet. Pick any part to look closer.",
+    "swipe": "Swipe to see the whole scheme",
+    "scene": {
+      "label": "The whole scheme: a laptop calls one task by name, a runner runs a workflow of task names. Each CI task joins its shared task in the project's tasks and runs in the box. The result and the cache stay outside the box, and the cache outlives every run. Deploy is a project task without a shared one: it runs past the box, through the gate to delivery, which only takes inputs.",
+      "zones": {
+        "route": {
+          "title": "Route",
+          "note": "a laptop calls a task, a runner a workflow"
+        },
+        "run": {
+          "title": "Run",
+          "note": "tasks do the work, in the box"
+        },
+        "deliver": {
+          "title": "Deliver",
+          "note": "not yours to rewrite"
+        }
+      },
+      "command": "ci/node/build",
+      "event": "push",
+      "workflow": ["lint", "test", "build", "deploy"],
+      "tasks": ["ci/node/lint", "ci/node/test", "ci/node/build", "cd/node/deploy"],
+      "tool": "node",
+      "images": ["go", "terraform", "node"],
+      "code": "src",
       "result": "app/dist",
-      "gate": "Gate",
-      "delivery": { "title": "Delivery", "detail": "deploy · apply · publish" }
+      "cache": "cache",
+      "vault": ["CD", "deploy, apply, publish"]
     },
-    "steps": [
-      { "href": "#step-images", "number": "01", "label": "Pack the tools" },
-      { "href": "#step-run", "number": "02", "label": "Teach the run" },
-      { "href": "#step-contract", "number": "03", "label": "Name the work" },
-      { "href": "#step-ci", "number": "04", "label": "Call it from CI" },
-      { "href": "#step-gate", "number": "05", "label": "Gate the delivery" }
-    ]
+    "panel": {
+      "intro": {
+        "kicker": "How to read it",
+        "title": "Follow the dots.",
+        "legend": [
+          {
+            "tone": "laptop",
+            "text": "Laptop: you call one task by name."
+          },
+          {
+            "tone": "runner",
+            "text": "Runner: an event starts the workflow."
+          },
+          {
+            "tone": "shared",
+            "text": "Shared task: common logic any project can reuse."
+          }
+        ]
+      },
+      "pick": "Parts of the scheme",
+      "back": "The whole run",
+      "previous": {
+        "key": "prev",
+        "label": "Previous part"
+      },
+      "next": {
+        "key": "next",
+        "label": "Next part"
+      },
+      "parts": [
+        {
+          "id": "laptop",
+          "zone": "Route",
+          "label": "Laptop",
+          "text": "Run the CI tasks **before you push**: `lint`, `test`, `build`, right on your machine.",
+          "points": [
+            {
+              "title": "Nothing to set up",
+              "text": "No tools to install, no versions to match. The box brings them."
+            },
+            {
+              "title": "Breaks here first",
+              "text": "A broken build shows up on your machine, not later in a CI log."
+            }
+          ]
+        },
+        {
+          "id": "runner",
+          "zone": "Route",
+          "label": "Runner",
+          "text": "An event starts the **whole workflow** on a runner: `lint`, `test`, `build`, then `deploy`.",
+          "points": [
+            {
+              "title": "A bare runner is enough",
+              "text": "Docker-in-Docker, nothing else. No toolchains to install or keep up to date on CI machines."
+            },
+            {
+              "title": "Privileges under control",
+              "text": "You decide what each task container may do, down to dropping every capability."
+            },
+            {
+              "title": "No surprises after a push",
+              "text": "These are the tasks you already ran on your laptop. Green there means green here."
+            }
+          ]
+        },
+        {
+          "id": "project",
+          "zone": "Run",
+          "label": "Project tasks",
+          "text": "The project's **own task list**: names, arguments and versions are decided here, not in CI config.",
+          "points": [
+            {
+              "title": "Shared blocks, your way",
+              "text": "Use a shared task as it is, pass it your own arguments or run your own command in its image."
+            },
+            {
+              "title": "Project quirks welcome",
+              "text": "Anything only this project needs becomes a task of its own, right next to the shared ones."
+            },
+            {
+              "title": "Updates when you say so",
+              "text": "A change in a shared task reaches your project only when you choose to take it."
+            }
+          ]
+        },
+        {
+          "id": "shared",
+          "zone": "Run",
+          "label": "Shared tasks",
+          "text": "**How to run a tool**, written once: the image, the mounts, the cache and the flags.",
+          "points": [
+            {
+              "title": "No copy-paste between repos",
+              "text": "Projects call the shared task instead of carrying the same container commands around."
+            },
+            {
+              "title": "One fix reaches everyone",
+              "text": "Tune a flag or add a cache once, and every project using it gets the change on its next update."
+            },
+            {
+              "title": "Defaults you can override",
+              "text": "Version, arguments, env and container settings come preset. A project changes what it needs; the safety flags stay put."
+            }
+          ]
+        },
+        {
+          "id": "registry",
+          "zone": "Run",
+          "label": "Images",
+          "text": "**The tools themselves**, packed into images and tagged by tool version: `node:22.23.1`, `golang:1.27.1`, `terraform:1.15.9`.",
+          "points": [
+            {
+              "title": "The tag tells the truth",
+              "text": "It is the tool's version, and there is no latest. You always know what you are running."
+            }
+          ]
+        },
+        {
+          "id": "box",
+          "zone": "Run",
+          "label": "The box",
+          "text": "A **fresh container** for every run: tools from the image, your code mounted in.",
+          "points": [
+            {
+              "title": "Clean every time",
+              "text": "Nothing leaks in from the last run or from your machine. If it passes here, it isn't luck."
+            },
+            {
+              "title": "In and out on purpose",
+              "text": "Folders, env, ports and the user are part of the task's setup. Nothing crosses the walls unless the task lets it."
+            },
+            {
+              "title": "Fast reruns",
+              "text": "Caches live outside and are mounted in. Nothing gets downloaded twice."
+            }
+          ]
+        },
+        {
+          "id": "gate",
+          "zone": "Deliver",
+          "label": "The gate",
+          "text": "**One checkpoint** between CI and CD: delivery starts only when every task before it is green.",
+          "points": [
+            {
+              "title": "One required check",
+              "text": "Protect the branch with the gate alone. Add or rename tasks, and the rule keeps working."
+            },
+            {
+              "title": "When and whether",
+              "text": "The workflow decides when delivery runs. The gate decides whether it may."
+            },
+            {
+              "title": "Exceptions on purpose",
+              "text": "Mark the jobs that may be skipped or ignored. Everything else has to pass."
+            }
+          ]
+        },
+        {
+          "id": "delivery",
+          "zone": "Deliver",
+          "label": "Delivery",
+          "text": "**Deploy, apply and publish** come ready-made. A project fills in its inputs and calls them.",
+          "points": [
+            {
+              "title": "Ships on day one",
+              "text": "A new project sets a few inputs and releases like the rest. No release scripts to write or review."
+            },
+            {
+              "title": "Every release looks the same",
+              "text": "One way out for every project. When something breaks, it breaks in a place you already know."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "divider": {
+    "text": "Want one of your own? The details are below"
+  },
+  "bends": {
+    "id": "bends",
+    "kicker": "Flexible by design",
+    "title": "Three things stay. Everything else bends.",
+    "stays": {
+      "label": "Stays",
+      "items": [
+        "Tasks do the work, in a container.",
+        "Workflows call names and nothing else.",
+        "Delivery takes inputs, not commands."
+      ]
+    },
+    "bend": {
+      "label": "Bends",
+      "items": [
+        "Any CI that runs a shell and starts containers.",
+        "Docker or Podman as the engine: one setting in the runner.",
+        "A shared task as it is, with your vars, your own command in its image, or a task of your own.",
+        "Ready-made workflow presets, or your own workflows built from the same blocks.",
+        "Delivery as a workflow preset or as a task no project can include.",
+        "My images and modules, or yours. Caches wherever you point them."
+      ]
+    }
   },
   "guide": {
     "id": "guide",
     "headline": ["The guide"],
     "title": "The guide: build your own",
-    "intro": "The steps go in build order. Each one ends with a check you can run before moving on.",
+    "aside": "An example, not a recipe.",
+    "intro": "The concept doesn't care which tools you pick. This guide does: it's written for Taskfile and GitHub Actions, the pair I run myself. Most steps end with a check you can run before moving on.",
+    "brief": [
+      {
+        "label": "Tasks",
+        "text": "I run tasks with [Taskfile](https://taskfile.dev). It already has what this setup leans on:",
+        "points": [
+          "[Remote includes](https://taskfile.dev/docs/remote-taskfiles) fetch shared Taskfiles straight from a repo, pinned to a commit.",
+          "[Vars](https://taskfile.dev/docs/guide/includes#vars-of-included-taskfiles) and [env](https://taskfile.dev/docs/guide/environment) let each project tune what it brings in.",
+          "[Internal tasks](https://taskfile.dev/docs/guide/defining-tasks#internal-tasks) keep the helpers out of the task list."
+        ],
+        "aside": "The same idea works with [just](https://just.systems) or [Make](https://www.gnu.org/software/make/) too, but you'll write more glue: neither can fetch shared files from a repo."
+      },
+      {
+        "label": "CI",
+        "text": "The CI part of the guide is written for [GitHub Actions](https://docs.github.com/actions), because that's where my code lives. The process itself runs just as well on [GitLab CI](https://docs.gitlab.com/ci/), [Gitea Actions](https://docs.gitea.com/usage/actions/overview), [Jenkins](https://www.jenkins.io/doc/) or any CI that has a shell and can start containers.",
+        "punch": "Only the files that call the tasks change. The images and the tasks stay as they are."
+      },
+      {
+        "label": "Before you start",
+        "points": [
+          "[Docker](https://docs.docker.com/get-started/get-docker/) and [Task](https://taskfile.dev/docs/installation) on your machine",
+          "a registry you can push images to",
+          "a git repo for the shared Taskfiles",
+          "a CI whose runners can run Docker-in-Docker"
+        ],
+        "check": true
+      },
+      {
+        "label": "Shortcut",
+        "text": "Rather not build it all yourself? Take mine: [images](https://github.com/mr-chelyshkin/images), [tasks](https://github.com/mr-chelyshkin/tasks) and [actions](https://github.com/mr-chelyshkin/actions).",
+        "aside": "This site runs on them too: here are its [Taskfile](https://github.com/mr-chelyshkin/site/blob/main/Taskfile.yml) and [workflows](https://github.com/mr-chelyshkin/site/tree/main/.github/workflows)."
+      }
+    ],
     "navLabel": "Steps of the guide",
-    "needs": {
-      "title": "Before you start",
-      "items": [
-        "Docker and Task on your machine",
-        "A container registry you can push to",
-        "A git repository for shared Taskfiles",
-        "Any CI whose runners can start containers"
-      ]
-    },
     "steps": [
       {
         "id": "step-images",
         "number": "01",
         "title": "Pack the tools",
-        "why": "Every tool a project needs lives in an image, at a pinned version. Nobody installs a toolchain by hand.",
+        "why": "Every tool lives in an image, at a pinned version. Nobody installs a toolchain by hand.",
         "actions": [
-          "Write a Dockerfile per tool and keep the versions it takes next to it.",
+          "Write a Dockerfile per tool.",
           "Build it for every platform your laptops and runners use.",
-          "Push it to your registry under a version tag. Skip `latest`."
+          "Push it to your registry under a version tag, not `latest`."
         ],
         "code": [
           {
             "label": "tools/node/Dockerfile",
-            "code": "ARG NODE_VERSION=22\nFROM node:${NODE_VERSION}-bookworm-slim\nWORKDIR /workspace"
+            "code": "ARG NODE_VERSION=22.23.1\nFROM node:${NODE_VERSION}-bookworm-slim\nWORKDIR /workspace"
           },
           {
             "label": "Build and publish",
-            "code": "docker buildx build --platform linux/amd64,linux/arm64 \\\n  --build-arg NODE_VERSION=22 \\\n  --tag your-registry/node:22 --push tools/node"
+            "code": "docker buildx build --platform linux/amd64,linux/arm64 \\\n  --build-arg NODE_VERSION=22.23.1 \\\n  --tag your-registry/node:22.23.1 --push tools/node"
           }
         ],
-        "check": "`docker run --rm your-registry/node:22 node --version` prints the version you pinned.",
-        "tip": "Rebuild on a schedule to pick up patches. Pin a digest when you need the exact bytes.",
+        "check": "`docker run --rm your-registry/node:22.23.1 node --version` prints the version you pinned.",
         "links": [
           {
             "label": "images → ci/node",
@@ -111,46 +374,52 @@
         "id": "step-run",
         "number": "02",
         "title": "Teach the run",
-        "why": "One shared Taskfile knows how to start each tool's container. Projects call it instead of copying `docker run` lines.",
+        "why": "One shared task starts every container. Tool modules decide what runs in it, projects only change the settings.",
+        "layers": {
+          "label": "How a call travels",
+          "items": [
+            {
+              "name": "Project",
+              "file": "Taskfile.yml",
+              "text": "names the work and holds the settings"
+            },
+            {
+              "name": "Module",
+              "file": "shared-tasks/node/Taskfile.yml",
+              "text": "decides what runs: the image, the cache"
+            },
+            {
+              "name": "Runner",
+              "file": "shared-tasks/docker/Taskfile.yml",
+              "text": "decides how it starts: the safety flags"
+            }
+          ],
+          "hops": [
+            "calls `node:exec` with its settings",
+            "calls `docker:run`, settings in `TASK_CONTEXT`",
+            "runs `docker run`"
+          ],
+          "end": "The box"
+        },
         "actions": [
-          "Create a repository for shared Taskfiles, one file per tool.",
-          "Add a task that runs a command in the tool's image, with the project mounted and the cache kept on the host.",
-          "Lock the container down: drop capabilities, forbid new privileges, run as the host user.",
-          "Tag a release. Projects will pin its commit."
+          "Write the runner: one `run` task. It fixes the safe part (no root, no capabilities, the project at `/workspace`, the cache on the host) and takes the rest as settings with defaults.",
+          "Build a module per tool on top: it picks the image and the cache, then calls the runner, included as `internal`.",
+          "Grow `run` and a read-only `audit` from `exec`. Pass `TASK_CONTEXT` down at each hop: that's how a project's settings reach the runner.",
+          "Tag a release. Projects pin its commit."
         ],
         "code": [
           {
-            "label": "shared-tasks/node/Taskfile.yml",
-            "code": "version: '3'\n\ntasks:\n  exec:\n    cmds:\n      - docker run --rm --init --cap-drop ALL\n          --security-opt no-new-privileges\n          --user \"$(id -u):$(id -g)\"\n          --volume \"{{.ROOT_DIR}}:/workspace\"\n          --volume \"{{.ROOT_DIR}}/.cache/node:/tmp/cache\"\n          --workdir /workspace\n          your-registry/node:{{.NODE_VERSION | default \"22\"}}\n          sh -c '{{.CMD}}'"
-          }
-        ],
-        "table": {
-          "caption": "What the flags do",
-          "rows": [
-            { "flag": "--rm --init", "note": "The container goes away after the run." },
-            {
-              "flag": "--volume <project>:/workspace",
-              "note": "Your project is mounted, not copied."
-            },
-            {
-              "flag": "--volume .cache/node",
-              "note": "The cache stays on your disk between runs."
-            },
-            {
-              "flag": "--cap-drop ALL, no-new-privileges",
-              "note": "No superpowers inside the box."
-            },
-            { "flag": "--user $(id -u):$(id -g)", "note": "Files come out yours, not root's." }
-          ]
-        },
-        "check": "`task --taskfile shared-tasks/node/Taskfile.yml exec CMD='node --version'` prints the version from inside the container, and no root-owned files appear.",
-        "links": [
-          {
-            "label": "tasks · Quick start",
-            "href": "https://github.com/mr-chelyshkin/tasks#quick-start"
+            "label": "shared-tasks/docker/Taskfile.yml",
+            "code": "# Tool modules decide what to run. This file decides how.\nversion: '3'\n\ntasks:\n  run:\n    requires:\n      vars: [IMAGE, CMD, PROJECT_ROOT]\n    vars:\n      # the caller's vars, project settings included\n      context:\n        ref: '.TASK_CONTEXT | default .'\n      # settings, each with a default\n      engine: '{{.context.CONTAINER_ENGINE | default \"docker\"}}'\n      mount: '{{.context.CONTAINER_MOUNT_MODE | default \"rw\"}}'\n      envs: '{{.context.CONTAINER_ENVS | default \"\"}}'\n      ports: '{{.context.CONTAINER_PORTS | default \"\"}}'\n    cmds:\n      - |\n        # fixed for every tool: no root, no capabilities\n        set -- {{.engine}} run --rm --init \\\n          --cap-drop ALL --security-opt no-new-privileges \\\n          --user \"$(id -u):$(id -g)\" --env HOME=/tmp \\\n          --volume {{.PROJECT_ROOT | shellQuote}}:/workspace:{{.mount}} \\\n          --workdir /workspace/{{.WORKDIR | default \".\"}}\n        # the cache stays on the host between runs\n        {{if .CACHE_DIR}}\n        mkdir -p {{.PROJECT_ROOT | shellQuote}}/{{.CACHE_DIR}}\n        set -- \"$@\" --volume {{.PROJECT_ROOT | shellQuote}}/{{.CACHE_DIR}}:{{.CACHE_TARGET}}\n        {{end}}\n        {{range .ENVS}}set -- \"$@\" --env {{. | shellQuote}}\n        {{end}}\n        {{range (.envs | splitArgs)}}set -- \"$@\" --env {{.}}\n        {{end}}\n        {{range (.ports | splitArgs)}}set -- \"$@\" --publish {{.}}\n        {{end}}\n        exec \"$@\" {{.IMAGE}} {{.CMD}}"
           },
           {
-            "label": "The Docker runner",
+            "label": "shared-tasks/node/Taskfile.yml",
+            "code": "version: '3'\n\nincludes:\n  docker:\n    taskfile: ../docker/Taskfile.yml\n    internal: true # projects never call the runner directly\n\ntasks:\n  exec:\n    requires:\n      vars: [CMD]\n    vars:\n      context:\n        ref: '.TASK_CONTEXT | default .'\n      version: '{{.context.NODE_VERSION | default \"22.23.1\"}}'\n    cmds:\n      # what to run is decided here, how to run it in the runner\n      - task: docker:run\n        vars:\n          IMAGE: 'your-registry/node:{{.version}}'\n          CMD: '{{.CMD}}'\n          PROJECT_ROOT: '{{.context.PROJECT_ROOT | default .ROOT_DIR}}'\n          WORKDIR: '{{.context.NODE_DIR | default \".\"}}'\n          CACHE_DIR: .cache/node\n          CACHE_TARGET: /tmp/node-cache\n          ENVS: [NPM_CONFIG_CACHE=/tmp/node-cache]\n          # the project's settings travel down with the call\n          TASK_CONTEXT:\n            ref: .context\n\n  # an npm script, built on exec\n  run:\n    requires:\n      vars: [SCRIPT]\n    cmds:\n      - task: exec\n        vars:\n          CMD: sh -c 'npm ci && npm run {{.SCRIPT}}'\n          TASK_CONTEXT:\n            ref: '.TASK_CONTEXT | default .'\n\n  # read-only, whatever the project set\n  audit:\n    cmds:\n      - task: exec\n        vars:\n          CMD: npm audit --audit-level=high\n          TASK_CONTEXT:\n            ref: 'merge (dict \"CONTAINER_MOUNT_MODE\" \"ro\") (.TASK_CONTEXT | default .)'"
+          }
+        ],
+        "links": [
+          {
+            "label": "The runner",
             "href": "https://github.com/mr-chelyshkin/tasks/blob/main/taskfiles/docker/Taskfile.yml"
           },
           {
@@ -158,8 +427,8 @@
             "href": "https://github.com/mr-chelyshkin/tasks/blob/main/taskfiles/node/Taskfile.yml"
           },
           {
-            "label": "Ephemeral runtime, persistent files",
-            "href": "https://github.com/mr-chelyshkin/tasks/blob/main/concept.md#ephemeral-runtime-persistent-files"
+            "label": "Quick start",
+            "href": "https://github.com/mr-chelyshkin/tasks#quick-start"
           }
         ]
       },
@@ -167,21 +436,23 @@
         "id": "step-contract",
         "number": "03",
         "title": "Name the work",
-        "why": "The project owns the names CI will call and what they do. The name is the contract. The steps behind it are yours.",
+        "why": "The project decides what each name does. CI only ever sees the names.",
         "actions": [
-          "Include the shared Taskfile, pinned to a commit.",
-          "Declare a `ci/<area>/<verb>` task for everything CI should run: build, test, lint.",
-          "Change the steps behind a name whenever you like. Keep the name."
+          "Include the module, pinned to a commit. Its `vars` apply to every call from the project.",
+          "Add a `ci/<area>/<verb>` task for everything CI should run: build, test, lint.",
+          "Use a shared task as is, give it an argument, or run your own command. A setting passed with one call stays with that call."
         ],
         "code": [
           {
             "label": "Taskfile.yml, in the project",
-            "code": "version: '3'\n\nincludes:\n  node: https://your-git/shared-tasks/raw/<commit>/node/Taskfile.yml\n\ntasks:\n  ci/node/build:\n    cmds:\n      - task: node:exec\n        vars: { CMD: npm ci && npm run build }"
+            "code": "version: '3'\n\nincludes:\n  node:\n    taskfile: https://your-git/shared-tasks/raw/<commit>/node/Taskfile.yml\n    vars: # for every call from this project\n      NODE_VERSION: '22.23.1'\n      NODE_DIR: app\n      CONTAINER_ENVS: NPM_TOKEN\n\ntasks:\n  ci/node/build: # a shared task with an argument\n    cmds:\n      - task: node:run\n        vars: { SCRIPT: build }\n\n  ci/node/audit: # a shared task as is\n    cmds:\n      - task: node:audit\n\n  run/dev: # your own command, a setting for this call only\n    cmds:\n      - task: node:exec\n        vars:\n          CMD: sh -c 'npm ci && npm run dev -- --host 0.0.0.0'\n          CONTAINER_PORTS: 127.0.0.1:5173:5173"
           },
-          { "label": "Run it", "code": "task ci/node/build" }
+          {
+            "label": "Run it",
+            "code": "task ci/node/build"
+          }
         ],
         "check": "`task ci/node/build` passes on your laptop.",
-        "tip": "Shared templates can bring ready jobs. A project uses one as it is, overrides it, or writes its own.",
         "links": [
           {
             "label": "This site's Taskfile",
@@ -193,16 +464,21 @@
         "id": "step-ci",
         "number": "04",
         "title": "Call it from CI",
-        "why": "CI runs the same names on its runners. It needs Docker, Task and nothing project-specific.",
+        "why": "CI gets one thin wrapper: it installs Task and runs a task by name. The job passes the name and its arguments, nothing else.",
         "actions": [
-          "Make sure your runners can start containers. Docker-in-docker is fine, with capabilities dropped.",
-          "Install Task in the job, or use a small adapter that does it for you.",
-          "Call `task <name>` for each check. Decide in the workflow which events run which names."
+          "Give your runners Docker-in-Docker: the tasks start their containers there.",
+          "Write the wrapper once: install Task at a pinned version, check its checksum, keep it cached, run the task.",
+          "Give it two inputs: the task name and its arguments, one per line. Arguments reach Task as data, never through a shell.",
+          "Call it once per check, then add a last job that passes only when all of them passed."
         ],
         "code": [
           {
-            "label": "The same call, different CIs",
-            "code": "# GitHub Actions\n- run: task ci/node/build\n\n# GitLab CI\nscript: task ci/node/build\n\n# Jenkins\nsh 'task ci/node/build'"
+            "label": ".github/workflows/pr.yml",
+            "code": "jobs:\n  build:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@v7\n      - uses: mr-chelyshkin/actions/task-run@v2\n        with:\n          task: ci/node/build # a name from the project's Taskfile\n          args: | # optional, one per line, passed as data\n            KEY=value\n\n  audit:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@v7\n      - uses: mr-chelyshkin/actions/task-run@v2\n        with:\n          task: ci/node/audit\n\n  gate: # passes only when every check passed\n    if: always()\n    needs: [build, audit]\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: mr-chelyshkin/actions/job-results-check@v2\n        with:\n          results: ${{ toJSON(needs) }}"
+          },
+          {
+            "label": "The same wrapper in other CIs: a sketch",
+            "code": "# GitLab CI: a job template from a shared repo\ninclude:\n  - project: your-group/ci-templates\n    ref: <commit>\n    file: task-run.yml\n\nbuild:\n  extends: .task-run\n  variables:\n    TASK_NAME: ci/node/build\n    TASK_ARGS: KEY=value\n\n# Jenkins: a step from a shared library\n@Library('ci-templates@<commit>') _\ntaskRun(name: 'ci/node/build', args: ['KEY=value'])"
           }
         ],
         "check": "A pull request runs the same `ci/node/build` as your laptop and gets the same result.",
@@ -212,158 +488,78 @@
             "href": "https://github.com/mr-chelyshkin/actions/tree/main/task-run"
           },
           {
-            "label": "Workflow presets",
-            "href": "https://github.com/mr-chelyshkin/actions#workflows"
+            "label": "The last job",
+            "href": "https://github.com/mr-chelyshkin/actions/tree/main/job-results-check"
+          },
+          {
+            "label": "GitLab includes",
+            "href": "https://docs.gitlab.com/ci/yaml/includes/"
+          },
+          {
+            "label": "Jenkins shared libraries",
+            "href": "https://www.jenkins.io/doc/book/pipeline/shared-libraries/"
           }
         ]
       },
       {
-        "id": "step-gate",
+        "id": "step-deploy",
         "number": "05",
-        "title": "Gate the delivery",
-        "why": "Deploys need production keys. They run only in CI, after the checks, and skip the task wrapper.",
+        "title": "Keep the deploy separate",
+        "why": "Delivery is written once, outside the projects. A project fills in the settings and never touches the steps.",
         "actions": [
-          "Add a final job that passes only when every check passed.",
-          "Run delivery after it, on tags or the main branch, with short-lived keys.",
-          "Keep delivery out of Taskfiles. Nobody should be able to deploy from a laptop."
+          "Write the deploy once: as a ready-made pipeline step, or as a task projects can't include.",
+          "Take settings only: names, regions, buckets. No commands.",
+          "Run it after all checks pass, on tags or the main branch, with short-lived keys."
         ],
-        "zones": {
-          "label": "Reproducible tasks run anywhere. Privileged delivery runs only in CI.",
-          "reproducible": {
-            "label": "Reproducible · anywhere",
-            "items": ["fmt", "lint", "test", "build", "docs", "plan"]
-          },
-          "gate": "Gate",
-          "privileged": {
-            "label": "Privileged · CI only",
-            "items": ["deploy", "apply", "publish", "invalidate"]
-          },
-          "note": "deploy is a right, not a command."
-        },
-        "check": "Your laptop can run every `ci/*` task and none of the delivery steps.",
+        "check": "Your laptop can run every `ci/*` task and none of the deploy steps.",
         "links": [
           {
-            "label": "The gate",
-            "href": "https://github.com/mr-chelyshkin/actions/tree/main/job-results-check"
+            "label": "A ready-made deploy",
+            "href": "https://github.com/mr-chelyshkin/actions/blob/main/.github/workflows/cd-aws-s3-static.yml"
           },
           {
             "label": "terraform-apply",
             "href": "https://github.com/mr-chelyshkin/actions/tree/main/terraform-apply"
-          },
+          }
+        ],
+        "code": [
           {
-            "label": "aws-cloudfront-invalidate",
-            "href": "https://github.com/mr-chelyshkin/actions/tree/main/aws-cloudfront-invalidate"
+            "label": ".github/workflows/publish.yml",
+            "code": "deploy:\n  needs: build\n  uses: …/cd-aws-s3-static.yml@v2\n  permissions:\n    contents: read\n    id-token: write # the job gets short-lived AWS keys, no stored secrets\n  with:\n    aws-role-arn: ${{ vars.AWS_DEPLOY_ROLE_ARN }}\n    aws-region: ${{ vars.AWS_REGION }}\n    domain-name: ${{ vars.SITE_DOMAIN_NAME }}\n    site-bucket-name: ${{ vars.SITE_BUCKET_NAME }}"
           }
         ]
       }
     ]
   },
-  "finePrint": {
-    "id": "fine-print",
-    "kicker": ["Epilogue", "Read before use"],
-    "title": "The fine print, in large type.",
-    "body": ["Pin versions on purpose. And know what the box promises, and what it doesn't."],
-    "linksLabel": "Read more",
-    "links": [
+  "faq": {
+    "id": "faq",
+    "kicker": ["The fine print"],
+    "title": "FAQ",
+    "items": [
       {
-        "label": "Choose versions deliberately",
-        "href": "https://github.com/mr-chelyshkin/tasks/blob/main/concept.md#choose-versions-deliberately"
+        "q": "Why not put the build in the workflow?",
+        "a": "Then it only runs in CI. A task runs the same on your laptop, and a new CI doesn't mean a new build."
       },
       {
-        "label": "What matches, what can differ",
-        "href": "https://github.com/mr-chelyshkin/tasks/blob/main/concept.md#what-matches-what-can-differ"
+        "q": "Can a project write its own tasks?",
+        "a": "Sure. Use a shared task as is, pass it vars, run your own command through `exec`, or write one from scratch. CI only sees the name."
+      },
+      {
+        "q": "Where do caches live?",
+        "a": "In a folder of the project, mounted into the container. The container starts clean every time, the cache doesn't. On CI, its own cache keeps that folder between runs."
+      },
+      {
+        "q": "Does the runner need privileged Docker?",
+        "a": "Yes, for Docker-in-Docker: without it the tasks have nowhere to start their containers. Keep the privileges with the daemon. Task containers drop every capability, can't gain new ones and run as your user. If a task truly needs a capability, add that one on its call, never `--privileged`."
+      },
+      {
+        "q": "Can a project change delivery?",
+        "a": "It passes inputs: names, regions, buckets. The steps stay fixed: a workflow preset after the gate, or a locked task no project can include."
+      },
+      {
+        "q": "Is the box identical everywhere?",
+        "a": "Same image, same mounts, same flags. The CPU may differ, which is why the images are built for amd64 and arm64."
       }
-    ],
-    "sheet": {
-      "pinned": {
-        "title": "Pinned on purpose",
-        "items": [
-          "Task: an exact version",
-          "Shared Taskfiles: a commit",
-          "Images: a tag, or a digest for strict runs",
-          "Third-party CI steps: a commit"
-        ]
-      },
-      "honest": {
-        "title": "Same box, honestly",
-        "same": { "label": "Same", "text": "commands, image, mounts, env and cache rules" },
-        "differ": {
-          "label": "May differ",
-          "text": "sources, CPU architecture, host kernel, credentials, network, cache contents"
-        }
-      }
-    }
-  },
-  "mine": {
-    "id": "mine",
-    "kicker": ["Epilogue", "One way to build it"],
-    "title": "One way to build it: mine.",
-    "body": [
-      "My version is built for my stack and for GitHub. Use it as it is, or read it as an example for yours. The process doesn't mind."
-    ],
-    "projects": [
-      {
-        "name": "Images",
-        "stock": "paper",
-        "kicker": ["Step 01", "Tool images"],
-        "summary": "Images for the stacks I use: Go, Rust, Python, Node, Nix and Terraform. Rebuilt every week, never tagged latest.",
-        "specs": [
-          { "term": "Registry", "value": "GHCR" },
-          { "term": "Platforms", "value": "amd64 / arm64" }
-        ],
-        "links": [{ "label": "GitHub", "href": "https://github.com/mr-chelyshkin/images" }]
-      },
-      {
-        "name": "Tasks",
-        "stock": "cyan",
-        "kicker": ["Step 02", "Shared Taskfiles"],
-        "summary": "A module per tool on top of one hardened Docker runner. Projects include them pinned to a commit.",
-        "specs": [
-          { "term": "Built with", "value": "Task / Docker" },
-          { "term": "Modules", "value": "Go, Rust, Node, Terraform…" }
-        ],
-        "links": [{ "label": "GitHub", "href": "https://github.com/mr-chelyshkin/tasks" }]
-      },
-      {
-        "name": "Actions",
-        "stock": "ink",
-        "kicker": ["Steps 04–05", "GitHub Actions"],
-        "summary": "task-run calls a task by name. Checks, a gate and delivery steps cover the rest. Built for GitHub.",
-        "specs": [
-          { "term": "Adapter", "value": "task-run" },
-          { "term": "Delivery", "value": "Terraform / S3 / CloudFront" }
-        ],
-        "links": [{ "label": "GitHub", "href": "https://github.com/mr-chelyshkin/actions" }]
-      },
-      {
-        "name": "This site",
-        "stock": "grid",
-        "kicker": ["Step 03", "A consumer"],
-        "summary": "This very page shipped through it: a Taskfile with ci/node/build and a few workflows that call it.",
-        "specs": [
-          { "term": "Stack", "value": "Vue / Vite" },
-          { "term": "Delivery", "value": "S3 / CloudFront" }
-        ],
-        "links": [
-          {
-            "label": "Taskfile",
-            "href": "https://github.com/mr-chelyshkin/site/blob/main/Taskfile.yml"
-          }
-        ]
-      }
-    ]
-  },
-  "finale": {
-    "id": "finale",
-    "kicker": ["Epilogue", "The guide on one card"],
-    "title": "Use these parts. Or build your own.",
-    "body": "Either way, you end up with one command, the same box everywhere, and a gate in front of production.",
-    "checklist": [
-      "tool images in your registry",
-      "a shared Taskfile that runs them",
-      "task names in each project",
-      "a CI that calls the names",
-      "a gate in front of delivery"
     ]
   }
 }

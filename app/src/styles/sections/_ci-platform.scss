@@ -18,9 +18,12 @@
   .ci-hero__grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    align-items: center;
     gap: 40px var(--wall-gap);
     margin-top: 20px;
+  }
+
+  .ci-hero__demo {
+    contain: size;
   }
 
   .ci-hero__kicker {
@@ -45,25 +48,41 @@
   }
 
   .ci-hero__statement-line:last-child {
+    margin-top: 0.12em;
     color: var(--color-cyan);
+    @include tools.handwritten(clamp(36px, 4vw, 60px));
+    text-transform: none;
+    rotate: -2deg;
+    transform-origin: left center;
   }
 
-  .ci-hero__lede {
-    @include tools.public-work-lede;
-    max-width: 56ch;
+  .ci-hero__jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 26px;
+    margin-top: 22px;
   }
 
-  .ci-part {
-    padding-top: var(--section-space);
-    font-size: clamp(56px, 10vw, 150px);
+  .ci-hero__jump-link {
+    @include tools.link-label;
+    @include tools.underlined-link;
+    color: var(--color-paper);
+    transition: color var(--motion-fast) var(--ease-settle);
+
+    @media (hover: hover) {
+      &:hover {
+        color: var(--color-blood);
+      }
+    }
   }
 
-  .ci-mine {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    align-items: start;
-    gap: 48px var(--wall-gap);
-    margin-top: clamp(36px, 4vw, 60px);
+  .ci-back {
+    padding-top: clamp(48px, 6vw, 96px);
+  }
+
+  .ci-back__link {
+    display: inline-block;
+    padding: 8px;
   }
 
   @include tools.below(xl) {
@@ -73,16 +92,7 @@
 
     .ci-hero__demo {
       max-width: 640px;
-    }
-
-    .ci-mine {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @include tools.below(md) {
-    .ci-mine {
-      grid-template-columns: minmax(0, 1fr);
+      contain: none;
     }
   }
 }

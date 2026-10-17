@@ -66,7 +66,7 @@
         {
           "key": "platforms",
           "title": "Internal developer platforms",
-          "description": "Ship on a Friday afternoon, go home, enjoy the weekend. That’s the whole spec."
+          "description": "Ship on a Friday afternoon, go home, enjoy the weekend. That's the whole spec."
         },
         {
           "key": "runtime",
@@ -76,7 +76,7 @@
         {
           "key": "infrastructure",
           "title": "Hybrid cloud & bare metal",
-          "description": "Someone else’s computer or your own, humming in a rack. I’m at home with both."
+          "description": "Someone else's computer or your own, humming in a rack. I'm at home with both."
         }
       ]
     },
@@ -120,7 +120,7 @@
           "name": "Ozon Tech",
           "unit": "Commerce",
           "role": "Lead DevOps Engineer",
-          "note": "Built the platform behind the marketplace’s mobile apps: Mac Studios, emulators, and releases nobody had to babysit.",
+          "note": "Built the platform behind the marketplace's mobile apps: Mac Studios, emulators, and releases nobody had to babysit.",
           "pass": "laminated",
           "from": "2022-02",
           "to": "2023-06",
@@ -131,7 +131,7 @@
           "name": "Aqua Security",
           "unit": "Cloud security",
           "role": "Senior SRE (Core)",
-          "note": "Moved customer databases to Aurora Serverless, and nobody noticed. In SRE, that’s the compliment.",
+          "note": "Moved customer databases to Aurora Serverless, and nobody noticed. In SRE, that's the compliment.",
           "pass": "smartcard",
           "from": "2023-09",
           "to": "2025-11",
@@ -153,7 +153,7 @@
           "name": "Banank",
           "unit": "Digital banking",
           "role": "Staff Engineer",
-          "note": "Building a bank’s infra from scratch on Google Cloud. No legacy yet — give it time.",
+          "note": "Building a bank's infra from scratch on Google Cloud. No legacy yet — give it time.",
           "pass": "metal",
           "from": "2025-12",
           "to": null,
@@ -173,13 +173,27 @@
           "name": "CI/CD Platform",
           "stock": "grid",
           "kicker": ["Images / Tasks / Actions", "Walkthrough"],
-          "summary": "Same command, same box, on your laptop and in any CI.",
+          "summary": "Simple on purpose. Every need lands in one of the three.",
           "specs": [],
           "sketch": {
-            "command": "task ci/node/build",
-            "from": ["laptop", "any CI"],
-            "image": "node:22",
-            "to": "same box"
+            "caption": "every CI diagram ever",
+            "trigger": "on push",
+            "tasks": ["lint", "test", "build"],
+            "deploy": "deploy",
+            "rewrite": "my build",
+            "insert": "e2e",
+            "split": { "above": "CI", "below": "CD" },
+            "notes": [
+              { "title": ["arrows = workflow"], "body": ["it only says names"] },
+              {
+                "title": ["steps = tasks,", "they do the work"],
+                "body": ["swap one, add your own"]
+              },
+              {
+                "title": ["last step = CD"],
+                "body": ["its keys, its wheel.", "you only say where"]
+              }
+            ]
           },
           "stain": "coffee",
           "links": [{ "label": "Read the walkthrough", "href": "/works/ci-platform" }]
@@ -189,7 +203,7 @@
     "contact": {
       "id": "contact",
       "label": "Write to me",
-      "headline": ["Tell me what", "you’re building."],
+      "headline": ["Tell me what", "you're building."],
       "description": "For independent project work or a platform engineering role, send me a short note about the product and where you need help.",
       "email": "mr.chelyshkin@icloud.com",
       "hint": "tear one off: it copies the address",

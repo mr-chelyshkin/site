@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { ExhibitLink } from '@/components/sections/ci-platform/types'
+import type { GuideLink } from '@/components/sections/ci-platform/types'
 
 defineProps<{
   label: string
-  links: readonly ExhibitLink[]
+  links: readonly GuideLink[]
   newTab: string
 }>()
 </script>

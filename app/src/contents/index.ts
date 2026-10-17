@@ -7,6 +7,20 @@ export type SiteContent = typeof siteContent
 export type HomeContent = SiteContent['home']
 export type StackLayer = HomeContent['practice']['layers'][number]
 export type Company = HomeContent['commerce']['companies'][number]
+export interface SketchNote {
+  title: readonly string[]
+  body: readonly string[]
+}
+export interface ProjectSketch {
+  caption: string
+  trigger: string
+  tasks: readonly string[]
+  deploy: string
+  rewrite: string
+  insert: string
+  split: { above: string; below: string }
+  notes: readonly SketchNote[]
+}
 export interface Project {
   name: string
   stock: string
@@ -15,7 +29,7 @@ export interface Project {
   specs: readonly { term: string; value: string }[]
   links: readonly { label: string; href: string }[]
   qr?: string
-  sketch?: { command: string; from: readonly string[]; image: string; to: string }
+  sketch?: ProjectSketch
   stain?: string
 }
 export type SocialProfiles = SiteContent['socialProfiles']

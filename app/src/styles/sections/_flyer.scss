@@ -131,100 +131,150 @@
     overflow: visible;
   }
 
-  .flyer-sketch__term {
-    fill: var(--color-ink);
-  }
-
-  .flyer-sketch__dot {
-    fill: var(--color-steel);
-  }
-
-  .flyer-sketch__where {
-    font: 600 10px var(--font-mono);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    fill: var(--color-steel);
-  }
-
-  .flyer-sketch__prompt {
-    font-family: var(--font-mono);
-    font-weight: 600;
-    fill: var(--color-paper);
-  }
-
-  .flyer-sketch__dollar {
-    fill: var(--color-cyan);
-  }
-
-  .flyer-sketch__wire {
+  .flyer-sketch__pencil {
     fill: none;
-    stroke: var(--color-ink);
-    stroke-width: 1.8;
+    stroke: var(--color-steel);
+    stroke-width: 1.4;
+  }
+
+  .flyer-sketch__box {
+    fill: color-mix(in srgb, var(--color-paper-white) 70%, transparent);
+  }
+
+  .flyer-sketch__label {
+    font: 600 12.5px var(--font-mono);
+    text-anchor: middle;
+    fill: var(--color-ink-soft);
+  }
+
+  .flyer-sketch__caption {
+    font: 500 18px var(--font-hand);
+    fill: var(--color-steel);
+  }
+
+  .flyer-sketch__pen {
+    fill: none;
+    stroke: var(--color-blood);
+    stroke-width: 2.3;
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke-dasharray: 1;
   }
 
-  .flyer-sketch__face {
-    stroke: var(--color-ink);
-    stroke-width: 1.8;
-    stroke-linejoin: round;
+  .flyer-sketch__stroke--strike {
+    stroke-width: 3;
   }
 
-  .flyer-sketch__face--front {
+  .flyer-sketch__lock {
     fill: var(--color-paper-white);
+    stroke: var(--color-blood);
+    stroke-width: 2.2;
+
+    path {
+      fill: none;
+    }
   }
 
-  .flyer-sketch__face--top {
-    fill: color-mix(in srgb, var(--color-ink) 8%, var(--color-paper-white));
-  }
-
-  .flyer-sketch__face--side {
-    fill: color-mix(in srgb, var(--color-ink) 26%, var(--color-paper-white));
-  }
-
-  .flyer-sketch__image {
-    font: 800 15px var(--font-mono);
-    fill: var(--color-ink);
-  }
-
+  .flyer-sketch__mark,
   .flyer-sketch__note {
-    font: 500 26px var(--font-hand);
-    fill: var(--color-ink);
-    transform-box: fill-box;
-    transform-origin: center;
-    rotate: -4deg;
+    font: 500 18px var(--font-hand);
+    fill: var(--color-blood);
+  }
+
+  .flyer-sketch__mark {
+    font-size: 22px;
+    text-anchor: end;
+  }
+
+  .flyer-sketch__note-title {
+    font-size: 24px;
+  }
+
+  .flyer-sketch__tape {
+    fill: var(--color-cyan);
+    opacity: 0.5;
+  }
+
+  .flyer-sketch__split {
+    font: 500 30px var(--font-hand);
+    fill: var(--color-cyan-deep);
   }
 
   @media screen and (prefers-reduced-motion: no-preference) {
-    .flyer-sketch__source,
-    .flyer-sketch__box,
-    .flyer-sketch__note {
+    .flyer-sketch__pencil,
+    .flyer-sketch__label,
+    .flyer-sketch__caption,
+    .flyer-sketch__lock,
+    .flyer-sketch__mark,
+    .flyer-sketch__note,
+    .flyer-sketch__split {
       transition: opacity var(--motion-base) var(--ease-settle) var(--delay, 0ms);
     }
 
-    .flyer-sketch__wire {
-      transition: stroke-dashoffset 700ms var(--ease-settle) calc(var(--delay, 0ms) + 250ms);
+    .flyer-sketch__stroke {
+      stroke-dasharray: 1 2;
+      transition: stroke-dashoffset 450ms var(--ease-settle) var(--delay, 0ms);
     }
 
-    .flyer-sketch__box,
-    .flyer-sketch__arrow {
-      --delay: 750ms;
+    .flyer-sketch__tape {
+      --delay: 2400ms;
+      transform-box: fill-box;
+      transform-origin: left center;
+      transition: scale 600ms var(--ease-settle) var(--delay);
     }
 
-    .flyer-sketch__note {
-      --delay: 1150ms;
+    .flyer-sketch__stroke--pointer {
+      --delay: 850ms;
+    }
+
+    .flyer-sketch__stroke--brace {
+      --delay: 1100ms;
+    }
+
+    .flyer-sketch__stroke--strike {
+      --delay: 1450ms;
+    }
+
+    .flyer-sketch__mark--rewrite {
+      --delay: 1550ms;
+    }
+
+    .flyer-sketch__stroke--caret {
+      --delay: 1700ms;
+    }
+
+    .flyer-sketch__mark--insert {
+      --delay: 1780ms;
+    }
+
+    .flyer-sketch__stroke--frame {
+      --delay: 1950ms;
+    }
+
+    .flyer-sketch__lock {
+      --delay: 2150ms;
+    }
+
+    .flyer-sketch__split {
+      --delay: 2700ms;
     }
 
     .flyer-sketch:not(.flyer-sketch--drawn) {
-      .flyer-sketch__source,
-      .flyer-sketch__box,
-      .flyer-sketch__note {
+      .flyer-sketch__pencil,
+      .flyer-sketch__label,
+      .flyer-sketch__caption,
+      .flyer-sketch__lock,
+      .flyer-sketch__mark,
+      .flyer-sketch__note,
+      .flyer-sketch__split {
         opacity: 0;
       }
 
-      .flyer-sketch__wire {
-        stroke-dashoffset: 1;
+      .flyer-sketch__stroke {
+        stroke-dashoffset: 1.01;
+      }
+
+      .flyer-sketch__tape {
+        scale: 0 1;
       }
     }
   }

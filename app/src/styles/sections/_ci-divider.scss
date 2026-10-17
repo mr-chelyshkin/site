@@ -1,0 +1,36 @@
+@use '../tools';
+
+@layer sections {
+  .ci-divider {
+    margin-top: var(--section-space);
+    padding-block: 24px;
+    overflow-x: clip;
+  }
+
+  .ci-divider__tape {
+    display: flex;
+    gap: 2.4em;
+    width: max-content;
+    min-width: calc(100% + 40px);
+    margin-inline: -20px;
+    padding: 15px 20px 14px;
+    background: tools.$paper-grain, var(--color-stock-cyan);
+    color: var(--color-ink);
+    font: 800 var(--text-size-sm) / 1 var(--font-mono);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    rotate: calc(-1.1deg * var(--tilt-scale));
+    box-shadow: 0 6px 14px rgb(0 0 0 / 50%);
+
+    @include tools.below(md) {
+      font-size: var(--text-size-xsm);
+    }
+  }
+
+  .ci-divider__run::after {
+    content: '✂';
+    content: '✂' / '';
+    margin-left: 2.4em;
+  }
+}
