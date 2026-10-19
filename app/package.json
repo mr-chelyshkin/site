@@ -16,24 +16,24 @@
     "qr-codes": "swift scripts/qr.swift"
   },
   "dependencies": {
-    "vue": "3.5.43",
+    "vue": "3.5.44",
     "vue-router": "5.4.0"
   },
   "devDependencies": {
     "@tsconfig/node22": "22.0.6",
     "@types/node": "24.1.0",
-    "@vitejs/plugin-vue": "6.0.9",
+    "@vitejs/plugin-vue": "6.0.10",
     "@vue/eslint-config-prettier": "10.2.0",
     "@vue/tsconfig": "0.9.1",
     "eslint": "9.32.0",
     "eslint-plugin-vue": "10.11.1",
     "jiti": "2.7.0",
-    "prettier": "3.9.9",
+    "prettier": "3.9.10",
     "sass-embedded": "1.105.1",
     "sharp": "0.35.5",
     "typescript": "5.8.3",
-    "typescript-eslint": "8.71.1",
+    "typescript-eslint": "8.71.2",
     "vite": "7.3.6",
-    "vue-tsc": "3.3.12"
+    "vue-tsc": "3.3.13"
   }
 }
