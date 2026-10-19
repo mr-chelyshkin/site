@@ -92,6 +92,7 @@ watch(selected, async (id) => {
             :torn="['bottom']"
             :tape="['top']"
             :tilt="-0.4"
+            live
           >
             <div ref="scroller" class="ci-picture__scroll" tabindex="0" :aria-label="content.swipe">
               <div class="ci-picture__body">
