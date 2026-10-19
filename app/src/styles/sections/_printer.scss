@@ -190,6 +190,12 @@
       letter-spacing: 0.2em;
       text-transform: uppercase;
       opacity: 0.6;
+
+      .printer--jammed & {
+        color: #e5484d;
+        font-weight: 800;
+        opacity: 1;
+      }
     }
 
     .printer--printing &::before {
@@ -576,6 +582,10 @@
       }
     }
 
+    &--error {
+      color: #e5484d;
+    }
+
     &--note {
       top: calc(100% - var(--receipt-room) + 34px);
       right: auto;
@@ -677,15 +687,11 @@
 
   @include tools.below(md) {
     .printer {
-      --receipt-room: 64px;
+      --receipt-room: max(64px, calc(var(--paper-height, 0px) - 13px));
 
       width: 224px;
       zoom: 1.38;
       transition: padding-bottom var(--motion-base) var(--ease-settle);
-    }
-
-    .printer:not(.printer--ready) {
-      --receipt-room: 320px;
     }
 
     .printer__mount {

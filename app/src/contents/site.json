@@ -233,6 +233,7 @@
           }
         ],
         "hint": "tear it off",
+        "error": "error",
         "note": "it's in your downloads",
         "jam": {
           "title": "Paper jam",
