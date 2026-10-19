@@ -38,6 +38,7 @@ const ordered = computed(() => ({
   role: props.printer.roles.find((r) => r.id === order.value?.role),
 }))
 const note = ref(false)
+const jammed = computed(() => outcome.value === 'jam' && state.value !== 'ready')
 const status = computed(() => {
   if (state.value === 'printing') return 'Printing…'
   if (outcome.value === 'jam') {
@@ -127,6 +128,8 @@ function save(file: Blob, of: Order) {
 
 const printKey = ref<HTMLButtonElement | null>(null)
 const paper = ref<HTMLButtonElement | null>(null)
+const paperHeight = ref(0)
+watch(paper, (el) => (paperHeight.value = el?.offsetHeight ?? 0), { flush: 'post' })
 
 function tear() {
   if (state.value !== 'printed') return
@@ -163,7 +166,8 @@ onBeforeUnmount(() => {
   <div
     ref="root"
     class="printer"
-    :class="[`printer--${state}`, { 'printer--jammed': outcome === 'jam' && state !== 'ready' }]"
+    :class="[`printer--${state}`, { 'printer--jammed': jammed }]"
+    :style="paperHeight ? { '--paper-height': `${paperHeight}px` } : undefined"
   >
     <svg class="printer__cable" viewBox="0 0 60 520" aria-hidden="true" focusable="false">
       <path class="printer__cable-shadow" d="M4 176C32 182 42 222 36 286S22 420 26 470" />
@@ -227,7 +231,7 @@ onBeforeUnmount(() => {
         <span class="printer__seam" aria-hidden="true" />
         <WallLabel class="printer__label" text="CV printer" :tilt="-2" />
         <span class="printer__led" aria-hidden="true"
-          ><span class="printer__led-legend">Ready</span></span
+          ><span class="printer__led-legend">{{ jammed ? 'Error' : 'Ready' }}</span></span
         >
         <div class="printer__panel">
           <div
@@ -334,7 +338,14 @@ onBeforeUnmount(() => {
       </span>
     </button>
 
-    <p v-if="state === 'printed'" class="printer__hint" aria-hidden="true">{{ printer.hint }}</p>
+    <p
+      v-if="state === 'printed'"
+      class="printer__hint"
+      :class="{ 'printer__hint--error': jammed }"
+      aria-hidden="true"
+    >
+      {{ jammed ? printer.error : printer.hint }}
+    </p>
     <p v-if="note" class="printer__hint printer__hint--note" aria-hidden="true">
       {{ printer.note }}
     </p>

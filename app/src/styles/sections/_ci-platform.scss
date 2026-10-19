@@ -105,4 +105,10 @@
       contain: none;
     }
   }
+
+  @include tools.below(md) {
+    .ci-hero__demo {
+      display: none;
+    }
+  }
 }
