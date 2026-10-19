@@ -190,6 +190,12 @@
       letter-spacing: 0.2em;
       text-transform: uppercase;
       opacity: 0.6;
+
+      .printer--jammed & {
+        color: #e5484d;
+        font-weight: 800;
+        opacity: 1;
+      }
     }
 
     .printer--printing &::before {
@@ -576,6 +582,10 @@
       }
     }
 
+    &--error {
+      color: #e5484d;
+    }
+
     &--note {
       top: calc(100% - var(--receipt-room) + 34px);
       right: auto;
@@ -665,6 +675,51 @@
         0 100%
       );
       animation: printer-fall 700ms ease-in forwards;
+    }
+  }
+
+  .printer__cord {
+    position: absolute;
+    display: none;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  @include tools.below(md) {
+    .printer {
+      --receipt-room: max(64px, calc(var(--paper-height, 0px) - 13px));
+
+      width: 224px;
+      zoom: 1.38;
+      transition: padding-bottom var(--motion-base) var(--ease-settle);
+    }
+
+    .printer__mount {
+      right: -14px;
+    }
+
+    .printer__cable {
+      display: none;
+    }
+
+    .printer__cord {
+      top: 236px;
+      right: -6px;
+      display: block;
+      width: 40px;
+      height: 84px;
+    }
+  }
+
+  @media (max-width: 374px) {
+    .printer {
+      zoom: 1.3;
+    }
+  }
+
+  @media (max-width: 349px) {
+    .printer {
+      zoom: 1.15;
     }
   }
 }

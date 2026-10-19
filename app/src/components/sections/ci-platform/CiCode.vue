@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import KeyCap from '@/components/ui/KeyCap.vue'
 import { highlight } from '@/components/sections/ci-platform/highlight'
 
@@ -8,9 +8,23 @@ const props = defineProps<{
   code: string
   copyLabel: string
   copiedLabel: string
+  moreLabel: string
+  lessLabel: string
 }>()
 
+const FOLD_AFTER = 14
+
 const lines = computed(() => highlight(props.code, /dockerfile/i.test(props.label)))
+const long = computed(() => lines.value.length > FOLD_AFTER)
+const open = ref(false)
+const root = ref<HTMLElement | null>(null)
+
+const toggle = async () => {
+  open.value = !open.value
+  if (open.value) return
+  await nextTick()
+  if ((root.value?.getBoundingClientRect().top ?? 0) < 0) root.value?.scrollIntoView()
+}
 const copied = ref(false)
 let timer = 0
 
@@ -52,13 +66,18 @@ onBeforeUnmount(() => window.clearTimeout(timer))
 </script>
 
 <template>
-  <figure class="ci-code">
+  <figure ref="root" class="ci-code" :class="{ 'ci-code--long': long, 'ci-code--open': open }">
     <figcaption class="ci-code__head">
       <span class="c-kicker ci-code__label">{{ label }}</span>
     </figcaption>
     <pre
       class="ci-code__body"
     ><code><span v-for="(line, i) in lines" :key="i" class="ci-code__line"><span v-for="(token, j) in line" :key="j" :class="token.kind === 'plain' ? undefined : `ci-tok ci-tok--${token.kind}`">{{ token.text }}</span></span></code></pre>
+    <div v-if="long" class="ci-code__fold">
+      <button type="button" class="ci-code__more" :aria-expanded="open" @click="toggle">
+        {{ open ? lessLabel : moreLabel.replace('{n}', String(lines.length)) }}
+      </button>
+    </div>
     <KeyCap
       class="ci-code__key"
       :class="{ 'c-key--down': copied }"

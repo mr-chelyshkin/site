@@ -37,6 +37,8 @@ defineProps<{
         :code="block.code"
         :copy-label="labels.copy"
         :copied-label="labels.copied"
+        :more-label="labels.more"
+        :less-label="labels.less"
       />
     </div>
 

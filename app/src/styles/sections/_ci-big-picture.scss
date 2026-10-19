@@ -65,22 +65,12 @@
     }
   }
 
-  .ci-picture__scroll {
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scrollbar-width: thin;
+  .ci-picture__crop {
+    overflow: hidden;
   }
 
   .ci-picture__body {
     padding: clamp(16px, 2vw, 28px) clamp(8px, 1.2vw, 16px) clamp(8px, 1.2vw, 14px);
-  }
-
-  .ci-picture__swipe {
-    display: none;
-    margin-top: 18px;
-    color: var(--color-cyan);
-    @include tools.handwritten(clamp(20px, 1.8vw, 26px));
-    rotate: -1.5deg;
   }
 
   .ci-panel {
@@ -357,12 +347,16 @@
   }
 
   @include tools.below(md) {
-    .ci-picture__body {
-      width: 760px;
+    .ci-picture__stage {
+      grid-template-areas:
+        'side'
+        'parts';
     }
 
-    .ci-picture__swipe {
-      display: block;
+    .ci-picture__chip {
+      min-height: 44px;
+      padding: 0 15px;
+      font-size: 12px;
     }
   }
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import PastedSheet from '@/components/ui/PastedSheet.vue'
 import SprayText from '@/components/ui/SprayText.vue'
 import WallSection from '@/components/ui/WallSection.vue'
@@ -19,6 +19,19 @@ const TILTS = [-0.6, 0.5, -0.4, 0.6, -0.5]
 const sheets = ref<HTMLElement[]>([])
 const active = ref(props.content.steps[0]?.id ?? '')
 let observer: IntersectionObserver | undefined
+
+const bar = ref<HTMLDetailsElement | null>(null)
+const at = computed(() =>
+  Math.max(
+    0,
+    props.content.steps.findIndex(({ id }) => id === active.value),
+  ),
+)
+const current = computed(() => props.content.steps[at.value])
+const last = computed(() => props.content.steps.at(-1)?.number ?? '')
+const closeBar = () => {
+  if (bar.value) bar.value.open = false
+}
 
 onMounted(() => {
   if (typeof IntersectionObserver === 'undefined') return
@@ -73,6 +86,37 @@ onBeforeUnmount(() => observer?.disconnect())
     </header>
 
     <div class="ci-guide__body">
+      <nav v-if="current" class="ci-guide__bar" :aria-label="content.navLabel">
+        <details ref="bar">
+          <summary class="ci-guide__bar-head">
+            <span class="ci-guide__bar-count">{{ current.number }} / {{ last }}</span>
+            <span class="ci-guide__bar-title">{{ current.title }}</span>
+            <span class="ci-guide__bar-arrow" aria-hidden="true">↓</span>
+            <span class="ci-guide__bar-progress" aria-hidden="true">
+              <span
+                v-for="(step, i) in content.steps"
+                :key="step.id"
+                class="ci-guide__bar-tick"
+                :class="{ 'ci-guide__bar-tick--on': i <= at }"
+              />
+            </span>
+          </summary>
+          <ol class="ci-guide__bar-list" role="list">
+            <li v-for="step in content.steps" :key="step.id">
+              <a
+                class="ci-guide__index-link ci-guide__bar-link"
+                :class="{ 'ci-guide__index-link--on': active === step.id }"
+                :href="`#${step.id}`"
+                :aria-current="active === step.id ? 'step' : undefined"
+                @click="closeBar"
+              >
+                <span class="ci-guide__index-number">{{ step.number }}</span>
+                {{ step.title }}
+              </a>
+            </li>
+          </ol>
+        </details>
+      </nav>
       <nav class="ci-guide__index" :aria-label="content.navLabel">
         <ol class="ci-guide__index-list" role="list">
           <li v-for="step in content.steps" :key="step.id">
@@ -103,6 +147,7 @@ onBeforeUnmount(() => observer?.disconnect())
             :torn="['bottom']"
             :tape="['top']"
             :tilt="TILTS[i % TILTS.length] ?? 0"
+            :live="step.layers !== undefined"
           >
             <div class="ci-guide__sheet">
               <CiGuideStep :step="step" :labels="labels" />

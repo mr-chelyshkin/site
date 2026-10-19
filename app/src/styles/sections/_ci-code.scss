@@ -1,3 +1,5 @@
+@use '../tools';
+
 @layer sections {
   .ci-code {
     position: relative;
@@ -103,5 +105,53 @@
 
   .ci-tok--keyword {
     color: #ef6b6f;
+  }
+
+  .ci-code__fold {
+    display: none;
+  }
+
+  @include tools.below(md) {
+    .ci-code--long .ci-code__body {
+      padding-bottom: 72px;
+    }
+
+    .ci-code--long:not(.ci-code--open) .ci-code__body {
+      max-height: calc(16px + 9 * 1.7em + 72px);
+      overflow-y: hidden;
+    }
+
+    .ci-code__fold {
+      position: absolute;
+      right: 0;
+      bottom: 26px;
+      left: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      height: 112px;
+      padding-bottom: 16px;
+      border-radius: 0 0 3px 3px;
+      background: linear-gradient(transparent, var(--color-ink) 62%);
+      pointer-events: none;
+    }
+
+    .ci-code--open .ci-code__fold {
+      height: auto;
+      background: none;
+    }
+
+    .ci-code__more {
+      min-height: 44px;
+      padding: 0 18px;
+      border: 1px solid color-mix(in srgb, var(--color-paper) 55%, transparent);
+      border-radius: 999px;
+      background: var(--color-ink);
+      color: var(--color-paper);
+      font: 800 11px / 1 var(--font-mono);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      pointer-events: auto;
+    }
   }
 }

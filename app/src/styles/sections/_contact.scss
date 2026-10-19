@@ -48,6 +48,10 @@
     font: 900 clamp(18px, 2.66vw, 36px) / 1 var(--font-stencil);
     text-transform: uppercase;
 
+    @include tools.below(md) {
+      @include tools.touch-target;
+    }
+
     &::after {
       content: '↗';
       margin-left: 0.12em;
@@ -132,8 +136,11 @@
     }
 
     .contact__tabs {
-      height: 120px;
-      font-size: 9px;
+      height: 136px;
+    }
+
+    .contact__sheet.c-sheet--near {
+      transform: perspective(1400px) rotateX(4deg);
     }
   }
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import CiScene from '@/components/sections/ci-platform/CiScene.vue'
 import CiScenePanel from '@/components/sections/ci-platform/CiScenePanel.vue'
 import KeyCap from '@/components/ui/KeyCap.vue'
@@ -7,7 +7,7 @@ import PastedSheet from '@/components/ui/PastedSheet.vue'
 import WallSection from '@/components/ui/WallSection.vue'
 import { useClock } from '@/composables/useClock'
 import { useInView } from '@/composables/useInView'
-import { useReducedMotion } from '@/composables/useReducedMotion'
+import { useMediaQuery } from '@/composables/useMediaQuery'
 import type { CiPlatformContent } from '@/contents'
 
 const props = defineProps<{
@@ -15,10 +15,9 @@ const props = defineProps<{
 }>()
 
 const stage = ref<HTMLElement | null>(null)
-const scroller = ref<HTMLElement | null>(null)
 const inView = useInView(stage)
 const clock = useClock(inView)
-const reduced = useReducedMotion()
+const wide = useMediaQuery('(min-width: 48rem)')
 const selected = ref<string | null>(null)
 
 const order = computed(() => [null, ...props.content.panel.parts.map(({ id }) => id)])
@@ -42,8 +41,6 @@ const typing = (target: EventTarget | null) =>
 const onKey = (event: KeyboardEvent) => {
   if (!inView.value || event.defaultPrevented || typing(event.target)) return
   if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
-  const box = scroller.value
-  if (event.target === box && box && box.scrollWidth > box.clientWidth) return
   if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
   event.preventDefault()
   press(event.key === 'ArrowRight' ? 'next' : 'previous')
@@ -57,20 +54,6 @@ onBeforeUnmount(() => {
 const toggle = (id: string) => {
   selected.value = selected.value === id ? null : id
 }
-
-watch(selected, async (id) => {
-  const box = scroller.value
-  if (!id || !box || box.scrollWidth <= box.clientWidth) return
-  await nextTick()
-  const part = box.querySelector(`[data-part="${id}"]`)
-  if (!part) return
-  const from = box.getBoundingClientRect()
-  const to = part.getBoundingClientRect()
-  box.scrollTo({
-    left: box.scrollLeft + to.left - from.left + to.width / 2 - from.width / 2,
-    behavior: reduced.value ? 'auto' : 'smooth',
-  })
-})
 </script>
 
 <template>
@@ -83,7 +66,7 @@ watch(selected, async (id) => {
       <p class="ci-picture__lede">{{ content.lede }}</p>
     </header>
     <div ref="stage" class="ci-picture__stage">
-      <div class="ci-picture__scheme">
+      <div v-if="wide" class="ci-picture__scheme">
         <div class="ci-picture__board">
           <PastedSheet
             class="ci-picture__sheet"
@@ -92,8 +75,9 @@ watch(selected, async (id) => {
             :torn="['bottom']"
             :tape="['top']"
             :tilt="-0.4"
+            live
           >
-            <div ref="scroller" class="ci-picture__scroll" tabindex="0" :aria-label="content.swipe">
+            <div class="ci-picture__crop">
               <div class="ci-picture__body">
                 <CiScene
                   :content="content.scene"
@@ -123,7 +107,6 @@ watch(selected, async (id) => {
             </KeyCap>
           </div>
         </div>
-        <p class="ci-picture__swipe">{{ content.swipe }} →</p>
       </div>
       <aside class="ci-picture__side">
         <div class="ci-frame">
