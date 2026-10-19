@@ -10,6 +10,8 @@ export interface GuideLabels {
   check: string
   copy: string
   copied: string
+  more: string
+  less: string
 }
 
 export interface GuideLayer {
