@@ -4,6 +4,7 @@ import CvPrinter from '@/components/sections/CvPrinter.vue'
 import PastedSheet from '@/components/ui/PastedSheet.vue'
 import TearTabs from '@/components/ui/TearTabs.vue'
 import WallSection from '@/components/ui/WallSection.vue'
+import { useMediaQuery } from '@/composables/useMediaQuery'
 import { useScrollDrift } from '@/composables/useScrollDrift'
 import type { HomeContent, SocialProfiles } from '@/contents'
 
@@ -16,6 +17,7 @@ defineProps<{
 }>()
 
 const board = ref<HTMLElement | null>(null)
+const wide = useMediaQuery('(min-width: 48rem)')
 const sheet = ref<InstanceType<typeof PastedSheet> | null>(null)
 useScrollDrift(
   computed(() => sheet.value?.$el ?? null),
@@ -64,8 +66,8 @@ useScrollDrift(
             class="contact__tabs"
             seed="contact"
             :email="content.email"
-            :count="11"
-            :gone="[3, 7]"
+            :count="wide ? 11 : 6"
+            :gone="wide ? [3, 7] : [2]"
             :copied="copied"
           />
         </template>

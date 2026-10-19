@@ -1,3 +1,5 @@
+@use '../tools';
+
 @mixin in-hand {
   rotate: 0deg;
   translate: 0 calc(var(--lift) * -1);
@@ -227,6 +229,35 @@
 
     .pass[data-rehang] {
       animation: pass-rehang 520ms var(--ease-settle) backwards;
+    }
+  }
+
+  @include tools.below(md) {
+    .pass {
+      width: min(100%, calc(var(--w, 210px) * 1.22));
+    }
+
+    .pass
+      :is(
+        .pass__facts,
+        .pass-holder__band,
+        .pass-holder__note,
+        .pass-laminated__head,
+        .pass-laminated__note,
+        .pass-metal__kicker,
+        .pass-metal__line,
+        .pass-metal__id,
+        .pass-reel__note,
+        .pass-reel__foot,
+        .pass-smartcard__band,
+        .pass-smartcard__facts,
+        .pass-smartcard__note,
+        .pass-smartcard__foot,
+        .pass-visitor__access,
+        .pass-visitor__lines,
+        .pass-visitor__foot
+      ) {
+      font-size: 11px;
     }
   }
 }

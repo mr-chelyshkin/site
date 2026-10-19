@@ -352,5 +352,11 @@
         'side'
         'parts';
     }
+
+    .ci-picture__chip {
+      min-height: 44px;
+      padding: 0 15px;
+      font-size: 12px;
+    }
   }
 }

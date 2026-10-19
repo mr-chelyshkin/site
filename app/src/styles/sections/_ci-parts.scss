@@ -42,6 +42,10 @@
     @include tools.underlined-link;
     color: var(--color-paper);
 
+    @include tools.below(md) {
+      @include tools.touch-target;
+    }
+
     @media (hover: hover) {
       &:hover {
         color: var(--color-cyan);

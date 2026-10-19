@@ -102,6 +102,10 @@
     text-underline-offset: 3px;
     transition: color var(--motion-fast) var(--ease-settle);
 
+    @include tools.below(md) {
+      @include tools.touch-target(32px);
+    }
+
     @media (hover: hover) {
       &:hover {
         color: var(--color-cyan);
@@ -162,6 +166,10 @@
     }
   }
 
+  .ci-guide__bar {
+    display: none;
+  }
+
   .ci-guide__steps {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -180,18 +188,110 @@
 
   @include tools.below(xl) {
     .ci-guide__body {
-      grid-template-columns: minmax(0, 1fr);
+      display: block;
       max-width: 860px;
     }
 
     .ci-guide__index {
       display: none;
     }
+
+    .ci-guide__bar {
+      position: sticky;
+      top: 0;
+      z-index: calc(var(--z-paper) + 2);
+      display: block;
+      margin-bottom: clamp(28px, 4vw, 40px);
+      background: var(--color-wall);
+      box-shadow: 0 12px 16px -8px rgb(0 0 0 / 60%);
+    }
+
+    .ci-guide__bar-head {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px 12px;
+      min-height: 56px;
+      padding: 10px 0;
+      color: var(--color-paper);
+      list-style: none;
+      cursor: pointer;
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+    }
+
+    .ci-guide__bar-count {
+      color: var(--color-cyan);
+      font: 900 18px / 1 var(--font-stencil);
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+
+    .ci-guide__bar-title {
+      overflow: hidden;
+      font-size: var(--text-size-sm);
+      font-weight: 800;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .ci-guide__bar-arrow {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border: 1px solid color-mix(in srgb, var(--color-wall-text) 45%, transparent);
+      border-radius: 50%;
+      font-size: 14px;
+      transition: rotate var(--motion-fast) var(--ease-settle);
+    }
+
+    details[open] .ci-guide__bar-arrow {
+      rotate: 180deg;
+    }
+
+    .ci-guide__bar-progress {
+      display: grid;
+      grid-auto-flow: column;
+      grid-column: 1 / -1;
+      gap: 4px;
+    }
+
+    .ci-guide__bar-tick {
+      height: 3px;
+      background: color-mix(in srgb, var(--color-wall-text) 28%, transparent);
+      transition: background var(--motion-base) var(--ease-settle);
+    }
+
+    .ci-guide__bar-tick--on {
+      background: var(--color-cyan);
+    }
+
+    .ci-guide__bar-list {
+      padding-bottom: 12px;
+    }
+
+    .ci-guide__bar-link {
+      align-items: center;
+      min-height: 44px;
+      padding: 6px 0;
+    }
+
+    .ci-guide__step {
+      scroll-margin-top: 96px;
+    }
   }
 
   @include tools.below(md) {
     .ci-guide__text {
       width: auto;
+    }
+
+    .ci-guide__bar {
+      margin-inline: calc(var(--wall-gutter) * -1);
+      padding-inline: var(--wall-gutter);
     }
 
     .ci-guide__brief {

@@ -12,7 +12,9 @@
     "do": "Do",
     "check": "Check",
     "copy": "Copy",
-    "copied": "Copied"
+    "copied": "Copied",
+    "more": "Show all {n} lines",
+    "less": "Show less"
   },
   "hero": {
     "kicker": "A setup you build yourself",

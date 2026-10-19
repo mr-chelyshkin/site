@@ -66,6 +66,10 @@
     @include tools.underlined-link;
     transition: color var(--motion-fast) var(--ease-settle);
 
+    @include tools.below(md) {
+      @include tools.touch-target;
+    }
+
     @media (hover: hover) {
       &:hover {
         color: var(--color-blood);

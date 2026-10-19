@@ -667,4 +667,53 @@
       animation: printer-fall 700ms ease-in forwards;
     }
   }
+
+  .printer__cord {
+    position: absolute;
+    display: none;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  @include tools.below(md) {
+    .printer {
+      --receipt-room: 64px;
+
+      width: 224px;
+      zoom: 1.38;
+      transition: padding-bottom var(--motion-base) var(--ease-settle);
+    }
+
+    .printer:not(.printer--ready) {
+      --receipt-room: 320px;
+    }
+
+    .printer__mount {
+      right: -14px;
+    }
+
+    .printer__cable {
+      display: none;
+    }
+
+    .printer__cord {
+      top: 236px;
+      right: -6px;
+      display: block;
+      width: 40px;
+      height: 84px;
+    }
+  }
+
+  @media (max-width: 374px) {
+    .printer {
+      zoom: 1.3;
+    }
+  }
+
+  @media (max-width: 349px) {
+    .printer {
+      zoom: 1.15;
+    }
+  }
 }
