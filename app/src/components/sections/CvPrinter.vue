@@ -315,6 +315,7 @@ onBeforeUnmount(() => {
         <span class="printer__option">role · {{ ordered.role?.label }}</span>
         <span class="printer__rule" />
         <template v-if="outcome === 'jam'">
+          <span class="printer__jam-error">{{ printer.jam.error }}</span>
           <span class="printer__jam">{{ printer.jam.title }}</span>
           <span class="printer__jam-line">{{ printer.jam.line }}</span>
         </template>
@@ -338,14 +339,7 @@ onBeforeUnmount(() => {
       </span>
     </button>
 
-    <p
-      v-if="state === 'printed'"
-      class="printer__hint"
-      :class="{ 'printer__hint--error': jammed }"
-      aria-hidden="true"
-    >
-      {{ jammed ? printer.error : printer.hint }}
-    </p>
+    <p v-if="state === 'printed'" class="printer__hint" aria-hidden="true">{{ printer.hint }}</p>
     <p v-if="note" class="printer__hint printer__hint--note" aria-hidden="true">
       {{ printer.note }}
     </p>
