@@ -385,12 +385,17 @@ watch(
     camera.value = reduced.value ? [tx, ty] : [lerp(x, tx, 0.1), lerp(y, ty, 0.1)]
   },
 )
-const view = computed(() => {
-  if (props.zoom === 'dot') {
-    const [x, y] = camera.value
-    return { x: x - CAMERA.width / 2, y: y - CAMERA.height / 2, ...CAMERA }
+const view = computed(() => (props.zoom && props.zoom !== 'dot' ? zoomed(props.zoom) : SCENE))
+const aspect = computed(() => (props.zoom ? `${ZOOM_ASPECT}` : `${SCENE.width} / ${SCENE.height}`))
+const pan = computed(() => {
+  if (props.zoom !== 'dot') return undefined
+  const [x, y] = camera.value
+  const left = (x - CAMERA.width / 2 - SCENE.x) / SCENE.width
+  const top = (y - CAMERA.height / 2 - SCENE.y) / SCENE.height
+  return {
+    width: `${(100 * SCENE.width) / CAMERA.width}%`,
+    transform: `translate3d(${(-100 * left).toFixed(3)}%, ${(-100 * top).toFixed(3)}%, 0)`,
   }
-  return props.zoom ? zoomed(props.zoom) : SCENE
 })
 
 const live = computed(() => {
@@ -540,350 +545,360 @@ const part = (id: string) =>
 </script>
 
 <template>
-  <svg
+  <div
     class="ci-scene"
-    :class="{ 'ci-scene--zoom': zoom, 'ci-scene--picked': selected !== null }"
-    :viewBox="`${view.x} ${view.y} ${view.width} ${view.height}`"
-    :role="zoom ? undefined : 'group'"
-    :aria-label="zoom ? undefined : content.label"
-    :aria-hidden="zoom ? 'true' : undefined"
+    :class="{
+      'ci-scene--zoom': zoom,
+      'ci-scene--pan': zoom === 'dot',
+      'ci-scene--picked': selected !== null,
+    }"
+    :style="{ aspectRatio: aspect }"
   >
-    <defs>
-      <pattern
-        :id="hatch"
-        width="5"
-        height="5"
-        patternUnits="userSpaceOnUse"
-        patternTransform="rotate(45)"
-      >
-        <rect class="ci-scene__hatch-ground" width="5" height="5" />
-        <line class="ci-scene__hatch" x1="0" y1="0" x2="0" y2="5" />
-      </pattern>
-      <pattern :id="keys" width="4.6" height="4.4" patternUnits="userSpaceOnUse">
-        <rect class="ci-scene__key" x="0.4" y="0.4" width="3.8" height="3.6" rx="0.6" />
-      </pattern>
-    </defs>
-
-    <g
-      v-for="zone in zoom ? [] : ZONES"
-      :key="zone.key"
-      :class="`ci-scene__zone ci-scene__zone--${zone.key}`"
+    <svg
+      class="ci-scene__svg"
+      :style="pan"
+      :viewBox="`${view.x} ${view.y} ${view.width} ${view.height}`"
+      :role="zoom ? undefined : 'group'"
+      :aria-label="zoom ? undefined : content.label"
+      :aria-hidden="zoom ? 'true' : undefined"
     >
-      <text class="ci-scene__zone-title" :x="zone.x" :y="SCENE.y + 24">
-        {{ content.zones[zone.key].title }}
-      </text>
-      <text class="ci-scene__zone-note" :x="zone.x" :y="SCENE.y + 40">
-        {{ content.zones[zone.key].note }}
-      </text>
-    </g>
+      <defs>
+        <pattern
+          :id="hatch"
+          width="5"
+          height="5"
+          patternUnits="userSpaceOnUse"
+          patternTransform="rotate(45)"
+        >
+          <rect class="ci-scene__hatch-ground" width="5" height="5" />
+          <line class="ci-scene__hatch" x1="0" y1="0" x2="0" y2="5" />
+        </pattern>
+        <pattern :id="keys" width="4.6" height="4.4" patternUnits="userSpaceOnUse">
+          <rect class="ci-scene__key" x="0.4" y="0.4" width="3.8" height="3.6" rx="0.6" />
+        </pattern>
+      </defs>
 
-    <IsoSolid class="ci-scene__plate ci-solid--cd" :box="PLATES.deliver" :project="project" />
-    <IsoSolid
-      class="ci-scene__plate ci-solid--plate"
-      :box="PLATES.run"
-      :project="project"
-      :side="`url(#${hatch})`"
-    />
-    <IsoSolid
-      class="ci-scene__plate ci-solid--plate"
-      :box="PLATES.route"
-      :project="project"
-      :side="`url(#${hatch})`"
-    />
-    <polyline v-for="(points, i) in PATHS" :key="i" class="ci-scene__path" :points="points" />
-
-    <g v-bind="part('laptop')">
-      <IsoSolid class="ci-solid--alu" :box="LAPTOP" :project="project" />
-      <g :transform="onTop(project, LAPTOP)">
-        <rect class="ci-scene__keyboard" x="5" y="4" width="52" height="20" rx="1" />
-        <rect x="5.4" y="4.4" width="51.2" height="19.2" :style="{ fill: `url(#${keys})` }" />
-        <rect class="ci-scene__trackpad" x="21" y="27" width="20" height="12" rx="1.5" />
-      </g>
-      <polygon class="ci-scene__bezel" :points="lid.inner" />
-      <g :transform="lid.screen">
-        <rect class="ci-scene__display" x="2.4" y="2.4" width="57.2" height="37.2" rx="1" />
-        <text class="ci-scene__term" x="6" y="12">
-          <tspan class="ci-scene__term--prompt">~ $</tspan>
-          {{ typed }}
+      <g
+        v-for="zone in zoom ? [] : ZONES"
+        :key="zone.key"
+        :class="`ci-scene__zone ci-scene__zone--${zone.key}`"
+      >
+        <text class="ci-scene__zone-title" :x="zone.x" :y="SCENE.y + 24">
+          {{ content.zones[zone.key].title }}
         </text>
-        <text v-if="answered" class="ci-scene__term ci-scene__term--ok" x="6" y="20">
-          ✓ {{ content.result }}
+        <text class="ci-scene__zone-note" :x="zone.x" :y="SCENE.y + 40">
+          {{ content.zones[zone.key].note }}
         </text>
       </g>
-      <polygon class="ci-scene__lid" :points="lid.edge" />
-      <polygon class="ci-scene__lid ci-scene__lid--side" :points="lid.side" />
-    </g>
 
-    <g v-bind="part('delivery')">
-      <IsoSolid class="ci-solid--vault" :box="VAULT" :project="project" />
-      <g :transform="onFront(project, VAULT)">
-        <text class="ci-scene__stencil" x="7" y="14">{{ content.vault[0] }}</text>
-        <circle class="ci-scene__dial" cx="25" cy="36" r="11" />
-        <circle class="ci-scene__dial-core" cx="25" cy="36" r="4" />
-        <path class="ci-scene__dial-ticks" d="M25 25.5v3M35.5 36h-3M25 46.5v-3M14.5 36h3" />
-        <path class="ci-scene__handle" d="M42 36h11M53 31v10" />
-        <text class="ci-scene__engraving" x="7" y="58">{{ content.vault[1] }}</text>
-        <g class="ci-scene__lock" :transform="lock">
-          <path class="ci-scene__shackle" d="M58 26V21a4 4 0 0 1 8 0v5" />
-          <rect class="ci-scene__lock-body" x="56" y="26" width="12" height="10" rx="1.5" />
-          <circle class="ci-scene__keyhole" cx="62" cy="31" r="1.3" />
+      <IsoSolid class="ci-scene__plate ci-solid--cd" :box="PLATES.deliver" :project="project" />
+      <IsoSolid
+        class="ci-scene__plate ci-solid--plate"
+        :box="PLATES.run"
+        :project="project"
+        :side="`url(#${hatch})`"
+      />
+      <IsoSolid
+        class="ci-scene__plate ci-solid--plate"
+        :box="PLATES.route"
+        :project="project"
+        :side="`url(#${hatch})`"
+      />
+      <polyline v-for="(points, i) in PATHS" :key="i" class="ci-scene__path" :points="points" />
+
+      <g v-bind="part('laptop')">
+        <IsoSolid class="ci-solid--alu" :box="LAPTOP" :project="project" />
+        <g :transform="onTop(project, LAPTOP)">
+          <rect class="ci-scene__keyboard" x="5" y="4" width="52" height="20" rx="1" />
+          <rect x="5.4" y="4.4" width="51.2" height="19.2" :style="{ fill: `url(#${keys})` }" />
+          <rect class="ci-scene__trackpad" x="21" y="27" width="20" height="12" rx="1.5" />
         </g>
-      </g>
-    </g>
-
-    <g v-bind="part('runner')">
-      <IsoSolid class="ci-solid--shell" :box="RUNNER" :project="project" />
-      <g :transform="onFront(project, RUNNER)">
-        <g v-for="bay in 6" :key="bay">
-          <rect
-            class="ci-scene__bay"
-            :x="4 + (bay - 1) * 9.4"
-            y="3.5"
-            width="8"
-            height="13"
-            rx="0.8"
-          />
-          <line
-            class="ci-scene__bay-grip"
-            :x1="5.6 + (bay - 1) * 9.4"
-            y1="13.6"
-            :x2="10.4 + (bay - 1) * 9.4"
-            y2="13.6"
-          />
-          <circle class="ci-scene__led" :cx="10.2 + (bay - 1) * 9.4" cy="5.6" r="0.8" />
-        </g>
-        <circle class="ci-scene__power" cx="66" cy="10" r="2.2" />
-        <circle class="ci-scene__led ci-scene__led--amber" cx="61.6" cy="15" r="0.8" />
-      </g>
-      <IsoSolid :class="{ 'ci-solid--lit': called }" :box="CARD" :project="project" />
-      <g :transform="onTop(project, CARD)">
-        <text class="ci-scene__print ci-scene__print--strong" x="4" y="8">
-          on {{ content.event }}
-        </text>
-        <g v-for="(task, i) in content.workflow" :key="task">
-          <rect
-            v-if="story.ships && marks.current === i"
-            class="ci-scene__marker"
-            x="2.5"
-            :y="9.3 + i * 7"
-            width="36"
-            height="6.4"
-          />
-          <text class="ci-scene__print" x="4" :y="14 + i * 7">→ {{ task }}</text>
-          <text
-            v-if="story.ships && marks.finished.has(i)"
-            class="ci-scene__check"
-            x="42"
-            :y="14 + i * 7"
-          >
-            ✓
+        <polygon class="ci-scene__bezel" :points="lid.inner" />
+        <g :transform="lid.screen">
+          <rect class="ci-scene__display" x="2.4" y="2.4" width="57.2" height="37.2" rx="1" />
+          <text class="ci-scene__term" x="6" y="12">
+            <tspan class="ci-scene__term--prompt">~ $</tspan>
+            {{ typed }}
+          </text>
+          <text v-if="answered" class="ci-scene__term ci-scene__term--ok" x="6" y="20">
+            ✓ {{ content.result }}
           </text>
         </g>
+        <polygon class="ci-scene__lid" :points="lid.edge" />
+        <polygon class="ci-scene__lid ci-scene__lid--side" :points="lid.side" />
       </g>
-    </g>
 
-    <g v-bind="part('registry')">
-      <g v-for="(crate, i) in CRATES" :key="i">
+      <g v-bind="part('delivery')">
+        <IsoSolid class="ci-solid--vault" :box="VAULT" :project="project" />
+        <g :transform="onFront(project, VAULT)">
+          <text class="ci-scene__stencil" x="7" y="14">{{ content.vault[0] }}</text>
+          <circle class="ci-scene__dial" cx="25" cy="36" r="11" />
+          <circle class="ci-scene__dial-core" cx="25" cy="36" r="4" />
+          <path class="ci-scene__dial-ticks" d="M25 25.5v3M35.5 36h-3M25 46.5v-3M14.5 36h3" />
+          <path class="ci-scene__handle" d="M42 36h11M53 31v10" />
+          <text class="ci-scene__engraving" x="7" y="58">{{ content.vault[1] }}</text>
+          <g class="ci-scene__lock" :transform="lock">
+            <path class="ci-scene__shackle" d="M58 26V21a4 4 0 0 1 8 0v5" />
+            <rect class="ci-scene__lock-body" x="56" y="26" width="12" height="10" rx="1.5" />
+            <circle class="ci-scene__keyhole" cx="62" cy="31" r="1.3" />
+          </g>
+        </g>
+      </g>
+
+      <g v-bind="part('runner')">
+        <IsoSolid class="ci-solid--shell" :box="RUNNER" :project="project" />
+        <g :transform="onFront(project, RUNNER)">
+          <g v-for="bay in 6" :key="bay">
+            <rect
+              class="ci-scene__bay"
+              :x="4 + (bay - 1) * 9.4"
+              y="3.5"
+              width="8"
+              height="13"
+              rx="0.8"
+            />
+            <line
+              class="ci-scene__bay-grip"
+              :x1="5.6 + (bay - 1) * 9.4"
+              y1="13.6"
+              :x2="10.4 + (bay - 1) * 9.4"
+              y2="13.6"
+            />
+            <circle class="ci-scene__led" :cx="10.2 + (bay - 1) * 9.4" cy="5.6" r="0.8" />
+          </g>
+          <circle class="ci-scene__power" cx="66" cy="10" r="2.2" />
+          <circle class="ci-scene__led ci-scene__led--amber" cx="61.6" cy="15" r="0.8" />
+        </g>
+        <IsoSolid :class="{ 'ci-solid--lit': called }" :box="CARD" :project="project" />
+        <g :transform="onTop(project, CARD)">
+          <text class="ci-scene__print ci-scene__print--strong" x="4" y="8">
+            on {{ content.event }}
+          </text>
+          <g v-for="(task, i) in content.workflow" :key="task">
+            <rect
+              v-if="story.ships && marks.current === i"
+              class="ci-scene__marker"
+              x="2.5"
+              :y="9.3 + i * 7"
+              width="36"
+              height="6.4"
+            />
+            <text class="ci-scene__print" x="4" :y="14 + i * 7">→ {{ task }}</text>
+            <text
+              v-if="story.ships && marks.finished.has(i)"
+              class="ci-scene__check"
+              x="42"
+              :y="14 + i * 7"
+            >
+              ✓
+            </text>
+          </g>
+        </g>
+      </g>
+
+      <g v-bind="part('registry')">
+        <g v-for="(crate, i) in CRATES" :key="i">
+          <IsoSolid
+            class="ci-solid--kraft"
+            :class="{ 'ci-solid--lit': i === toolCrate && live.has('registry') }"
+            :box="crate"
+            :project="project"
+          />
+          <rect
+            class="ci-scene__crate-tape"
+            :transform="onTop(project, crate)"
+            x="0"
+            y="11"
+            :width="crate.width"
+            height="6"
+          />
+          <g :transform="onFront(project, crate)">
+            <rect class="ci-scene__crate-label" x="2" y="7" width="24" height="9" />
+            <text class="ci-scene__crate-text" x="14" y="13.2">{{ content.images[i] }}</text>
+          </g>
+        </g>
+      </g>
+
+      <g v-bind="part('project')">
+        <IsoSolid :box="SHEET" :project="project" />
+        <g :transform="onTop(project, SHEET)">
+          <g v-for="(task, i) in content.tasks" :key="task">
+            <rect
+              v-if="marks.current === i"
+              class="ci-scene__marker"
+              x="3"
+              :y="7.5 + i * 14"
+              :width="SHEET.width - 6"
+              height="11"
+            />
+            <text
+              class="ci-scene__print ci-scene__print--task"
+              :class="{ 'ci-scene__print--strong': marks.current === i }"
+              x="5"
+              :y="15 + i * 14"
+            >
+              {{ task }}
+            </text>
+            <text
+              v-if="marks.finished.has(i)"
+              class="ci-scene__check ci-scene__check--task"
+              :x="SHEET.width - 9"
+              :y="15 + i * 14"
+            >
+              ✓
+            </text>
+          </g>
+        </g>
+      </g>
+
+      <g v-bind="part('shared')">
         <IsoSolid
-          class="ci-solid--kraft"
-          :class="{ 'ci-solid--lit': i === toolCrate && live.has('registry') }"
-          :box="crate"
+          v-for="(card, i) in CARDS"
+          :key="i"
+          :class="{ 'ci-solid--lit': i === CARDS.length - 1 && live.has('shared') }"
+          :box="card"
           :project="project"
         />
-        <rect
-          class="ci-scene__crate-tape"
-          :transform="onTop(project, crate)"
-          x="0"
-          y="11"
-          :width="crate.width"
-          height="6"
-        />
-        <g :transform="onFront(project, crate)">
-          <rect class="ci-scene__crate-label" x="2" y="7" width="24" height="9" />
-          <text class="ci-scene__crate-text" x="14" y="13.2">{{ content.images[i] }}</text>
+        <g :transform="onTop(project, CARDS[CARDS.length - 1] ?? SHEET)">
+          <text class="ci-scene__print ci-scene__print--tool" x="6" y="17">{{ content.tool }}</text>
+          <rect class="ci-scene__lines" x="6" y="25" width="30" height="2" />
+          <rect class="ci-scene__lines" x="6" y="31" width="24" height="2" />
+          <rect class="ci-scene__lines" x="6" y="37" width="28" height="2" />
         </g>
       </g>
-    </g>
 
-    <g v-bind="part('project')">
-      <IsoSolid :box="SHEET" :project="project" />
-      <g :transform="onTop(project, SHEET)">
-        <g v-for="(task, i) in content.tasks" :key="task">
-          <rect
-            v-if="marks.current === i"
-            class="ci-scene__marker"
-            x="3"
-            :y="7.5 + i * 14"
-            :width="SHEET.width - 6"
-            height="11"
-          />
-          <text
-            class="ci-scene__print ci-scene__print--task"
-            :class="{ 'ci-scene__print--strong': marks.current === i }"
-            x="5"
-            :y="15 + i * 14"
-          >
-            {{ task }}
-          </text>
-          <text
-            v-if="marks.finished.has(i)"
-            class="ci-scene__check ci-scene__check--task"
-            :x="SHEET.width - 9"
-            :y="15 + i * 14"
-          >
-            ✓
-          </text>
-        </g>
-      </g>
-    </g>
-
-    <g v-bind="part('shared')">
-      <IsoSolid
-        v-for="(card, i) in CARDS"
-        :key="i"
-        :class="{ 'ci-solid--lit': i === CARDS.length - 1 && live.has('shared') }"
-        :box="card"
-        :project="project"
-      />
-      <g :transform="onTop(project, CARDS[CARDS.length - 1] ?? SHEET)">
-        <text class="ci-scene__print ci-scene__print--tool" x="6" y="17">{{ content.tool }}</text>
-        <rect class="ci-scene__lines" x="6" y="25" width="30" height="2" />
-        <rect class="ci-scene__lines" x="6" y="31" width="24" height="2" />
-        <rect class="ci-scene__lines" x="6" y="37" width="28" height="2" />
-      </g>
-    </g>
-
-    <g v-bind="part('box')">
-      <polygon
-        v-for="(points, i) in glass.back"
-        :key="i"
-        class="ci-scene__glass-back"
-        :points="points"
-      />
-      <IsoSolid class="ci-solid--src" :box="CODE" :project="project" />
-      <text
-        class="ci-scene__print ci-scene__print--src"
-        :transform="onTop(project, CODE)"
-        x="7"
-        y="17"
-      >
-        {{ content.code }}
-      </text>
-      <g v-if="copy" :opacity="copy.opacity">
-        <IsoSolid class="ci-solid--kraft" :box="copy.box" :project="project" />
-      </g>
-      <polygon
-        v-for="(points, i) in glass.front"
-        :key="i"
-        class="ci-scene__glass"
-        :points="points"
-      />
-      <polygon
-        v-for="(points, i) in glass.front"
-        :key="`glow-${i}`"
-        class="ci-scene__glow"
-        :opacity="glow"
-        :points="points"
-      />
-      <polyline class="ci-scene__rim" :points="glass.rim" />
-      <text class="ci-scene__glass-tag" :transform="onFront(project, BOX)" x="5" y="10">
-        {{ content.tool }}
-      </text>
-    </g>
-
-    <g v-bind="piece('box')">
-      <g class="ci-scene__drum" :opacity="drum.opacity">
-        <path class="ci-scene__drum-side" :d="drum.side" />
-        <path v-for="(d, i) in drum.bands" :key="i" class="ci-scene__drum-band" :d="d" />
-        <ellipse
-          class="ci-scene__drum-top"
-          :cx="drum.cx"
-          :cy="drum.top"
-          :rx="drum.rx"
-          :ry="drum.ry"
+      <g v-bind="part('box')">
+        <polygon
+          v-for="(points, i) in glass.back"
+          :key="i"
+          class="ci-scene__glass-back"
+          :points="points"
         />
-        <ellipse
-          class="ci-scene__drum-glow"
-          :cx="drum.cx"
-          :cy="drum.top"
-          :rx="drum.rx"
-          :ry="drum.ry"
-          :opacity="glow * 2.2"
-        />
-        <text class="ci-scene__drum-text" :x="drum.cx" :y="drum.top + 13.4">
-          {{ content.cache }}
-        </text>
-      </g>
-      <g :opacity="dist.opacity">
-        <IsoSolid class="ci-solid--kraft" :box="dist.box" :project="project" />
-        <polygon class="ci-scene__glow" :points="distTop" :opacity="pickup" />
+        <IsoSolid class="ci-solid--src" :box="CODE" :project="project" />
         <text
-          class="ci-scene__print ci-scene__print--small"
-          :transform="onTop(project, dist.box)"
-          x="2.5"
-          y="12"
+          class="ci-scene__print ci-scene__print--src"
+          :transform="onTop(project, CODE)"
+          x="7"
+          y="17"
         >
-          {{ content.result }}
+          {{ content.code }}
+        </text>
+        <g v-if="copy" :opacity="copy.opacity">
+          <IsoSolid class="ci-solid--kraft" :box="copy.box" :project="project" />
+        </g>
+        <polygon
+          v-for="(points, i) in glass.front"
+          :key="i"
+          class="ci-scene__glass"
+          :points="points"
+        />
+        <polygon
+          v-for="(points, i) in glass.front"
+          :key="`glow-${i}`"
+          class="ci-scene__glow"
+          :opacity="glow"
+          :points="points"
+        />
+        <polyline class="ci-scene__rim" :points="glass.rim" />
+        <text class="ci-scene__glass-tag" :transform="onFront(project, BOX)" x="5" y="10">
+          {{ content.tool }}
         </text>
       </g>
-    </g>
 
-    <g
-      v-for="(dot, i) in tokens"
-      :key="i"
-      :class="`ci-scene__dot ci-scene__dot--${dot.tone}`"
-      :transform="`translate(${dot.point[0].toFixed(1)} ${dot.point[1].toFixed(1)})`"
-    >
-      <circle class="ci-scene__token" r="5" />
-      <text v-if="dot.label" class="ci-scene__token-label" x="8" y="-5">
-        {{ dot.label }}
-      </text>
-    </g>
+      <g v-bind="piece('box')">
+        <g class="ci-scene__drum" :opacity="drum.opacity">
+          <path class="ci-scene__drum-side" :d="drum.side" />
+          <path v-for="(d, i) in drum.bands" :key="i" class="ci-scene__drum-band" :d="d" />
+          <ellipse
+            class="ci-scene__drum-top"
+            :cx="drum.cx"
+            :cy="drum.top"
+            :rx="drum.rx"
+            :ry="drum.ry"
+          />
+          <ellipse
+            class="ci-scene__drum-glow"
+            :cx="drum.cx"
+            :cy="drum.top"
+            :rx="drum.rx"
+            :ry="drum.ry"
+            :opacity="glow * 2.2"
+          />
+          <text class="ci-scene__drum-text" :x="drum.cx" :y="drum.top + 13.4">
+            {{ content.cache }}
+          </text>
+        </g>
+        <g :opacity="dist.opacity">
+          <IsoSolid class="ci-solid--kraft" :box="dist.box" :project="project" />
+          <polygon class="ci-scene__glow" :points="distTop" :opacity="pickup" />
+          <text
+            class="ci-scene__print ci-scene__print--small"
+            :transform="onTop(project, dist.box)"
+            x="2.5"
+            y="12"
+          >
+            {{ content.result }}
+          </text>
+        </g>
+      </g>
 
-    <g v-bind="part('gate')">
-      <IsoSolid class="ci-solid--steel" :box="POST" :project="project" />
-      <line class="ci-scene__arm ci-scene__arm--edge" v-bind="arm" />
-      <line class="ci-scene__arm" v-bind="arm" />
-      <line class="ci-scene__arm ci-scene__arm--stripes" v-bind="arm" />
-    </g>
-
-    <g
-      v-for="label in zoom ? [] : labels"
-      :key="label.id"
-      class="ci-scene__part ci-scene__label-hit"
-      :class="state(label.id)"
-      aria-hidden="true"
-      @click="emit('select', label.id)"
-    >
-      <rect
-        class="ci-scene__label-tag"
-        :x="label.left"
-        :y="label.y - 10"
-        :width="label.width"
-        height="14"
-        rx="2"
-      />
-      <text class="ci-scene__label" :x="label.left + label.width / 2" :y="label.y">
-        {{ label.text }}
-      </text>
-    </g>
-    <g
-      v-for="decal in zoom ? [] : decals"
-      :key="decal.id"
-      class="ci-scene__part ci-scene__label-hit"
-      :class="state(decal.id)"
-      :transform="decal.transform"
-      aria-hidden="true"
-      @click="emit('select', decal.id)"
-    >
-      <rect class="ci-scene__label-tag" :width="decal.width" :height="DECAL.depth" rx="1.5" />
-      <text
-        class="ci-scene__label ci-scene__label--decal"
-        :x="decal.width / 2"
-        :y="DECAL.depth / 2 + 2.3"
+      <g
+        v-for="(dot, i) in tokens"
+        :key="i"
+        :class="`ci-scene__dot ci-scene__dot--${dot.tone}`"
+        :transform="`translate(${dot.point[0].toFixed(1)} ${dot.point[1].toFixed(1)})`"
       >
-        {{ decal.text }}
-      </text>
-    </g>
-  </svg>
+        <circle class="ci-scene__token" r="5" />
+        <text v-if="dot.label" class="ci-scene__token-label" x="8" y="-5">
+          {{ dot.label }}
+        </text>
+      </g>
+
+      <g v-bind="part('gate')">
+        <IsoSolid class="ci-solid--steel" :box="POST" :project="project" />
+        <line class="ci-scene__arm ci-scene__arm--edge" v-bind="arm" />
+        <line class="ci-scene__arm" v-bind="arm" />
+        <line class="ci-scene__arm ci-scene__arm--stripes" v-bind="arm" />
+      </g>
+
+      <g
+        v-for="label in zoom ? [] : labels"
+        :key="label.id"
+        class="ci-scene__part ci-scene__label-hit"
+        :class="state(label.id)"
+        aria-hidden="true"
+        @click="emit('select', label.id)"
+      >
+        <rect
+          class="ci-scene__label-tag"
+          :x="label.left"
+          :y="label.y - 10"
+          :width="label.width"
+          height="14"
+          rx="2"
+        />
+        <text class="ci-scene__label" :x="label.left + label.width / 2" :y="label.y">
+          {{ label.text }}
+        </text>
+      </g>
+      <g
+        v-for="decal in zoom ? [] : decals"
+        :key="decal.id"
+        class="ci-scene__part ci-scene__label-hit"
+        :class="state(decal.id)"
+        :transform="decal.transform"
+        aria-hidden="true"
+        @click="emit('select', decal.id)"
+      >
+        <rect class="ci-scene__label-tag" :width="decal.width" :height="DECAL.depth" rx="1.5" />
+        <text
+          class="ci-scene__label ci-scene__label--decal"
+          :x="decal.width / 2"
+          :y="DECAL.depth / 2 + 2.3"
+        >
+          {{ decal.text }}
+        </text>
+      </g>
+    </svg>
+  </div>
 </template>

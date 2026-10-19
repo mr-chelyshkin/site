@@ -103,6 +103,7 @@ onBeforeUnmount(() => observer?.disconnect())
             :torn="['bottom']"
             :tape="['top']"
             :tilt="TILTS[i % TILTS.length] ?? 0"
+            :live="step.layers !== undefined"
           >
             <div class="ci-guide__sheet">
               <CiGuideStep :step="step" :labels="labels" />

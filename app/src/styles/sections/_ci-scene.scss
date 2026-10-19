@@ -1,9 +1,23 @@
 @layer sections {
   .ci-scene {
+    position: relative;
+    width: 100%;
+  }
+
+  .ci-scene__svg {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
-    height: auto;
+    height: 100%;
     overflow: visible;
+  }
+
+  .ci-scene--pan .ci-scene__svg {
+    inset: 0 auto auto 0;
+    height: auto;
+    max-width: none;
+    will-change: transform;
   }
 
   .ci-solid {
