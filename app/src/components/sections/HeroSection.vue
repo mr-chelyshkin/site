@@ -4,6 +4,7 @@ import DitherPhoto from '@/components/ui/DitherPhoto.vue'
 import PastedSheet from '@/components/ui/PastedSheet.vue'
 import SprayText from '@/components/ui/SprayText.vue'
 import TearTabs from '@/components/ui/TearTabs.vue'
+import { useMediaQuery } from '@/composables/useMediaQuery'
 import { useScrollDrift } from '@/composables/useScrollDrift'
 import type { HomeContent } from '@/contents'
 
@@ -20,6 +21,7 @@ const bands = [
 const smear = { at: 74, height: 6, row: 1020, shift: -4.2 }
 
 const notice = ref<InstanceType<typeof PastedSheet> | null>(null)
+const wide = useMediaQuery('(min-width: 48rem)')
 useScrollDrift(
   computed(() => notice.value?.$el ?? null),
   { rate: 0.08 },
@@ -89,8 +91,8 @@ useScrollDrift(
         <TearTabs
           seed="hero-notice"
           :email="email"
-          :count="8"
-          :gone="[1, 2, 3, 5, 7]"
+          :count="wide ? 8 : 5"
+          :gone="wide ? [1, 2, 3, 5, 7] : [1, 3]"
           :copied="copied"
         />
       </template>

@@ -14,6 +14,20 @@
   }
 }
 
+@mixin touch-target($size: 44px) {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, #{$size});
+    height: max(100%, #{$size});
+    translate: -50% -50%;
+  }
+}
+
 @mixin focus-ring {
   outline: 2px solid currentColor;
   outline-offset: 4px;

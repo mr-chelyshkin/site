@@ -61,6 +61,10 @@
     flex-wrap: wrap;
     gap: 10px 26px;
     margin-top: 22px;
+
+    @include tools.below(md) {
+      gap: 10px 14px;
+    }
   }
 
   .ci-hero__jump-link {
@@ -68,6 +72,12 @@
     @include tools.underlined-link;
     color: var(--color-paper);
     transition: color var(--motion-fast) var(--ease-settle);
+
+    @include tools.below(md) {
+      @include tools.touch-target;
+      font-size: clamp(11px, 3.2vw, 13px);
+      letter-spacing: 0.06em;
+    }
 
     @media (hover: hover) {
       &:hover {

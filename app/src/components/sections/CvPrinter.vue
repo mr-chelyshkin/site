@@ -174,6 +174,15 @@ onBeforeUnmount(() => {
       <rect class="printer__plug-grip" x="15" y="470" width="14" height="2" rx="1" />
       <rect class="printer__plug-grip" x="15" y="474" width="14" height="2" rx="1" />
     </svg>
+    <svg class="printer__cord" viewBox="0 0 40 84" aria-hidden="true" focusable="false">
+      <path class="printer__cable-shadow" d="M23 4C25 22 33 30 31 48S23 62 23 66" />
+      <path class="printer__cable-wire" d="M20 0C22 18 30 26 28 44S20 58 20 62" />
+      <path class="printer__cable-shine" d="M21 0C23 16 29 24 27.5 38" />
+      <rect class="printer__socket" x="5" y="58" width="30" height="24" rx="3" />
+      <rect class="printer__plug" x="11" y="61" width="18" height="14" rx="2" />
+      <rect class="printer__plug-grip" x="13" y="64" width="14" height="1.6" rx="0.8" />
+      <rect class="printer__plug-grip" x="13" y="67.4" width="14" height="1.6" rx="0.8" />
+    </svg>
     <span class="printer__mount" aria-hidden="true" />
     <div class="printer__box">
       <svg class="printer__depth" aria-hidden="true" focusable="false">

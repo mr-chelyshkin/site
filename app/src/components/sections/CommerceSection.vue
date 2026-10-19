@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import nailStart from '@/assets/images/cable-nail-a.webp'
 import nailEnd from '@/assets/images/cable-nail-b.webp'
 import AccessPass from '@/components/sections/AccessPass.vue'
@@ -30,6 +30,32 @@ function rehang() {
 }
 
 const nails = { '--nail-start': `url(${nailStart})`, '--nail-end': `url(${nailEnd})` }
+
+const shown = ref(0)
+const two = (n: number) => String(n).padStart(2, '0')
+let frame = 0
+
+const track = () => {
+  frame = 0
+  const list = cable.value
+  if (!list) return
+  const { left, width } = list.getBoundingClientRect()
+  const middle = left + width / 2
+  let gap = Infinity
+  ;[...list.children].forEach((hook, i) => {
+    const box = hook.getBoundingClientRect()
+    const off = Math.abs(box.left + box.width / 2 - middle)
+    if (off < gap) {
+      gap = off
+      shown.value = i
+    }
+  })
+}
+const onScroll = () => {
+  if (!frame) frame = requestAnimationFrame(track)
+}
+
+onBeforeUnmount(() => cancelAnimationFrame(frame))
 
 function centerFocusedPass(event: FocusEvent) {
   const list = event.currentTarget as HTMLElement
@@ -66,6 +92,7 @@ function centerFocusedPass(event: FocusEvent) {
         :style="nails"
         role="list"
         @focusin="centerFocusedPass"
+        @scroll.passive="onScroll"
       >
         <li
           v-for="(company, i) in content.companies"
@@ -86,6 +113,9 @@ function centerFocusedPass(event: FocusEvent) {
           <AccessPass :company="company" :index="i" :holder="holder" />
         </li>
       </ul>
+      <p class="commerce__count" aria-hidden="true">
+        {{ two(shown + 1) }} / {{ two(content.companies.length) }}
+      </p>
 
       <div v-if="revoked" class="commerce__revoked">
         <SprayText
