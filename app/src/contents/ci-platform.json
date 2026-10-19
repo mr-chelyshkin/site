@@ -66,7 +66,6 @@
     "kicker": "The idea in motion",
     "title": "Two callers, one box.",
     "lede": "Everything from the first call to the release, on one sheet. Pick any part to look closer.",
-    "swipe": "Swipe to see the whole scheme",
     "scene": {
       "label": "The whole scheme: a laptop calls one task by name, a runner runs a workflow of task names. Each CI task joins its shared task in the project's tasks and runs in the box. The result and the cache stay outside the box, and the cache outlives every run. Deploy is a project task without a shared one: it runs past the box, through the gate to delivery, which only takes inputs.",
       "zones": {
