@@ -124,10 +124,10 @@ export default defineConfig({
     },
   },
   build: {
-    rollupOptions: {
+    rolldownOptions: {
       output: {
-        manualChunks: {
-          vue: ['vue', 'vue-router'],
+        codeSplitting: {
+          groups: [{ name: 'vue', test: /node_modules[\\/](?:@vue|vue|vue-router)[\\/]/ }],
         },
       },
     },
