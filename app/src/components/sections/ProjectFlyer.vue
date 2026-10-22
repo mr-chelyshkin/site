@@ -2,6 +2,9 @@
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import coffeeStain from '@/assets/images/coffee-stain.webp'
+import crtSticker from '@/assets/images/crt-sticker.webp'
+import keyboardSticker from '@/assets/images/keyboard-sticker.webp'
+import bookSticker from '@/assets/images/book-sticker.webp'
 import FlyerSketch from '@/components/sections/FlyerSketch.vue'
 import BarCode from '@/components/ui/BarCode.vue'
 import PastedSheet from '@/components/ui/PastedSheet.vue'
@@ -14,6 +17,11 @@ const props = defineProps<{
 }>()
 
 const STOCKS = ['paper', 'cyan', 'ink', 'grid'] as const
+const PHOTOS: Partial<Record<string, { src: string; width: number; height: number }>> = {
+  crt: { src: crtSticker, width: 520, height: 481 },
+  keyboard: { src: keyboardSticker, width: 560, height: 395 },
+  book: { src: bookSticker, width: 360, height: 467 },
+}
 const TILTS = [-1.6, 2.3, -0.8]
 const ADVANCES: Partial<Record<string, number>> = {
   A: 0.478,
@@ -61,6 +69,22 @@ const ADVANCES: Partial<Record<string, number>> = {
 }
 
 const stock = computed(() => STOCKS.find((s) => s === props.project.stock) ?? 'paper')
+const photos = computed(() =>
+  (props.project.photos ?? []).flatMap((key) => {
+    const photo = PHOTOS[key]
+    return photo ? [{ key, ...photo }] : []
+  }),
+)
+const summary = computed(() =>
+  props.project.summary
+    .split(/(\*[^*]+\*)/)
+    .filter(Boolean)
+    .map((text) =>
+      text.length > 2 && text.startsWith('*') && text.endsWith('*')
+        ? { text: text.slice(1, -1), mark: true }
+        : { text, mark: false },
+    ),
+)
 const tilt = computed(() => TILTS[props.order % TILTS.length] ?? 0)
 const sticker = computed(() => {
   const link = props.project.links[0]
@@ -81,7 +105,7 @@ const fit = computed(() => {
   <PastedSheet
     as="article"
     class="flyer"
-    :class="[`flyer--${stock}`, { 'flyer--with-qr': sticker }]"
+    :class="[`flyer--${stock}`, { 'flyer--with-qr': sticker, 'flyer--with-photos': photos.length }]"
     :seed="project.name"
     :stock="stock"
     :torn="order % 2 ? ['top'] : ['bottom']"
@@ -99,29 +123,55 @@ const fit = computed(() => {
       </p>
       <h3 class="flyer__name">{{ project.name }}</h3>
       <FlyerSketch v-if="project.sketch" class="flyer__sketch" :sketch="project.sketch" />
-      <p class="flyer__summary">{{ project.summary }}</p>
-      <dl v-if="project.specs.length" class="flyer__specs">
-        <template v-for="(spec, i) in project.specs" :key="i">
-          <dt class="flyer__spec-term">{{ spec.term }}</dt>
-          <dd class="flyer__spec-value">{{ spec.value }}</dd>
-        </template>
-      </dl>
-      <ul v-if="project.links.length" class="flyer__links" role="list">
-        <li v-for="link in project.links" :key="link.href">
-          <RouterLink v-if="link.href.startsWith('/')" class="flyer__link" :to="link.href"
-            >{{ link.label }} →</RouterLink
-          >
-          <a
-            v-else
-            class="flyer__link"
-            :href="link.href"
-            target="_blank"
-            rel="noopener noreferrer"
-            :aria-label="`${link.label}: ${project.name} (opens in a new tab)`"
-            >{{ link.label }} ↗</a
-          >
-        </li>
-      </ul>
+      <div class="flyer__spread">
+        <div v-if="photos.length" class="flyer__photos">
+          <img
+            v-for="photo in photos"
+            :key="photo.key"
+            class="flyer__photo"
+            :class="`flyer__photo--${photo.key}`"
+            :src="photo.src"
+            alt=""
+            :width="photo.width"
+            :height="photo.height"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="flyer__text">
+          <p class="flyer__summary">
+            <template v-for="(part, i) in summary" :key="i">
+              <span v-if="part.mark" class="flyer__mark">{{ part.text }}</span>
+              <template v-else>{{ part.text }}</template>
+            </template>
+          </p>
+          <ul v-if="project.points?.length" class="flyer__points" role="list">
+            <li v-for="point in project.points" :key="point" class="flyer__point">{{ point }}</li>
+          </ul>
+          <dl v-if="project.specs.length" class="flyer__specs">
+            <template v-for="(spec, i) in project.specs" :key="i">
+              <dt class="flyer__spec-term">{{ spec.term }}</dt>
+              <dd class="flyer__spec-value">{{ spec.value }}</dd>
+            </template>
+          </dl>
+          <ul v-if="project.links.length" class="flyer__links" role="list">
+            <li v-for="link in project.links" :key="link.href">
+              <RouterLink v-if="link.href.startsWith('/')" class="flyer__link" :to="link.href"
+                >{{ link.label }} →</RouterLink
+              >
+              <a
+                v-else
+                class="flyer__link"
+                :href="link.href"
+                target="_blank"
+                rel="noopener noreferrer"
+                :aria-label="`${link.label}: ${project.name} (opens in a new tab)`"
+                >{{ link.label }} ↗</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
       <BarCode v-if="stock === 'paper'" class="flyer__barcode" :seed="project.name" vertical />
       <img
         v-if="project.stain"

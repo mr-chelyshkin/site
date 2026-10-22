@@ -31,5 +31,7 @@ export interface Project {
   qr?: string
   sketch?: ProjectSketch
   stain?: string
+  points?: readonly string[]
+  photos?: readonly string[]
 }
 export type SocialProfiles = SiteContent['socialProfiles']

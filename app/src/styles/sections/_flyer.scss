@@ -29,6 +29,102 @@
     line-height: 1.6;
   }
 
+  .flyer--with-photos .flyer__spread {
+    display: grid;
+    grid-template-columns: minmax(0, 38%) minmax(0, 1fr);
+    align-items: start;
+    gap: 18px;
+    margin-top: 14px;
+  }
+
+  .flyer__photos {
+    position: relative;
+  }
+
+  .flyer__photo {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 4px 5px rgb(0 0 0 / 30%));
+    user-select: none;
+  }
+
+  .flyer__photo--crt {
+    width: 80%;
+    margin-left: auto;
+    rotate: 4deg;
+  }
+
+  .flyer__photo--keyboard {
+    position: relative;
+    margin-top: -14%;
+    rotate: -5deg;
+  }
+
+  .flyer__photo--book {
+    position: absolute;
+    top: 12%;
+    left: -8%;
+    width: 46%;
+    rotate: -8deg;
+  }
+
+  .flyer--with-photos .flyer__summary {
+    margin-top: 0;
+    font: 900 min(22px, 4cqw) / 1.1 var(--font-display);
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .flyer__mark {
+    display: inline-block;
+    padding-bottom: 0.14em;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'><path d='M2 10 C 40 4, 80 14, 120 7 S 180 6, 198 9' stroke='%23c1121f' stroke-width='5' fill='none' stroke-linecap='round'/></svg>")
+      left bottom / 100% 0.3em no-repeat;
+  }
+
+  .flyer__points {
+    margin-top: 14px;
+    padding-left: 26px;
+    font: 500 min(22px, 4.4cqw) / 1.2 var(--font-hand);
+  }
+
+  .flyer__point + .flyer__point {
+    margin-top: 2px;
+  }
+
+  .flyer__point::before {
+    content: '';
+    display: inline-block;
+    width: 18px;
+    height: 14px;
+    margin-right: 8px;
+    margin-left: -26px;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 16'><path d='M2 9 L7.5 14 L18 2' stroke='%23c1121f' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>")
+      center / contain no-repeat;
+    rotate: -6deg;
+  }
+
+  @container (width < 400px) {
+    .flyer--with-photos .flyer__spread {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .flyer--with-photos .flyer__summary {
+      font-size: min(24px, 6.8cqw);
+    }
+
+    .flyer--with-photos .flyer__points {
+      font-size: 22px;
+    }
+
+    .flyer--with-photos .flyer__photos {
+      justify-self: center;
+      width: min(100%, 250px);
+    }
+  }
+
   .flyer__specs {
     display: grid;
     grid-template-columns: max-content 1fr;
