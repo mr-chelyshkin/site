@@ -15,7 +15,7 @@ resource "aws_cloudfront_origin_access_control" "cv" {
 }
 
 resource "aws_cloudfront_cache_policy" "site" {
-  name        = "${local.name_prefix}-cache-v1"
+  name        = "${local.name_prefix}-cache"
   comment     = "Honor origin cache headers"
   max_ttl     = 31536000
   min_ttl     = 0
@@ -48,7 +48,7 @@ data "aws_cloudfront_origin_request_policy" "all_viewer_except_host" {
 }
 
 resource "aws_cloudfront_response_headers_policy" "site" {
-  name    = "${local.name_prefix}-headers-v1"
+  name    = "${local.name_prefix}-headers"
   comment = "Security headers for ${var.domain_name}"
 
   security_headers_config {

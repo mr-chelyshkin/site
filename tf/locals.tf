@@ -1,5 +1,6 @@
 locals {
-  name_prefix          = "mr-chelyshkin-site-${replace(var.domain_name, ".", "-")}"
+  domain_labels        = split(".", var.domain_name)
+  name_prefix          = join("-", reverse(slice(local.domain_labels, 0, length(local.domain_labels) - 1)))
   cloudfront_origin_id = "s3-${var.site_bucket_name}"
 
   cv_name        = "${local.name_prefix}-cv"
@@ -29,5 +30,6 @@ locals {
     ManagedBy  = "Terraform"
     Project    = "mr-chelyshkin-site"
     Repository = "mr-chelyshkin/site"
+    Site       = var.domain_name
   }
 }
