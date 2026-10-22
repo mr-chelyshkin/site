@@ -197,6 +197,20 @@
           },
           "stain": "coffee",
           "links": [{ "label": "Read the walkthrough", "href": "/works/ci-platform" }]
+        },
+        {
+          "name": "LimaNix",
+          "stock": "cyan",
+          "kicker": ["Environments / Tools / macOS"],
+          "summary": "Linux dev machines *on your Mac.*",
+          "points": [
+            "One file describes the machine",
+            "Tools ready on first boot",
+            "Your code stays on the Mac"
+          ],
+          "specs": [],
+          "photos": ["crt", "keyboard", "book"],
+          "links": [{ "label": "limanix.dev", "href": "https://limanix.dev" }]
         }
       ]
     },

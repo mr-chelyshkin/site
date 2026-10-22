@@ -93,6 +93,27 @@ const overlays = [
     width: 80,
     scale: 3,
   },
+  {
+    name: 'crt-sticker',
+    source: 'crt-sticker.png',
+    crop: [0, 0, 1, 1],
+    width: 260,
+    scale: 2,
+  },
+  {
+    name: 'keyboard-sticker',
+    source: 'keyboard-sticker.png',
+    crop: [0, 0, 1, 1],
+    width: 280,
+    scale: 2,
+  },
+  {
+    name: 'book-sticker',
+    source: 'book-sticker.png',
+    crop: [0, 0, 1, 1],
+    width: 120,
+    scale: 3,
+  },
 ]
 
 const logos = [
