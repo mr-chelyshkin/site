@@ -14,6 +14,7 @@
     { "label": "Contact", "href": "/#contact" }
   ],
   "tearTabs": {
+    "label": "hire me",
     "copied": "Address copied"
   },
   "socialProfiles": {
@@ -219,7 +220,7 @@
       "label": "Write to me",
       "headline": ["Tell me what", "you're building."],
       "description": "For independent project work or a platform engineering role, send me a short note about the product and where you need help.",
-      "email": "mr.chelyshkin@icloud.com",
+      "email": "hire@mr-chelyshkin.com",
       "hint": "tear one off: it copies the address",
       "printer": {
         "templates": [

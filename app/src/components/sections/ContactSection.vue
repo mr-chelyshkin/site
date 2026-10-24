@@ -11,6 +11,7 @@ import type { HomeContent, SocialProfiles } from '@/contents'
 defineProps<{
   content: HomeContent['contact']
   profiles: SocialProfiles
+  tabLabel: string
   copied: string
   name: string
   companies: HomeContent['commerce']['companies']
@@ -66,6 +67,7 @@ useScrollDrift(
             class="contact__tabs"
             seed="contact"
             :email="content.email"
+            :label="tabLabel"
             :count="wide ? 11 : 6"
             :gone="wide ? [3, 7] : [2]"
             :copied="copied"
