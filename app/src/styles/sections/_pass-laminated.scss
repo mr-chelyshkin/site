@@ -1,16 +1,20 @@
 @use '../tools';
 
 @layer sections {
+  .pass--laminated {
+    --pass-radius: 12px;
+    --pass-shadow: 20px rgb(0 0 0 / 50%);
+  }
+
   .pass-laminated {
     display: flex;
     min-height: 322px;
     padding: 8px;
-    border-radius: 12px;
+    border-radius: var(--pass-radius);
     background: linear-gradient(180deg, rgb(220 236 246 / 16%), rgb(220 236 246 / 7%));
     box-shadow:
       inset 0 0 0 1px rgb(255 255 255 / 40%),
-      inset 0 1.5px 0 rgb(255 255 255 / 45%),
-      var(--shadow-offset) 20px rgb(0 0 0 / 50%);
+      inset 0 1.5px 0 rgb(255 255 255 / 45%);
   }
 
   .pass-laminated__ring {

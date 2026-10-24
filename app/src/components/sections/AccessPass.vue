@@ -56,6 +56,7 @@ const hang = computed(() => {
     :aria-labelledby="nameId"
   >
     <div class="pass__twist">
+      <span class="pass__shadow" aria-hidden="true" />
       <component
         :is="KINDS[kind]"
         :company="company"

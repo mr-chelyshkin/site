@@ -1,22 +1,47 @@
 @use '../tools';
 
 @layer sections {
+  .pass--reel {
+    --pass-radius: 13px;
+    --pass-shadow: 22px rgb(0 0 0 / 55%);
+  }
+
   .pass-reel {
     display: flex;
     flex-direction: column;
     gap: 7px;
     min-height: 314px;
     padding: 30px 15px 14px;
-    border-radius: 13px;
+    isolation: isolate;
+    border-radius: var(--pass-radius);
     color: #e8edef;
-    background:
-      radial-gradient(130% 70% at var(--glint, 30%) -12%, rgb(255 255 255 / 11%), transparent 55%),
-      tools.$specks, linear-gradient(165deg, #2b3135, #1a1e21);
+    background: tools.$specks, linear-gradient(165deg, #2b3135, #1a1e21);
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 16%),
       inset 0 -1px 0 rgb(0 0 0 / 55%),
-      0 0 0 0.5px rgb(0 0 0 / 70%),
-      var(--shadow-offset) 22px rgb(0 0 0 / 55%);
+      0 0 0 0.5px rgb(0 0 0 / 70%);
+  }
+
+  .pass-reel__glow {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    container-type: size;
+    border-radius: inherit;
+    pointer-events: none;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0 -50%;
+      background: radial-gradient(65% 70% at 40% -12%, rgb(255 255 255 / 11%), transparent 55%);
+      translate: calc((var(--glint, 30) - 30) * 1cqw) 0;
+    }
+  }
+
+  .commerce__cable--live .pass-reel__glow::before {
+    will-change: transform;
   }
 
   .pass-reel__slot {
