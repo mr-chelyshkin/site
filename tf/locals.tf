@@ -14,7 +14,7 @@ locals {
   content_security_policy = join("; ", [
     "default-src 'self'",
     "base-uri 'self'",
-    "connect-src 'self'",
+    "connect-src 'self' https://cloudflareinsights.com",
     "font-src 'self' https://fonts.gstatic.com",
     "form-action 'self'",
     "frame-ancestors 'none'",
@@ -22,7 +22,7 @@ locals {
     "img-src 'self' data:",
     "media-src 'self'",
     "object-src 'none'",
-    "script-src 'self' https://challenges.cloudflare.com",
+    "script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   ])
 
