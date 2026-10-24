@@ -302,12 +302,18 @@
 
     &::after {
       z-index: 1;
+      will-change: transform;
       translate: 0 var(--dip, 0px);
     }
   }
 
+  .commerce__cable--live .commerce__wire {
+    will-change: transform;
+  }
+
   .commerce__cable--live .commerce__reel {
     z-index: 1;
+    will-change: transform;
     translate: 0 var(--dip, 0px);
   }
 

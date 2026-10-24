@@ -45,6 +45,7 @@ const stud = `${id}-stud`
     <circle class="pass-reel__snap-dome" cx="0" cy="-5.6" r="2.1" />
   </svg>
   <div class="pass__body pass-reel">
+    <span class="pass-reel__glow" aria-hidden="true" />
     <span class="pass-reel__slot" aria-hidden="true" />
     <h3 :id="nameId" class="u-visually-hidden">{{ company.name }}</h3>
     <div class="pass-reel__top">

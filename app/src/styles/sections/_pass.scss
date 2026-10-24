@@ -100,6 +100,9 @@
   }
 
   .commerce__cable--live .pass {
+    --dip: initial;
+    --cord-scale: initial;
+
     z-index: 2;
     will-change: transform;
     rotate: none;
@@ -139,6 +142,16 @@
         cursor: grabbing;
       }
     }
+
+    .pass__shadow,
+    .pass__body,
+    .pass__gloss::before {
+      will-change: transform;
+    }
+
+    .pass__shade {
+      will-change: opacity;
+    }
   }
 
   .pass__twist {
@@ -146,9 +159,15 @@
     transform-origin: 50% 40%;
   }
 
-  .pass__body {
-    --shadow-offset: var(--shadow-x, 0) var(--shadow-y, 16px);
+  .pass__shadow {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--pass-radius);
+    box-shadow: var(--shadow-x, 0) var(--shadow-y, 16px) var(--pass-shadow);
+    pointer-events: none;
+  }
 
+  .pass__body {
     position: relative;
   }
 
@@ -156,23 +175,29 @@
     position: absolute;
     inset: 0;
     z-index: 3;
+    overflow: hidden;
+    container-type: size;
     border-radius: inherit;
-    background:
-      linear-gradient(
-        112deg,
-        transparent calc(var(--glint, 30%) - 20%),
-        rgb(255 255 255 / 48%) calc(var(--glint, 30%) - 2%),
-        rgb(255 255 255 / 14%) calc(var(--glint, 30%) + 4%),
-        transparent calc(var(--glint, 30%) + 20%)
-      ),
-      linear-gradient(
-        112deg,
-        transparent calc(var(--glint, 30%) + 22%),
-        rgb(255 255 255 / 14%) calc(var(--glint, 30%) + 27%),
-        transparent calc(var(--glint, 30%) + 31%)
-      );
     mix-blend-mode: screen;
     pointer-events: none;
+
+    &::before {
+      --run: calc((var(--glint, 30) - 30) * (sin(112deg) * 1cqw - cos(112deg) * 1cqh));
+
+      content: '';
+      position: absolute;
+      inset: -50%;
+      background:
+        linear-gradient(
+          112deg,
+          transparent 30%,
+          rgb(255 255 255 / 48%) 39%,
+          rgb(255 255 255 / 14%) 42%,
+          transparent 50%
+        ),
+        linear-gradient(112deg, transparent 51%, rgb(255 255 255 / 14%) 53.5%, transparent 55.5%);
+      translate: calc(var(--run) * sin(112deg)) calc(var(--run) * cos(112deg) * -1);
+    }
   }
 
   .pass__shade {

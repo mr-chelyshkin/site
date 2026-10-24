@@ -29,6 +29,10 @@ interface Parts {
   line: SVGPolylineElement
   cord: SVGPathElement
   seam: SVGPathElement | null
+  shadow: HTMLElement | null
+  light: HTMLElement | null
+  holo: HTMLElement | null
+  shade: HTMLElement | null
 }
 
 interface Hung extends Parts {
@@ -137,16 +141,16 @@ export function usePassPhysics(cable: Ref<HTMLElement | null>) {
   }
 
   function draw(item: Hung) {
-    const { pass, hook, el, twist, body, line, cord, seam } = item
+    const { pass, hook, el, twist, line, cord, seam, shadow, light, holo, shade } = item
     const d = drawingOf(pass)
     el.style.transform = d.transform
-    el.style.setProperty('--shadow-x', `${d.shadowX.toFixed(2)}px`)
-    el.style.setProperty('--shadow-y', `${d.shadowY.toFixed(2)}px`)
-    el.style.setProperty('--glint', `${tenths(d.glint)}%`)
-    el.style.setProperty('--holo', `${tenths(d.holo)}deg`)
+    shadow?.style.setProperty('--shadow-x', `${d.shadowX.toFixed(2)}px`)
+    shadow?.style.setProperty('--shadow-y', `${d.shadowY.toFixed(2)}px`)
+    light?.style.setProperty('--glint', tenths(d.glint))
+    holo?.style.setProperty('--holo', `${tenths(d.holo)}deg`)
     twist.style.transform = d.twist
-    body.style.setProperty('--shade', d.shade.toFixed(3))
-    body.style.setProperty('--shade-side', String(d.shadeSide))
+    shade?.style.setProperty('--shade', d.shade.toFixed(3))
+    shade?.style.setProperty('--shade-side', String(d.shadeSide))
     hook.style.setProperty('--dip', `${d.dip.toFixed(2)}px`)
     hook.style.setProperty('--cord-scale', d.cordScale.toFixed(3))
 
@@ -175,16 +179,8 @@ export function usePassPhysics(cable: Ref<HTMLElement | null>) {
     }
   }
 
-  function clear({ hook, el, twist, body, line, cord, seam }: Hung) {
-    for (const name of [
-      'transform',
-      '--shadow-x',
-      '--shadow-y',
-      '--glint',
-      '--holo',
-      'opacity',
-      'animation-delay',
-    ]) {
+  function clear({ hook, el, twist, line, cord, seam, shadow, light, holo, shade }: Hung) {
+    for (const name of ['transform', 'opacity', 'animation-delay']) {
       el.style.removeProperty(name)
     }
     delete el.dataset.held
@@ -193,8 +189,12 @@ export function usePassPhysics(cable: Ref<HTMLElement | null>) {
     delete el.dataset.rehang
     el.tabIndex = 0
     twist.style.removeProperty('transform')
-    body.style.removeProperty('--shade')
-    body.style.removeProperty('--shade-side')
+    shadow?.style.removeProperty('--shadow-x')
+    shadow?.style.removeProperty('--shadow-y')
+    light?.style.removeProperty('--glint')
+    holo?.style.removeProperty('--holo')
+    shade?.style.removeProperty('--shade')
+    shade?.style.removeProperty('--shade-side')
     hook.style.removeProperty('--dip')
     hook.style.removeProperty('--cord-scale')
     line.removeAttribute('points')
@@ -410,7 +410,21 @@ export function usePassPhysics(cable: Ref<HTMLElement | null>) {
         if (import.meta.env.DEV) console.warn('usePassPhysics skips a hook missing its parts', hook)
         continue
       }
-      const parts = { hook, el, twist, body, line, cord, seam }
+      const parts = {
+        hook,
+        el,
+        twist,
+        body,
+        line,
+        cord,
+        seam,
+        shadow: hook.querySelector<HTMLElement>('.pass__shadow'),
+        light: hook.querySelector<HTMLElement>(
+          '.pass__gloss, .pass-metal__sheen, .pass-reel__glow',
+        ),
+        holo: hook.querySelector<HTMLElement>('.pass-holder__holo'),
+        shade: hook.querySelector<HTMLElement>('.pass__shade'),
+      }
       items.push({
         ...parts,
         pass: createPass(fitOf(parts, gap, scale)),
