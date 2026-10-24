@@ -3,7 +3,6 @@
     --pass-radius: 11px;
     --pass-shadow: 18px rgb(0 0 0 / 38%);
 
-    /* Painted after the glass, so its backdrop blur doesn't pull the shadow in. */
     .pass__shadow {
       z-index: 1;
     }

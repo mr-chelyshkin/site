@@ -1,5 +1,3 @@
-// feTurbulence fractalNoise from the SVG spec's reference code, so the texture matches the filter.
-
 const SIZE = 0x100
 const MASK = 0xff
 const OFFSET = 0x1000
@@ -49,7 +47,6 @@ function tables(seed) {
 const smooth = (t) => t * t * (3 - 2 * t)
 const lerp = (t, a, b) => a + t * (b - a)
 
-/** Returns a sampler for one channel (0-3) of fractalNoise, mapped to 0..1 like the filter's output. */
 export function fractalNoise(seed, channel) {
   const { lattice, gradients } = tables(seed)
   const gradient = gradients[channel]

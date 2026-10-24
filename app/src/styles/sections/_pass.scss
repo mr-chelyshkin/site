@@ -100,7 +100,6 @@
   }
 
   .commerce__cable--live .pass {
-    /* The cable's per-frame values stop here, so a frame restyles nothing inside the pass. */
     --dip: initial;
     --cord-scale: initial;
 
