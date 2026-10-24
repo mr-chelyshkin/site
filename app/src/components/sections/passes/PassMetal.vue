@@ -8,6 +8,7 @@ defineProps<{ company: Company; number: string; holder: string; nameId: string }
 
 <template>
   <div class="pass__body pass-metal">
+    <span class="pass-metal__sheen" aria-hidden="true" />
     <span class="pass-metal__hole" aria-hidden="true" />
     <h3 :id="nameId" class="u-visually-hidden">{{ company.name }}</h3>
     <p class="pass-metal__kicker" aria-hidden="true">{{ company.kicker }}</p>

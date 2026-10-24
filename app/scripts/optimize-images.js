@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url'
 
 import sharp from 'sharp'
 
+import { fractalNoise } from './turbulence.js'
+
 const srcDir = fileURLToPath(new URL('../src/', import.meta.url))
 const sourceDir = path.join(srcDir, 'assets/images-source')
 const source = path.join(sourceDir, 'hero.png')
@@ -11,6 +13,7 @@ const outputDir = path.join(srcDir, 'assets/images')
 const content = path.join(srcDir, 'contents/site.json')
 const qrDir = path.join(srcDir, 'assets/qr')
 const qrTargets = path.join(qrDir, 'targets.json')
+const pencilRecipe = path.join(sourceDir, 'pencil-noise.json')
 
 const light = [217, 228, 232]
 const cyan = [95, 176, 191]
@@ -329,6 +332,25 @@ async function logo({ name, source: file, crop }) {
   }
 }
 
+async function pencilNoise() {
+  const recipe = JSON.parse(fs.readFileSync(pencilRecipe, 'utf8'))
+  const { seed, frequency, octaves, x, y, density } = recipe
+  const sample = fractalNoise(seed, 3)
+  const width = Math.round(recipe.width * density)
+  const height = Math.round(recipe.height * density)
+  const noise = Buffer.alloc(width * height * 2)
+  for (let row = 0; row < height; row++) {
+    for (let column = 0; column < width; column++) {
+      const at = [x + (column + 0.5) / density, y + (row + 0.5) / density]
+      noise[(row * width + column) * 2 + 1] = Math.round(sample(...at, frequency, octaves) * 255)
+    }
+  }
+  await sharp(noise, { raw: { width, height, channels: 2 } })
+    .png({ compressionLevel: 9, adaptiveFiltering: true })
+    .toFile(path.join(outputDir, 'pencil-noise.png'))
+  console.log(` pencil-noise.png (${width}×${height}), from pencil-noise.json`)
+}
+
 async function main() {
   checkQrCodes()
   if (!fs.existsSync(source)) throw new Error(`Source photo not found: ${source}`)
@@ -341,6 +363,8 @@ async function main() {
   for (const options of overlays) await face(options)
   console.log('\nshaping: logos')
   for (const options of logos) await logo(options)
+  console.log('\ndrawing: pencil noise')
+  await pencilNoise()
 }
 
 main().catch((error) => {

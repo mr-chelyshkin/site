@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useId } from 'vue'
+import pencil from '@/assets/images-source/pencil-noise.json'
+import pencilNoise from '@/assets/images/pencil-noise.png'
 import { useReveal } from '@/composables/useReveal'
 import type { ProjectSketch, SketchNote } from '@/contents'
 
@@ -139,7 +141,14 @@ const drawn = useReveal(root, 0.5)
       >
         <defs>
           <filter :id="`${uid}-${layout.name}`" x="-5%" y="-5%" width="110%" height="110%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="7" />
+            <feImage
+              :href="pencilNoise"
+              :x="pencil.x"
+              :y="pencil.y"
+              :width="pencil.width"
+              :height="pencil.height"
+              preserveAspectRatio="none"
+            />
             <feDisplacementMap in="SourceGraphic" scale="2.4" />
           </filter>
         </defs>
