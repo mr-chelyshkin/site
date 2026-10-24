@@ -11,6 +11,7 @@ import type { HomeContent } from '@/contents'
 defineProps<{
   content: HomeContent['hero']
   email: string
+  tabLabel: string
   copied: string
 }>()
 
@@ -91,6 +92,7 @@ useScrollDrift(
         <TearTabs
           seed="hero-notice"
           :email="email"
+          :label="tabLabel"
           :count="wide ? 8 : 5"
           :gone="wide ? [1, 2, 3, 5, 7] : [1, 3]"
           :copied="copied"

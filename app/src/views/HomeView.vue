@@ -10,13 +10,19 @@ const { brand, home, socialProfiles, tearTabs } = siteContent
 </script>
 
 <template>
-  <HeroSection :content="home.hero" :email="home.contact.email" :copied="tearTabs.copied" />
+  <HeroSection
+    :content="home.hero"
+    :email="home.contact.email"
+    :tab-label="tearTabs.label"
+    :copied="tearTabs.copied"
+  />
   <PracticeSection :content="home.practice" />
   <CommerceSection :content="home.commerce" :holder="brand.shortName" :email="home.contact.email" />
   <OpenSourceSection :content="home.openSource" />
   <ContactSection
     :content="home.contact"
     :profiles="socialProfiles"
+    :tab-label="tearTabs.label"
     :copied="tearTabs.copied"
     :name="brand.fullName"
     :companies="home.commerce.companies"

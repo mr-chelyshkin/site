@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
-import { foldAddress } from '@/utils/email'
 import { seeded } from '@/utils/seeded'
 
 const props = withDefaults(
   defineProps<{
     seed: string
     email: string
+    label: string
     count: number
     gone?: readonly number[]
     copied: string
@@ -37,7 +37,6 @@ const scraps = computed(() =>
     }),
   ),
 )
-const address = computed(() => foldAddress(props.email))
 
 const swaying = ref(new Map<number, number>())
 const brush = (i: number, event: PointerEvent) => {
@@ -91,9 +90,7 @@ const tear = async (i: number, event: MouseEvent) => {
       @pointerenter="brush(n - 1, $event)"
       @animationend="settle(n - 1)"
     >
-      <span class="c-tear-tabs__text" aria-hidden="true"
-        >{{ address.first }}<wbr />{{ address.rest }}</span
-      >
+      <span class="c-tear-tabs__text" aria-hidden="true">{{ label }}</span>
     </button>
     <span class="u-visually-hidden" aria-live="polite" aria-atomic="true">{{ status }}</span>
   </div>
