@@ -4,10 +4,9 @@ import PassMark from '@/components/sections/passes/PassMark.vue'
 import type { Company } from '@/contents'
 import { validity } from '@/utils/format'
 
-const props = defineProps<{ company: Company; number: string; holder: string; nameId: string }>()
+const props = defineProps<{ company: Company; number: string; nameId: string }>()
 
 const purpose = computed(() => props.company.note.replace(/\.$/, ''))
-const guest = computed(() => props.holder.replace(/ /g, '\u00a0'))
 const soft = `${useId()}-soft`
 </script>
 
@@ -17,19 +16,16 @@ const soft = `${useId()}-soft`
     <div class="pass-visitor__label">
       <div class="pass-visitor__lines">
         <h3 :id="nameId" class="pass-visitor__name">{{ company.name }}</h3>
-        <p class="pass-visitor__line pass-visitor__host" aria-hidden="true">Host</p>
-        <p class="pass-visitor__line">Purpose: {{ purpose }}</p>
-        <p class="pass-visitor__line">Guest: {{ guest }}</p>
+        <p class="pass-visitor__host" aria-hidden="true">Host</p>
+        <p class="pass-visitor__role">{{ company.role }}</p>
       </div>
       <p class="pass-visitor__title" aria-hidden="true">
         <span class="pass-visitor__kicker">{{ company.kicker }}</span
         >{{ ' ' }}<small class="pass-visitor__access">Access {{ number }}</small>
       </p>
       <PassMark class="pass-visitor__mark" :logo="company.id" />
-      <p class="pass-visitor__foot">
-        <span>{{ company.role }}</span
-        >{{ ' ' }}<span>Valid {{ validity(company.from, company.to) }}</span>
-      </p>
+      <p class="pass-visitor__purpose">Purpose: {{ purpose }}</p>
+      <p class="pass-visitor__foot">Valid {{ validity(company.from, company.to) }}</p>
     </div>
     <svg
       class="pass-visitor__wrinkles"

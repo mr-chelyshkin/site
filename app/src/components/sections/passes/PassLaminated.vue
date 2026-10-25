@@ -5,7 +5,7 @@ import PassFacts from '@/components/sections/passes/PassFacts.vue'
 import PassMark from '@/components/sections/passes/PassMark.vue'
 import type { Company } from '@/contents'
 
-defineProps<{ company: Company; number: string; holder: string; nameId: string }>()
+defineProps<{ company: Company; number: string; nameId: string }>()
 
 const id = useId()
 const steel = `${id}-steel`
@@ -42,7 +42,7 @@ const through = `${id}-through`
         <span>Access {{ number }}</span>
       </p>
       <PassMark class="pass-laminated__mark" :logo="company.id" />
-      <PassFacts :company="company" :holder="holder" />
+      <PassFacts :company="company" />
       <p class="pass-laminated__note">{{ company.note }}</p>
       <BarCode class="pass-laminated__barcode" :seed="company.name" />
     </div>

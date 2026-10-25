@@ -117,23 +117,15 @@
   }
 
   .pass-smartcard__facts {
-    display: grid;
-    grid-template-columns: repeat(2, auto);
-    justify-content: space-between;
-    gap: 0 8px;
     font-size: 8px;
 
     .pass__value {
       overflow-wrap: normal;
     }
-
-    .pass__fact:nth-child(n + 3) {
-      grid-column: 1 / -1;
-    }
   }
 
   .pass-smartcard__note {
-    font-size: 9px;
+    font-size: 11px;
     line-height: 1.45;
     opacity: 0.85;
   }

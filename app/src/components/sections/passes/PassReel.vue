@@ -5,7 +5,7 @@ import PassFacts from '@/components/sections/passes/PassFacts.vue'
 import PassMark from '@/components/sections/passes/PassMark.vue'
 import type { Company } from '@/contents'
 
-defineProps<{ company: Company; number: string; holder: string; nameId: string }>()
+defineProps<{ company: Company; number: string; nameId: string }>()
 
 const id = useId()
 const sheen = `${id}-sheen`
@@ -52,7 +52,7 @@ const stud = `${id}-stud`
       <p class="pass-reel__role">{{ company.role }}</p>
       <PassMark class="pass-reel__mark" :logo="company.id" />
     </div>
-    <PassFacts class="pass-reel__facts" :company="company" :holder="holder" :show-role="false" />
+    <PassFacts class="pass-reel__facts" :company="company" :show-role="false" />
     <p class="pass-reel__note">{{ company.note }}</p>
     <div class="pass-reel__foot" aria-hidden="true">
       <span>Access {{ number }}</span

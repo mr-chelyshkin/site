@@ -4,7 +4,7 @@ import PassFacts from '@/components/sections/passes/PassFacts.vue'
 import PassMark from '@/components/sections/passes/PassMark.vue'
 import type { Company } from '@/contents'
 
-defineProps<{ company: Company; number: string; holder: string; nameId: string }>()
+defineProps<{ company: Company; number: string; nameId: string }>()
 </script>
 
 <template>
@@ -22,7 +22,7 @@ defineProps<{ company: Company; number: string; holder: string; nameId: string }
         </div>
         <h3 :id="nameId" class="pass-holder__name">{{ company.name }}</h3>
       </div>
-      <PassFacts :company="company" :holder="holder" />
+      <PassFacts :company="company" />
       <p class="pass-holder__note">{{ company.note }}</p>
       <BarCode class="pass-holder__barcode" :seed="company.name" />
     </div>
