@@ -11,7 +11,6 @@ import { SHAPES, kindOf } from '@/utils/pass-kinds'
 
 const props = defineProps<{
   content: HomeContent['commerce']
-  holder: string
   email: string
 }>()
 
@@ -110,7 +109,7 @@ function centerFocusedPass(event: FocusEvent) {
           <span v-if="kindOf(company.pass) === 'reel'" class="commerce__reel" aria-hidden="true">
             <span class="commerce__reel-cap" />
           </span>
-          <AccessPass :company="company" :index="i" :holder="holder" />
+          <AccessPass :company="company" :index="i" />
         </li>
       </ul>
       <p class="commerce__count" aria-hidden="true">

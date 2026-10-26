@@ -3,7 +3,7 @@ import PassFacts from '@/components/sections/passes/PassFacts.vue'
 import PassMark from '@/components/sections/passes/PassMark.vue'
 import type { Company } from '@/contents'
 
-defineProps<{ company: Company; number: string; holder: string; nameId: string }>()
+defineProps<{ company: Company; number: string; nameId: string }>()
 </script>
 
 <template>
@@ -22,11 +22,11 @@ defineProps<{ company: Company; number: string; holder: string; nameId: string }
         <rect x="6.8" y="6.8" width="154.4" height="276.4" rx="7" />
         <rect x="10.2" y="10.2" width="147.6" height="269.6" rx="6" />
         <rect x="13.6" y="13.6" width="140.8" height="262.8" rx="5" />
-        <path d="M17 273 L30 244" stroke-width="1.6" />
+        <path d="M17 273 L30 258" stroke-width="1.6" />
       </g>
       <rect
         x="27"
-        y="234"
+        y="248"
         width="12"
         height="12"
         rx="1.5"
@@ -35,7 +35,7 @@ defineProps<{ company: Company; number: string; holder: string; nameId: string }
         stroke-width="0.8"
       />
       <g stroke="#d9a46b" stroke-width="0.6">
-        <path d="M29 234 v-3 M33 234 v-3 M37 234 v-3" />
+        <path d="M29 248 v-3 M33 248 v-3 M37 248 v-3" />
       </g>
     </svg>
     <span class="pass-smartcard__slot" aria-hidden="true" />
@@ -44,7 +44,7 @@ defineProps<{ company: Company; number: string; holder: string; nameId: string }
       <span>Access</span>{{ ' ' }}<span>{{ number }}</span>
     </p>
     <PassMark class="pass-smartcard__mark" :logo="company.id" />
-    <PassFacts class="pass-smartcard__facts" :company="company" :holder="holder" />
+    <PassFacts class="pass-smartcard__facts" :company="company" />
     <p class="pass-smartcard__note">{{ company.note }}</p>
     <p class="pass-smartcard__foot" aria-hidden="true">
       <span>13.56 MHz</span>
