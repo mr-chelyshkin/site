@@ -117,7 +117,12 @@
     flex-direction: column;
     grid-column: 2;
     grid-row: 2;
-    font-size: 7.5px;
+    align-self: center;
+  }
+
+  .pass-visitor__lines,
+  .pass-visitor__purpose {
+    font-size: 10.5px;
     line-height: 1.45;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -131,19 +136,25 @@
     letter-spacing: 0.06em;
   }
 
-  .pass-visitor__line {
+  .pass-visitor__role,
+  .pass-visitor__purpose {
     overflow-wrap: anywhere;
   }
 
   .pass-visitor__host {
     order: -1;
+    font-size: 8.5px;
+    letter-spacing: 0.06em;
+    opacity: 0.7;
+  }
+
+  .pass-visitor__purpose {
+    grid-column: 1 / -1;
   }
 
   .pass-visitor__foot {
-    display: flex;
     grid-column: 1 / -1;
-    justify-content: space-between;
-    font-size: 7px;
+    font-size: 10px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     opacity: 0.75;

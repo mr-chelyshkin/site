@@ -17,7 +17,7 @@ const { brand, home, socialProfiles, tearTabs } = siteContent
     :copied="tearTabs.copied"
   />
   <PracticeSection :content="home.practice" />
-  <CommerceSection :content="home.commerce" :holder="brand.shortName" :email="home.contact.email" />
+  <CommerceSection :content="home.commerce" :email="home.contact.email" />
   <OpenSourceSection :content="home.openSource" />
   <ContactSection
     :content="home.contact"

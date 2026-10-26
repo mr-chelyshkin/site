@@ -3,7 +3,7 @@ import PassMark from '@/components/sections/passes/PassMark.vue'
 import type { Company } from '@/contents'
 import { validity } from '@/utils/format'
 
-defineProps<{ company: Company; number: string; holder: string; nameId: string }>()
+defineProps<{ company: Company; number: string; nameId: string }>()
 </script>
 
 <template>
@@ -13,10 +13,8 @@ defineProps<{ company: Company; number: string; holder: string; nameId: string }
     <h3 :id="nameId" class="u-visually-hidden">{{ company.name }}</h3>
     <p class="pass-metal__kicker" aria-hidden="true">{{ company.kicker }}</p>
     <PassMark class="pass-metal__mark" :logo="company.id" />
-    <p class="pass-metal__line pass-metal__who">
-      <span aria-hidden="true">{{ holder }}<br /></span>{{ company.role }}<br />{{ company.unit }}
-    </p>
-    <p class="pass-metal__line pass-metal__who">{{ company.note }}</p>
+    <p class="pass-metal__line">{{ company.role }}</p>
+    <p class="pass-metal__line pass-metal__note">{{ company.note }}</p>
     <p class="pass-metal__id">
       <span aria-hidden="true">Access {{ number }}<br /></span>Valid
       {{ validity(company.from, company.to) }}
