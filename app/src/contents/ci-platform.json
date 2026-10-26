@@ -56,7 +56,7 @@
       },
       {
         "stamp": "Deliver",
-        "title": "Delivery isn't yours to rewrite.",
+        "title": "Delivery isn't the project's to rewrite.",
         "text": "Deploy, apply and publish own the credentials and how they run. A project only passes inputs, like a domain or a bucket.",
         "code": "deliver: static-site\ndomain: example.com\nbucket: my-site",
         "why": "every release goes the same way"
@@ -81,7 +81,7 @@
         },
         "deliver": {
           "title": "Deliver",
-          "note": "not yours to rewrite"
+          "note": "not the project's to rewrite"
         }
       },
       "command": "ci/node/build",
@@ -156,8 +156,8 @@
               "text": "You decide what each task container may do, down to dropping every capability."
             },
             {
-              "title": "No surprises after a push",
-              "text": "These are the tasks you already ran on your laptop. Green there means green here."
+              "title": "Fewer surprises after a push",
+              "text": "These are the tasks you already ran on your laptop, with the same tools and settings. What can still differ is the machine under the box."
             }
           ]
         },
@@ -257,7 +257,7 @@
           "id": "delivery",
           "zone": "Deliver",
           "label": "Delivery",
-          "text": "**Deploy, apply and publish** come ready-made. A project fills in its inputs and calls them.",
+          "text": "**Deploy, apply and publish** come ready-made. The project's `cd/node/deploy` passes them inputs, and the workflow calls it only after the gate.",
           "points": [
             {
               "title": "Ships on day one",
@@ -506,7 +506,7 @@
         "id": "step-deploy",
         "number": "05",
         "title": "Keep the deploy separate",
-        "why": "Delivery is written once, outside the projects. A project fills in the settings and never touches the steps.",
+        "why": "Delivery is written once, outside the projects. The project's side, `cd/node/deploy` on the scheme, is the `deploy` job below: it fills in the settings and never touches the steps.",
         "actions": [
           "Write the deploy once: as a ready-made pipeline step, or as a task projects can't include.",
           "Take settings only: names, regions, buckets. No commands.",

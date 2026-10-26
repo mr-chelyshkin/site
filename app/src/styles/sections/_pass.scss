@@ -238,9 +238,22 @@
 
   .pass__value {
     margin-bottom: 5px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.05em;
     overflow-wrap: anywhere;
+  }
+
+  .pass
+    :is(
+      .pass-holder__note,
+      .pass-laminated__note,
+      .pass-metal__note,
+      .pass-reel__note,
+      .pass-smartcard__note,
+      .pass-visitor__purpose
+    ) {
+    text-wrap: wrap;
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -279,7 +292,9 @@
         .pass-smartcard__note,
         .pass-smartcard__foot,
         .pass-visitor__access,
+        .pass-visitor__host,
         .pass-visitor__lines,
+        .pass-visitor__purpose,
         .pass-visitor__foot
       ) {
       font-size: 11px;

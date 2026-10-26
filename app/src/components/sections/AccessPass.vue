@@ -14,8 +14,6 @@ import { seeded } from '@/utils/seeded'
 const props = defineProps<{
   company: Company
   index: number
-  /** Name printed on the pass. */
-  holder: string
 }>()
 
 const KINDS: Record<PassKind, Component> = {
@@ -57,13 +55,7 @@ const hang = computed(() => {
   >
     <div class="pass__twist">
       <span class="pass__shadow" aria-hidden="true" />
-      <component
-        :is="KINDS[kind]"
-        :company="company"
-        :number="number"
-        :holder="holder"
-        :name-id="nameId"
-      />
+      <component :is="KINDS[kind]" :company="company" :number="number" :name-id="nameId" />
     </div>
   </article>
 </template>

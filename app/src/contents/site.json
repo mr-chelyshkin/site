@@ -1,7 +1,6 @@
 {
   "brand": {
     "fullName": "Igor Chelyshkin",
-    "shortName": "I. Chelyshkin",
     "role": "Software engineer, infrastructure"
   },
   "links": {
@@ -95,20 +94,48 @@
       },
       "companies": [
         {
-          "id": "raiffeisen-bank",
-          "name": "Raiffeisen Bank",
-          "unit": "Banking",
-          "role": "Senior Quality Assurance Engineer",
-          "note": "Rolled out Siebel CRM and Avaya in a bank, where every bug comes with its own compliance officer.",
-          "pass": "holder",
-          "from": "2014-10",
-          "to": "2016-09",
+          "id": "banank",
+          "name": "Banank",
+          "role": "Staff Engineer",
+          "note": "Building a bank's infra from scratch on Google Cloud. No legacy yet — give it time.",
+          "pass": "metal",
+          "from": "2025-12",
+          "to": null,
+          "kicker": "Staff"
+        },
+        {
+          "id": "forkjoin",
+          "name": "ForkJoin",
+          "role": "Senior DevOps Engineer",
+          "note": "Set up AWS and CI/CD for client teams, minus the whitepapers.",
+          "pass": "visitor",
+          "from": "2026-01",
+          "to": "2026-04",
+          "kicker": "Visitor"
+        },
+        {
+          "id": "aqua-security",
+          "name": "Aqua Security",
+          "role": "Senior SRE",
+          "note": "Moved customer databases to Aurora Serverless, and nobody noticed. In SRE, that's the compliment.",
+          "pass": "smartcard",
+          "from": "2023-09",
+          "to": "2025-11",
+          "kicker": ""
+        },
+        {
+          "id": "ozon-tech",
+          "name": "Ozon Tech",
+          "role": "Lead DevOps Engineer",
+          "note": "Built the CI platform for the marketplace's mobile apps: Mac Studios, emulators, and releases nobody had to babysit.",
+          "pass": "laminated",
+          "from": "2022-02",
+          "to": "2023-06",
           "kicker": ""
         },
         {
           "id": "vk",
           "name": "VK",
-          "unit": "Search",
           "role": "DevOps Team Lead",
           "note": "Moved services onto Kubernetes, ML models onto bare-metal GPUs, and a voice assistant onto a release schedule.",
           "pass": "reel",
@@ -117,48 +144,14 @@
           "kicker": ""
         },
         {
-          "id": "ozon-tech",
-          "name": "Ozon Tech",
-          "unit": "Commerce",
-          "role": "Lead DevOps Engineer",
-          "note": "Built the platform behind the marketplace's mobile apps: Mac Studios, emulators, and releases nobody had to babysit.",
-          "pass": "laminated",
-          "from": "2022-02",
-          "to": "2023-06",
+          "id": "raiffeisen-bank",
+          "name": "Raiffeisen Bank",
+          "role": "Senior Quality Assurance Engineer",
+          "note": "Automated testing for a bank's Siebel CRM and Avaya rollouts, where every bug comes with its own compliance officer.",
+          "pass": "holder",
+          "from": "2014-10",
+          "to": "2016-09",
           "kicker": ""
-        },
-        {
-          "id": "aqua-security",
-          "name": "Aqua Security",
-          "unit": "Cloud security",
-          "role": "Senior SRE (Core)",
-          "note": "Moved customer databases to Aurora Serverless, and nobody noticed. In SRE, that's the compliment.",
-          "pass": "smartcard",
-          "from": "2023-09",
-          "to": "2025-11",
-          "kicker": ""
-        },
-        {
-          "id": "forkjoin",
-          "name": "ForkJoin",
-          "unit": "Consultancy",
-          "role": "Collaboration",
-          "note": "AWS and CI/CD, minus the whitepapers.",
-          "pass": "visitor",
-          "from": "2026-01",
-          "to": "2026-04",
-          "kicker": "Visitor"
-        },
-        {
-          "id": "banank",
-          "name": "Banank",
-          "unit": "Digital banking",
-          "role": "Staff Engineer",
-          "note": "Building a bank's infra from scratch on Google Cloud. No legacy yet — give it time.",
-          "pass": "metal",
-          "from": "2025-12",
-          "to": null,
-          "kicker": "Staff"
         }
       ]
     },
