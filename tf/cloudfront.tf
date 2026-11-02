@@ -108,10 +108,10 @@ resource "aws_cloudfront_response_headers_policy" "site" {
 
 resource "aws_cloudfront_function" "uri_rewrite" {
   name    = "${local.name_prefix}-uri-rewrite"
-  comment = "Resolve site directory URLs to their S3 objects"
+  comment = "Redirect www to the canonical host and resolve site directory URLs"
   runtime = "cloudfront-js-2.0"
 
-  code    = file("${path.module}/functions/uri-rewrite.js")
+  code    = replace(file("${path.module}/functions/uri-rewrite.js"), "CANONICAL_HOST", jsonencode(var.domain_name))
   publish = true
 }
 
@@ -123,7 +123,7 @@ resource "aws_cloudfront_distribution" "site" {
   enabled             = true
   is_ipv6_enabled     = true
 
-  aliases = [var.domain_name]
+  aliases = [var.domain_name, "www.${var.domain_name}"]
 
   origin {
     domain_name              = aws_s3_bucket.site.bucket_regional_domain_name
@@ -169,6 +169,11 @@ resource "aws_cloudfront_distribution" "site" {
     cached_methods             = ["GET", "HEAD"]
     viewer_protocol_policy     = "https-only"
     compress                   = true
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.uri_rewrite.arn
+    }
   }
 
   custom_error_response {
