@@ -14,31 +14,25 @@ permissions:
 
 jobs:
   node:
-    uses: mr-chelyshkin/actions/.github/workflows/ci-node.yml@v2
+    uses: mr-chelyshkin/actions/.github/workflows/ci-node.yml@772ed02edbc40cbc539a507e0f55972da7cc7c8e # v3
     permissions:
       contents: read
 
   terraform:
-    uses: mr-chelyshkin/actions/.github/workflows/ci-terraform.yml@v2
-    permissions:
-      contents: read
-      id-token: write
-    with:
-      aws-role-arn: ${{ vars.AWS_TERRAFORM_PLAN_ROLE_ARN }}
-      aws-region: ${{ vars.AWS_REGION }}
-      env-vars: |
-        {
-          "TF_STATE_KEY": ${{ toJSON(vars.TF_STATE_KEY) }},
-          "TF_VAR_aws_region": ${{ toJSON(vars.AWS_REGION) }},
-          "TF_STATE_REGION": ${{ toJSON(vars.TF_STATE_REGION) }},
-          "TF_STATE_BUCKET": ${{ toJSON(vars.TF_STATE_BUCKET) }},
-          "TF_VAR_domain_name": ${{ toJSON(vars.SITE_DOMAIN_NAME) }},
-          "TF_VAR_site_bucket_name": ${{ toJSON(vars.SITE_BUCKET_NAME) }},
-          "TF_VAR_acm_certificate_arn": ${{ toJSON(vars.SITE_ACM_CERTIFICATE_ARN) }}
-        }
-    secrets:
-      terraform-vars: |
-        turnstile_secret_key=${{ secrets.TURNSTILE_SECRET_KEY }}
+    name: Terraform ${{ matrix.check }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        check: [fmt, validate]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: mr-chelyshkin/actions/task-run@772ed02edbc40cbc539a507e0f55972da7cc7c8e # v3
+        with:
+          task: ci/terraform/${{ matrix.check }}
 
   gate:
     if: always()
@@ -47,6 +41,6 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: mr-chelyshkin/actions/job-results-check@v2
+      - uses: mr-chelyshkin/actions/job-results-check@772ed02edbc40cbc539a507e0f55972da7cc7c8e # v3
         with:
           results: ${{ toJSON(needs) }}
